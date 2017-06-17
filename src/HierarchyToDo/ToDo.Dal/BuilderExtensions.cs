@@ -22,15 +22,20 @@ namespace ToDo.Dal
 	    }
 
 	    public static IApplicationBuilder UseToDo(this IApplicationBuilder app) =>
-		    app.UseElastic<ElasticSettings>(m => m
-			    // маппинг
-			    .AddMapping<User>()
-			    .AddMapping<Project>()
-			    .AddMapping<Task>()
-			    // проекции
-			    .AddProjection<Projections.User, User>()
-			    .AddProjection<Projections.UserWithRoles, User>()
-			    .AddProjection<Project, Project>()
-			    .AddProjection<Projections.Task, Task, Project, Project>());
+		    app.UseElastic<ElasticSettings, AdminRepository>(
+			    m => m
+				    // маппинг
+				    .AddMapping<User>()
+				    .AddMapping<Project>()
+				    .AddMapping<Task>()
+				    // проекции
+				    .AddProjection<Projections.User, User>()
+				    .AddProjection<Projections.UserWithRoles, User>()
+				    .AddProjection<Project, Project>()
+				    .AddProjection<Projections.Task, Task, Project, Project>(),
+			    rep =>
+			    {
+				    rep.AddUser("admin", "admin", "123", new[] {"admin"});
+			    });
     }
 }

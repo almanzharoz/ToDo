@@ -26,12 +26,14 @@ namespace Core.ElasticSearch
 			return services;
 		}
 
-		public static IApplicationBuilder UseElastic<TSettings>(this IApplicationBuilder app, Action<ElasticMapping<TSettings>> mappingFactory)
+		public static IApplicationBuilder UseElastic<TSettings, TRepository>(this IApplicationBuilder app, Action<ElasticMapping<TSettings>> mappingFactory, Action<TRepository> initFunc)
 			where TSettings : BaseElasticSettings
+			where TRepository : BaseRepository<TSettings>
+
 		{
 			var mapping = app.ApplicationServices.GetService<ElasticMapping<TSettings>>();
 			mappingFactory(mapping);
-			mapping.Build();
+			mapping.Build(initFunc, app.ApplicationServices.GetService<TRepository>());
 			return app;
 		}
 	}

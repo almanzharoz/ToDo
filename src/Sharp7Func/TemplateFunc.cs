@@ -62,6 +62,14 @@ namespace SharpFuncExt
 				ifTrue(arg);
 			return arg;
 		}
+		public static T IfNot<T, TResult>(this T arg, Func<T, bool> check, Func<T, TResult> ifTrue, Action<T> ifFalse)
+		{
+			if (!check(arg))
+				ifTrue(arg);
+			else
+				ifFalse(arg);
+			return arg;
+		}
 		public static T IfNot<T>(this T arg, Func<T, bool> check, Action<T> ifTrue)
 		{
 			if (!check(arg))

@@ -51,7 +51,7 @@ namespace ToDo.WebApp
 
 	        services.AddScoped<UserName>(x =>
 	        {
-		        var user = x.GetService<IHttpContextAccessor>().HttpContext.User;
+		        var user = x.GetService<IHttpContextAccessor>()?.HttpContext?.User;
 		        if (user != null && user.Identity != null && !String.IsNullOrWhiteSpace(user.FindFirst(ClaimTypes.NameIdentifier)?.Value))
 			        return new UserName(user.FindFirst(ClaimTypes.NameIdentifier).Value);
 		        return null;

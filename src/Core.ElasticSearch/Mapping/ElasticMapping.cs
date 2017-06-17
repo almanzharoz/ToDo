@@ -72,7 +72,8 @@ namespace Core.ElasticSearch.Mapping
 		/// <summary>
 		/// Проверяем индекс и маппинг
 		/// </summary>
-		internal void Build()
+		internal void Build<TRepository>(Action<TRepository> initFunc, TRepository repository)
+			where TRepository : BaseRepository<TSettings>
 		{
 			var connectionPool = new StaticConnectionPool(new[] {_settings.Url});
 			var connectionSettings = new ConnectionSettings(connectionPool, new HttpConnection());
@@ -97,7 +98,7 @@ namespace Core.ElasticSearch.Mapping
 						.Mappings(z => z.Each(_mapping, m => m.Value.Map(z))))
 					.IfNot(x => x.IsValid, x => x
 						.LogError(_logger, "Mapping error:\r\n" + x.DebugInformation)
-						.Throw(t => new Exception("Create index error")));
+						.Throw(t => new Exception("Create index error")), x => initFunc(repository));
 			else
 				_mapping.Each(m => m.Value.Map(client)
 					.IfNot(x => x.IsValid, x => x
