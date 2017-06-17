@@ -1,0 +1,9 @@
+﻿@model ValueTuple<bool, bool>
+@if (Model.Item2)
+{
+	<span>Пользователь @(Model.Item1 ? "заблоркирован" : "разблокирован")</span>
+}
+else
+{
+	<span>Ошибка</span>
+}

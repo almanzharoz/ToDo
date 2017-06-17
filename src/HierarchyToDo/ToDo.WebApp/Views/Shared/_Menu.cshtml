@@ -1,0 +1,13 @@
+﻿@if (User.IsInRole("manager"))
+{
+	<li><a asp-area="" asp-controller="Project" asp-action="Index">Мои проекты</a></li>
+}
+@if (User.IsInRole("user"))
+{
+	<li><a asp-area="" asp-controller="Task" asp-action="Projects">Проекты</a></li>
+	<li><a asp-area="" asp-controller="Task" asp-action="MyTasks">Мои задачи</a></li>
+}
+@if (User.IsInRole("admin"))
+{
+	<li><a asp-area="" asp-controller="Admin" asp-action="Users">Пользователи</a></li>
+}
