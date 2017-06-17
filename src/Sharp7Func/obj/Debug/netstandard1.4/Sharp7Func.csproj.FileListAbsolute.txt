@@ -1,7 +1,0 @@
-C:\Work\ToDo\src\Sharp7Func\bin\Debug\netstandard1.4\Sharp7Func.deps.json
-C:\Work\ToDo\src\Sharp7Func\bin\Debug\netstandard1.4\Sharp7Func.dll
-C:\Work\ToDo\src\Sharp7Func\bin\Debug\netstandard1.4\Sharp7Func.pdb
-C:\Work\ToDo\src\Sharp7Func\obj\Debug\netstandard1.4\Sharp7Func.csprojResolveAssemblyReference.cache
-C:\Work\ToDo\src\Sharp7Func\obj\Debug\netstandard1.4\Sharp7Func.AssemblyInfo.cs
-C:\Work\ToDo\src\Sharp7Func\obj\Debug\netstandard1.4\Sharp7Func.dll
-C:\Work\ToDo\src\Sharp7Func\obj\Debug\netstandard1.4\Sharp7Func.pdb
