@@ -1,0 +1,6 @@
+﻿@model string
+@using (Html.BeginForm("AddUser", "Project", new {id = Model}))
+{
+	<input type="text" class="typeahead" autocomplete="off" placeholder="имя пользователя" url="@Url.Action("GetUsers", "Project", new {id=Model})" set-id="adduserfield" />
+	<input type="hidden" id="adduserfield" name="user"/>
+}

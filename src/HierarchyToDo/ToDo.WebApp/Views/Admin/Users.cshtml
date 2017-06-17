@@ -1,0 +1,31 @@
+﻿@model IReadOnlyCollection<ToDo.Dal.Projections.UserWithRoles>
+
+<div><a asp-action="AddUser" class="modal-link">добавить пользователя</a></div>
+<table class="table table-hover">
+	<thead>
+	<tr>
+		<th>Имя</th>
+		<th>Роли</th>
+		<td>&nbsp;</td>
+	</tr>
+	</thead>
+	<tbody>
+	@foreach (var m in Model)
+	{
+		<tr>
+			<td>@m.Nick</td>
+			<td>
+				@foreach (var r in m.Roles)
+				{
+					<div>@r&nbsp;<a href="@Url.Action("DeleteRole", new {m.Id, role=r})" method="DELETE" class="modal-link">&times;</a></div>
+				}
+				<a href="@Url.Action("AddRole", new {m.Id})" class="modal-link">добавить</a>
+			</td>
+			<td>
+				<a href="@Url.Action("Deny", new {m.Id, deny = !m.Deny})" method="POST" class="modal-link">@(m.Deny ? "разблокировать" : "заблокировать")</a>
+				<a href="@Url.Action("Delete", new {m.Id})" method="DELETE" class="modal-link">удалить</a>
+			</td>
+		</tr>
+	}
+	</tbody>
+</table>

@@ -1,0 +1,26 @@
+﻿@model ToDo.WebApp.Model.Admin.NewUserEditModel
+<form asp-action="AddUser" method="post">
+	<table class="table">
+		<tr>
+			<th>Имя:</th>
+			<td>@Html.TextBoxFor(x => x.Name)</td>
+		</tr>
+		<tr>
+			<th>Email:</th>
+			<td>@Html.TextBoxFor(x => x.Email)</td>
+		</tr>
+		<tr>
+			<th>Пароль:</th>
+			<td>@Html.PasswordFor(x => x.Password)</td>
+		</tr>
+		<tr>
+			<th>Повтор пароля:</th>
+			<td>@Html.PasswordFor(x => x.ConfirmPassword)</td>
+		</tr>
+		<tr>
+			<th>Роли:</th>
+			<td>@Html.TextAreaFor(x => x.Roles)</td>
+		</tr>
+	</table>
+	<submit text="добавить" />
+</form>
