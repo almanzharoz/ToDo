@@ -37,7 +37,7 @@ namespace ToDo.Dal.Repositories
 			Search<Models.Task, Task>(TaskQuery(
 				parentTaskId.IfNotNull(
 					x => Query<Models.Task>.Term(p => p.ParentTask, GetTask(parentTaskId).Id),
-					() => !Query<Models.Task>.Exists(e => e.Field(p => p.ParentTask)))));
+					() => !Query<Models.Task>.Exists(e => e.Field(p => p.ParentTask))), id));
 
 		public bool AddTask(string projectId, string parentTask, string name, string note, DateTime deadline, int estimatedTime, UserName assign)
 		{
@@ -100,7 +100,7 @@ namespace ToDo.Dal.Repositories
 
 		public IEnumerable<Task> GetTasksToMe(string id, string s) =>
 			Search<Models.Task, Task>(q => q.Bool(b =>
-					b.Must(Query<Models.Task>.Match(m => m.Field(f => f.Name).Field(f => f.Note).Query(s)))
+					b.Must(Query<Models.Task>.Match(m => m.Field(f => f.Name).Query(s)) || Query<Models.Task>.Match(m => m.Field(f => f.Note).Query(s)))
 						.Filter(TaskQuery(Query<Models.Task>.Term(p => p.Assign, _user.Id), id))),
 				sort => sort.Ascending(p => p.Deadline));
 	}

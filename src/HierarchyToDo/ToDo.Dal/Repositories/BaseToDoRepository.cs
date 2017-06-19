@@ -37,10 +37,9 @@ namespace ToDo.Dal.Repositories
 			   && query;
 
 		protected QueryContainer TaskQuery(QueryContainer query, string project)
-			=> (Query<Models.Task>.Term(p => p.User, _user.HasNotNullArg("user").Id) ||
-			    Query<Models.Task>.HasParent<Project>(
+			=> Query<Models.Task>.HasParent<Project>(
 				    x => x.Query(q => q.Bool(b => b.Filter(f => f.Term(p => p.Users, _user.Id) &&
-				                                                f.Ids(id => id.Values(project.HasNotNullArg(nameof(project)))))))))
+				                                                f.Ids(id => id.Values(project.HasNotNullArg(nameof(project))))))))
 			   && query;
 
 		public bool Save<T>(string id, Func<string, T> getEntity, Func<T, T> update)
