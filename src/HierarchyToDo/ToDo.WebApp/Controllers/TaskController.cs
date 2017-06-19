@@ -48,5 +48,13 @@ namespace ToDo.WebApp.Controllers
 		public IActionResult GetUsers(string id, string s) =>
 			Json(_repository.GetUsersNames(id, s).Select(x => new { x.Id, Name = x.Nick }));
 
+		public IActionResult Board(string id, string parentTaskId, string s) =>
+			parentTaskId.IfNotNullOrDefault(_repository.GetTask)
+				.Convert(parentTask => View((
+					s,
+					_repository.GetProject(id, true),
+					parentTask,
+					_repository.GetTasksToMe(id, s)
+						.Convert(x => parentTask.IfNotNull(y => _repository.GetChildren(x, y), () => x)))));
 	}
 }

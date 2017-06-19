@@ -13,11 +13,14 @@
 	<div>@Html.TextBoxFor(x => x.EstimatedTime)</div>
 	<small>Назначить на:</small>
 	<div>
-		<input type="text" class="typeahead" autocomplete="off" placeholder="имя пользователя" url="@Url.Action("GetUsers", "Task", new {id=Model.ProjectId})" set-id="Assigned" />
+		<div class="input-group">
+			<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+			<input type="text" class="form-control typeahead" placeholder="имя пользователя" url="@Url.Action("GetUsers", "Task", new {id = Model.ProjectId})" set-id="Assigned">
+		</div>
 		@Html.HiddenFor(x => x.Assigned)
 	</div>
 	<small>Описание:</small>
-	<div>@Html.TextAreaFor(x => x.Note)</div>
+	<div>@Html.TextAreaFor(x => x.Note, new {rows = 10, style="width: 100%; max-width: none;"})</div>
 	<div>
 		<submit text="Добавить" />
 	</div>

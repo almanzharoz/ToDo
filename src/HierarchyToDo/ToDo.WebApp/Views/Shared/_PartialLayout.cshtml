@@ -1,5 +1,14 @@
 ﻿@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery antiforgery;
 @RenderBody()
-<h style="display: none;">@ViewBag.Title</h>
+<h style="display: none;">
+	@if (IsSectionDefined("Header"))
+	{
+		@RenderSection("Header")
+	}
+	else
+	{
+		@ViewBag.Title
+	}
+</h>
 <script>var antiforgeryRequestToken = "@antiforgery.GetAndStoreTokens(Context).RequestToken";</script>
 @RenderSection("Scripts", required: false)

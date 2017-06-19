@@ -1,0 +1,53 @@
+﻿@model ValueTuple<string, ToDo.Dal.Models.Project, ToDo.Dal.Projections.Task, System.Collections.Generic.IEnumerable<ToDo.Dal.Projections.Task>>
+@{
+	ViewBag.Title = Model.Item2.Name + ": Задачи для меня";
+}
+<form method="get">
+	<div class="input-group">
+		<input type="text" name="s" value="@Model.Item1" class="form-control" placeholder="Search">
+		<div class="input-group-btn">
+			<button class="btn btn-default" type="submit">
+				<i class="glyphicon glyphicon-search"></i>
+			</button>
+		</div>
+	</div>
+</form>
+<table class="table table-hover">
+	<thead>
+	<tr>
+		<th colspan="2"></th>
+		<th></th>
+	</tr>
+	</thead>
+	@foreach (var t in Model.Item4)
+	{
+		if (t.ParentTask != null)
+		{
+			<tr>
+				<td colspan="3">
+					@{
+						ToDo.Dal.Projections.Task task = t;
+						var tasks = new List<ToDo.Dal.Projections.Task>();
+						while ((task = task.ParentTask) != null)
+						{
+							tasks.Add(task);
+						}
+						tasks.Reverse();
+						foreach (var p in tasks)
+						{
+							<small class="with-filter">&nbsp;/&nbsp;<a href="@Url.Action("GetTask", new {p.Id})" class="modal-link">@p.Name</a><a href="@Url.Action("Board", new {id = Model.Item2.Id, s = Model.Item1, parentTaskId = p.Id})" class="filter"><span class="glyphicon glyphicon-filter"></span></a></small>
+						}
+					}
+				</td>
+			</tr>
+		}
+		<tr>
+			@if (t.ParentTask != null)
+			{
+				<td></td>
+			}
+			<td colspan="@(t.ParentTask == null?"2":null)"><a href="@Url.Action("GetTask", new {t.Id})" class="modal-link">@t.Name</a></td>
+			<td>@t.Deadline</td>
+		</tr>
+	}
+</table>

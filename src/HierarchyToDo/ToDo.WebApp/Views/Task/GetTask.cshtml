@@ -1,4 +1,43 @@
 ﻿@model ToDo.Dal.Projections.Task
-
-@Model.Parent.Nick
-@Model.Id
+@{
+	ViewBag.Title = Model.Name;
+}
+<table class="table table-hover">
+	<tr>
+		<th>Проект</th>
+		<td>@Model.Parent.Name</td>
+	</tr>
+	@if (Model.ParentTask != null)
+	{
+		<tr>
+			<th>Путь</th>
+			<td>
+				@{
+					ToDo.Dal.Projections.Task task = Model;
+					var tasks = new List<ToDo.Dal.Projections.Task>();
+					while ((task = task.ParentTask) != null)
+					{
+						tasks.Add(task);
+					}
+					tasks.Reverse();
+					foreach (var p in tasks)
+					{
+						<small>&nbsp;/&nbsp;@p.Name</small>
+					}
+				}
+			</td>
+		</tr>
+	}
+	<tr>
+		<th>Название</th>
+		<td>@Model.Name</td>
+	</tr>
+	<tr>
+		<th>Deadline</th>
+		<td>@Model.Deadline</td>
+	</tr>
+</table>
+@if (!String.IsNullOrEmpty(Model.Note))
+{
+	<div>@Html.Raw(Model.Note.Replace("\r\n", "<br/>"))</div>
+}

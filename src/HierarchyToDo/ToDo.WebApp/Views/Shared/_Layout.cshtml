@@ -50,13 +50,23 @@
             </div>
         </div>
     </nav>
-    <div class="container body-content">
-		<div id="content">@RenderBody()</div>
-        <hr />
-        <footer>
-            <p>&copy; 2017 - ToDo.WebApp</p>
-        </footer>
-    </div>
+<div class="container body-content">
+	<h1>
+		@if (IsSectionDefined("Header"))
+		{
+			@RenderSection("Header")
+		}
+		else
+		{
+			@ViewBag.Title
+		}
+	</h1>
+	<div id="content">@RenderBody()</div>
+	<hr/>
+	<footer>
+		<p>&copy; 2017 - ToDo.WebApp</p>
+	</footer>
+</div>
 	
 <!-- Modal -->
 <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">

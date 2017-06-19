@@ -48,21 +48,25 @@ namespace Core.ElasticSearch
 		protected async Task LoadAsync()
 		{
 			// TODO: Проблема: могут запрашиваться поля не входящие в проекцию, т.к. одинаково имя поля из другой проекции
-			foreach (var item in _container.PopEntitiesForLoad())
+			var entitiesToLoad = _container.PopEntitiesForLoad();
+			do
 			{
+				foreach (var item in entitiesToLoad)
+				{
 #if DEBUG
-				_logger.LogDebug($"Loading data: {Newtonsoft.Json.JsonConvert.SerializeObject(item)}");
-				_logger.LogDebug((await _client.SearchAsync<IEntity>(x => x
-					.Type(Types.Type(item.types))
-					.Source(s => s.Includes(f => f.Fields(item.fields.ToArray())))
-					.Query(q => q.Ids(id => id.Values(item.ids))))).DebugInformation);
+					_logger.LogDebug($"Loading data: {Newtonsoft.Json.JsonConvert.SerializeObject(item)}");
+					_logger.LogDebug((await _client.SearchAsync<IEntity>(x => x
+						.Type(Types.Type(item.types))
+						.Source(s => s.Includes(f => f.Fields(item.fields.ToArray())))
+						.Query(q => q.Ids(id => id.Values(item.ids))))).DebugInformation);
 #else
 				await _client.SearchAsync<IEntity>(x => x
 					.Type(Types.Type(item.types))
 					.Source(s => s.Includes(f => f.Fields(item.fields.ToArray())))
 					.Query(q => q.Ids(id => id.Values(item.ids))));
 #endif
-			}
+				}
+			} while ((entitiesToLoad = _container.PopEntitiesForLoad()).Any());
 		}
 
 		protected void Load()
@@ -70,21 +74,25 @@ namespace Core.ElasticSearch
 			var sw = new Stopwatch();
 			sw.Start();
 			// TODO: Проблема: могут запрашиваться поля не входящие в проекцию, т.к. одинаково имя из другой проекции
-			foreach (var item in _container.PopEntitiesForLoad())
+			var entitiesToLoad = _container.PopEntitiesForLoad();
+			do
 			{
+				foreach (var item in entitiesToLoad)
+				{
 #if DEBUG
-				_logger.LogDebug($"Loading data: {Newtonsoft.Json.JsonConvert.SerializeObject(item)}");
-				_logger.LogDebug((_client.Search<IEntity>(x => x
-					.Type(Types.Type(item.types))
-					.Source(s => s.Includes(f => f.Fields(item.fields.ToArray())))
-					.Query(q => q.Ids(id => id.Values(item.ids))))).DebugInformation);
+					_logger.LogDebug($"Loading data: {Newtonsoft.Json.JsonConvert.SerializeObject(item)}");
+					_logger.LogDebug((_client.Search<IEntity>(x => x
+						.Type(Types.Type(item.types))
+						.Source(s => s.Includes(f => f.Fields(item.fields.ToArray())))
+						.Query(q => q.Ids(id => id.Values(item.ids))))).DebugInformation);
 #else
 				_client.Search<IEntity>(x => x
 					.Type(Types.Type(item.types))
 					.Source(s => s.Includes(f => f.Fields(item.fields.ToArray())))
 					.Query(q => q.Ids(id => id.Values(item.ids))));
 #endif
-			}
+				}
+			} while ((entitiesToLoad = _container.PopEntitiesForLoad()).Any());
 			sw.Stop();
 			Debug.WriteLine("Load: " + sw.ElapsedMilliseconds);
 		}

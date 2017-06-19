@@ -1,7 +1,7 @@
 ﻿@using SharpFuncExt
 @model ValueTuple<ToDo.Dal.Models.Project, ToDo.Dal.Projections.Task, System.Collections.Generic.IEnumerable<ToDo.WebApp.Model.TaskViewModel>>
 @{
-	ViewBag.Title = Model.Item1.Name+(Model.Item2 == null ? ": Задачи" : $": Подзадачи \"{Model.Item2.Name}\"");
+	ViewBag.Title = Model.Item1.Name + (Model.Item2 == null ? ": Задачи" : $": Подзадачи \"{Model.Item2.Name}\"");
 }
 <table class="table table-hover">
 	<thead>
@@ -37,3 +37,25 @@
 	}
 	</tbody>
 </table>
+@section Header{
+	<div>
+		<span>Задачи: </span>
+		<a href="@Url.Action("Index", new {id = Model.Item1.Id})" class="modal-link">@Model.Item1.Name</a>
+		@if (Model.Item2 != null)
+		{
+			ToDo.Dal.Projections.Task task = Model.Item2;
+			var tasks = new List<ToDo.Dal.Projections.Task>();
+			tasks.Add(task);
+			while ((task = task.ParentTask) != null)
+			{
+				tasks.Add(task);
+			}
+			tasks.Reverse();
+			foreach (var t in tasks)
+			{
+				<span>&nbsp;/&nbsp;</span>
+				<a href="@Url.Action("Index", new {id = Model.Item1.Id, parentTaskId = t.Id})" class="modal-link">@t.Name</a>
+			}
+		}
+	</div>
+}

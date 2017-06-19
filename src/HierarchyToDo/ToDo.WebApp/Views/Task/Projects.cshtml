@@ -20,6 +20,9 @@
 				<a href="@Url.Action("Index", "Task", new {p.Id})" class="modal-link">задачи</a>
 			</td>
 			<td>
+				<a href="@Url.Action("Board", "Task", new {p.Id})" target="_blank">доска</a>
+			</td>
+			<td>
 				<a href="@Url.Action("AddTask", "Task", new {p.Id})" class="modal-link">добавить задачу</a>	
 			</td>
 		</tr>
