@@ -18,6 +18,11 @@ namespace Core.ElasticSearch
 			return services;
 		}
 
+		public static IServiceCollection AddElastic<TSettings>(this IServiceCollection services)
+			where TSettings : BaseElasticSettings, new()
+			=> AddElastic<TSettings>(services, new TSettings());
+		
+
 		public static IServiceCollection AddRepository<T, TSettings>(this IServiceCollection services)
 			where T : BaseRepository<TSettings>
 			where TSettings : BaseElasticSettings
@@ -35,6 +40,35 @@ namespace Core.ElasticSearch
 			mappingFactory(mapping);
 			mapping.Build(initFunc, app.ApplicationServices.GetService<TRepository>());
 			return app;
+		}
+
+		public static void UseElasticForTests<TSettings>(this IServiceProvider services, Action<ElasticMapping<TSettings>> mappingFactory)
+			where TSettings : BaseElasticSettings
+
+		{
+			var mapping = services.GetService<ElasticMapping<TSettings>>();
+			mappingFactory(mapping);
+			mapping.Drop();
+			mapping.Build(null);
+		}
+
+		public static void UseElastic<TSettings>(this IServiceProvider services, Action<ElasticMapping<TSettings>> mappingFactory)
+			where TSettings : BaseElasticSettings
+
+		{
+			var mapping = services.GetService<ElasticMapping<TSettings>>();
+			mappingFactory(mapping);
+			mapping.Build(null);
+		}
+
+		public static void UseElastic<TSettings, TRepository>(this IServiceProvider services, Action<ElasticMapping<TSettings>> mappingFactory, Action<TRepository> initFunc)
+			where TSettings : BaseElasticSettings
+			where TRepository : BaseRepository<TSettings>
+
+		{
+			var mapping = services.GetService<ElasticMapping<TSettings>>();
+			mappingFactory(mapping);
+			mapping.Build(initFunc, services.GetService<TRepository>());
 		}
 	}
 }

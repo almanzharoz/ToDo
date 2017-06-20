@@ -9,11 +9,13 @@ namespace Core.ElasticSearch
 {
 	public abstract partial class BaseRepository<TSettings>
 	{
-		protected bool Insert<T>(T entity, bool refresh = true) where T : class, IEntity
+		protected bool Insert<T>(T entity, bool refresh) where T : class, IEntity
 			=> Try(
-				c => c.Index(entity, refresh.If(new Func<IndexDescriptor<T>, IIndexRequest>(x => x.Refresh(Refresh.True)), null)),
+				c => c.Index(entity, refresh.If(new Func<IndexDescriptor<T>, IIndexRequest>(x => x.Refresh(Refresh.True)), null)).Fluent(x => entity.Id = x.Id),
 				r => r.Created,
 				RepositoryLoggingEvents.ES_INSERT);
+
+		protected bool Insert<T>(T entity) where T : class, IEntity => Insert(entity, true);
 
 		protected Task<bool> InsertAsync<T>(T entity, bool refresh = true) where T : class, IEntity
 			=> TryAsync(
@@ -21,7 +23,7 @@ namespace Core.ElasticSearch
 				r => r.Created,
 				RepositoryLoggingEvents.ES_INSERT);
 
-		protected bool Update<T>(T entity, bool refresh = true) where T : class, IEntity, IWithVersion
+		protected bool Update<T>(T entity, bool refresh) where T : class, IEntity, IWithVersion
 			=> Try(
 				c => c.Update(
 					DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, x => x.Version, nameof(entity))),
@@ -29,6 +31,8 @@ namespace Core.ElasticSearch
 				r => r.Result == Result.Updated,
 				RepositoryLoggingEvents.ES_UPDATE,
 				$"Update (Id: {entity?.Id})");
+
+		protected bool Update<T>(T entity) where T : class, IEntity, IWithVersion => Update(entity, true);
 
 		protected Task<bool> UpdateAsync<T>(T entity, bool refresh = true) where T : class, IEntity, IWithVersion
 			=> TryAsync(

@@ -13,6 +13,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToDo.Dal", "ToDo.Dal\ToDo.D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToDo.WebApp", "ToDo.WebApp\ToDo.WebApp.csproj", "{33CF955E-90E8-4A8D-B031-AB3E466933E0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{63DF5459-E264-4D01-90AA-AC58E4CABBCA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Tests", "..\Core.Tests\Core.Tests.csproj", "{940A1797-D289-4BC7-9987-BAC42C5562CC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +39,10 @@ Global
 		{33CF955E-90E8-4A8D-B031-AB3E466933E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33CF955E-90E8-4A8D-B031-AB3E466933E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33CF955E-90E8-4A8D-B031-AB3E466933E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{940A1797-D289-4BC7-9987-BAC42C5562CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{940A1797-D289-4BC7-9987-BAC42C5562CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{940A1797-D289-4BC7-9987-BAC42C5562CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{940A1797-D289-4BC7-9987-BAC42C5562CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -42,5 +50,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{092082CC-9B88-4F96-8F7D-B4094FC12429} = {47FDDFAF-FA28-4F5B-8490-4376795BC12F}
 		{D5737416-4B97-4429-862A-7D6B0D55BE3A} = {47FDDFAF-FA28-4F5B-8490-4376795BC12F}
+		{940A1797-D289-4BC7-9987-BAC42C5562CC} = {63DF5459-E264-4D01-90AA-AC58E4CABBCA}
 	EndGlobalSection
 EndGlobal

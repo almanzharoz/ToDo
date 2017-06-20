@@ -77,6 +77,12 @@ namespace SharpFuncExt
 				func(arg);
 			return arg;
 		}
+		public static T IfNotNull<T>(this T arg, Action<T> func)
+		{
+			if (arg.NotNull())
+				func(arg);
+			return arg;
+		}
 
 		public static T If<T, TValue>(this T arg, TValue value, Func<TValue, bool> checkFunc, Func<TValue, T, T> ifTrue, Func<TValue, T, T> ifFalse)
 			=> checkFunc(value) ? ifTrue(value, arg) : ifFalse(value, arg);

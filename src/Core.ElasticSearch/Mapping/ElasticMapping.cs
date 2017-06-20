@@ -72,8 +72,7 @@ namespace Core.ElasticSearch.Mapping
 		/// <summary>
 		/// Проверяем индекс и маппинг
 		/// </summary>
-		internal void Build<TRepository>(Action<TRepository> initFunc, TRepository repository)
-			where TRepository : BaseRepository<TSettings>
+		internal void Build(Action initAction)
 		{
 			var connectionPool = new StaticConnectionPool(new[] {_settings.Url});
 			var connectionSettings = new ConnectionSettings(connectionPool, new HttpConnection());
@@ -98,12 +97,34 @@ namespace Core.ElasticSearch.Mapping
 						.Mappings(z => z.Each(_mapping, m => m.Value.Map(z))))
 					.IfNot(x => x.IsValid, x => x
 						.LogError(_logger, "Mapping error:\r\n" + x.DebugInformation)
-						.Throw(t => new Exception("Create index error")), x => initFunc(repository));
+						.Throw(t => new Exception("Create index error")), x => initAction.IfNotNull(f => f()));
 			else
 				_mapping.Each(m => m.Value.Map(client)
 					.IfNot(x => x.IsValid, x => x
 						.LogError(_logger, "Mapping error:\r\n" + x.DebugInformation)
 						.Throw(t => new Exception("Mapping error"))));
+		}
+
+		internal void Build<TRepository>(Action<TRepository> initFunc, TRepository repository)
+			where TRepository : BaseRepository<TSettings>
+			=> Build(() => initFunc.IfNotNull(f => f(repository)));
+
+		internal void Drop()
+		{
+			var connectionPool = new StaticConnectionPool(new[] { _settings.Url });
+			var connectionSettings = new ConnectionSettings(connectionPool, new HttpConnection());
+
+			connectionSettings.DefaultFieldNameInferrer(x => x.ToLower());
+#if DEBUG
+			connectionSettings.PrettyJson();
+			connectionSettings.DisableDirectStreaming();
+#endif
+			connectionSettings.DefaultIndex(_settings.IndexName);
+
+			var client = new ElasticClient(connectionSettings);
+
+			if (client.IndexExists(_settings.IndexName).Exists)
+				client.DeleteIndex(_settings.IndexName);
 		}
 
 		internal bool TryGetResponseJsonConverter(Type type, out JsonConverter result)
