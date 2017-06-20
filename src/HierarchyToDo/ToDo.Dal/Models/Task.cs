@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace ToDo.Dal.Models
 {
-	public class Task : BaseEntityWithParent<Project, Project>, IWithName, IWithVersion, IWithCreated, IHasState, IWithUser, IWithFiles
+	public class Task : BaseEntityWithParent<Project, Project>, IWithName, IWithVersion, IWithCreated, IHasState, IWithUser
 	{
 		public DateTime Created { get; set; }
 		[Keyword]
@@ -17,7 +17,7 @@ namespace ToDo.Dal.Models
 		[JsonIgnore]
 		public int Version { get; set; }
 		public ERecordState State { get; set; }
-		public TaskState States { get; set; }
+		public TaskState[] States { get; set; }
 
 		[Keyword]
 		public Projections.Task ParentTask { get; set; }
@@ -35,7 +35,5 @@ namespace ToDo.Dal.Models
 		public DateTime Deadline { get; set; }
 
 		public string Name { get; set; }
-		public string Note { get; set; }
-		public string[] Files { get; set; }
 	}
 }

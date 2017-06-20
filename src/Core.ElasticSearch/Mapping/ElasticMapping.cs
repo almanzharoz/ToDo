@@ -35,6 +35,12 @@ namespace Core.ElasticSearch.Mapping
 			return this;
 		}
 
+		public ElasticMapping<TSettings> AddStruct<T>() where T : struct
+		{
+			_converters.TryAdd(typeof(T), new InsertObjectJsonConverter<T>());
+			return this;
+		}
+
 		public ElasticMapping<TSettings> AddProjection<T, TMapping>()
 			where T : class, IProjection<TMapping>, new()
 			where TMapping : class, IEntity

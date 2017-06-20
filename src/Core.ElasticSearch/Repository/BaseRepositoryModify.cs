@@ -17,6 +17,22 @@ namespace Core.ElasticSearch
 
 		protected bool Insert<T>(T entity) where T : class, IEntity => Insert(entity, true);
 
+		protected bool Insert<T, TParentModel, TParentProjection>(T entity, TParentProjection parent, bool refresh)
+			where T : class, IEntity, IWithParent<TParentModel, TParentProjection>
+			where TParentModel : class, IEntity
+			where TParentProjection : IProjection<TParentModel>
+			=> Try(
+				c => c.Index(entity, s => s.If(refresh, a => a.Refresh(Refresh.True)).IfNotNull(parent, a => a.Parent(parent.Id)))
+					.Fluent(x => entity.Set(p => p.Id, x.Id).Set(p => p.Parent, parent)),
+				r => r.Created,
+				RepositoryLoggingEvents.ES_INSERT);
+
+		protected bool Insert<T, TParentModel, TParentProjection>(T entity, TParentProjection parent)
+			where T : class, IEntity, IWithParent<TParentModel, TParentProjection>
+			where TParentModel : class, IEntity
+			where TParentProjection : IProjection<TParentModel> 
+			=> Insert<T, TParentModel, TParentProjection>(entity, parent, true);
+
 		protected Task<bool> InsertAsync<T>(T entity, bool refresh = true) where T : class, IEntity
 			=> TryAsync(
 				c => c.IndexAsync(entity, refresh.If(new Func<IndexDescriptor<T>, IIndexRequest>(x => x.Refresh(Refresh.True)), null)),

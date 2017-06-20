@@ -39,24 +39,20 @@ namespace ToDo.Dal.Repositories
 					x => Query<Models.Task>.Term(p => p.ParentTask, GetTask(parentTaskId).Id),
 					() => !Query<Models.Task>.Exists(e => e.Field(p => p.ParentTask))), id));
 
-		public bool AddTask(string projectId, string parentTask, string name, string note, DateTime deadline, int estimatedTime, UserName assign)
-		{
-			var t = new Models.Task()
+		public bool AddTask(string projectId, string parentTask, string name, string note, DateTime deadline,
+			int estimatedTime, UserName assign) =>
+			Insert<Models.Task, Project, Project>(new Models.Task
 			{
-				Parent = GetProject(projectId.HasNotNullArg(nameof(projectId))).HasNotNullArg("project"),
 				User = _user,
 				Created = DateTime.Now,
 				State = ERecordState.New,
 				Name = name.HasNotNullArg(nameof(name)),
-				Note = note,
+				States = new[] {new Models.TaskState {Note = note, State = ERecordState.New, Created = DateTime.Now, User = _user}},
 				Deadline = deadline,
 				EstimatedTime = estimatedTime,
 				ParentTask = parentTask.IfNotNullOrDefault(GetTask),
 				Assign = assign
-			};
-			var r = _client.Index(t, x => x.Refresh(Refresh.True).Parent(projectId));
-			return true;
-		}
+			}, GetProject(projectId.HasNotNullArg(nameof(projectId))).HasNotNullArg("project"));
 
 		public IReadOnlyCollection<Task> GetMyTasks(string id) =>
 			Search<Models.Task, Task>(UserQuery<Task>(null), s => s.Descending(p => p.Created));
@@ -100,7 +96,7 @@ namespace ToDo.Dal.Repositories
 
 		public IEnumerable<Task> GetTasksToMe(string id, string s) =>
 			Search<Models.Task, Task>(q => q.Bool(b =>
-					b.Must(Query<Models.Task>.Match(m => m.Field(f => f.Name).Query(s)) || Query<Models.Task>.Match(m => m.Field(f => f.Note).Query(s)))
+					b.Must(Query<Models.Task>.Match(m => m.Field(f => f.Name).Query(s)) || Query<Models.Task>.Match(m => m.Field(f => f.States.FirstOrDefault().Note).Query(s)))
 						.Filter(TaskQuery(Query<Models.Task>.Term(p => p.Assign, _user.Id), id))),
 				sort => sort.Ascending(p => p.Deadline));
 	}

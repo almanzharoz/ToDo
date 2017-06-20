@@ -1,4 +1,5 @@
-﻿@model ToDo.Dal.Projections.Task
+﻿@using ToDo.WebApp.Resources
+@model ToDo.Dal.Projections.Task
 @{
 	ViewBag.Title = Model.Name;
 }
@@ -33,11 +34,15 @@
 		<td>@Model.Name</td>
 	</tr>
 	<tr>
+		<th>Статус</th>
+		<td>@ERecordState.ResourceManager.GetString(Model.State.ToString())</td>
+	</tr>
+	<tr>
 		<th>Deadline</th>
 		<td>@Model.Deadline</td>
 	</tr>
 </table>
-@if (!String.IsNullOrEmpty(Model.Note))
+@if (!String.IsNullOrEmpty(Model.States.Last().Note))
 {
-	<div>@Html.Raw(Model.Note.Replace("\r\n", "<br/>"))</div>
+	<div>@Html.Raw(Model.States.Last().Note.Replace("\r\n", "<br/>"))</div>
 }

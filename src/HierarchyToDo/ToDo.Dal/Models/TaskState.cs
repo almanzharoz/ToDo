@@ -8,7 +8,7 @@ namespace ToDo.Dal.Models
 	{
 		public DateTime Created { get; set; }
 		[Keyword]
-		public User User { get; set; }
+		public Projections.User User { get; set; }
 		public ERecordState State { get; set; }
 
 		public string Note { get; set; }

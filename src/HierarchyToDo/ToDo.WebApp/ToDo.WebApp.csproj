@@ -33,5 +33,18 @@
     <ProjectReference Include="..\..\Sharp7Func\Sharp7Func.csproj" />
     <ProjectReference Include="..\ToDo.Dal\ToDo.Dal.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Resources\ERecordState.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ERecordState.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\ERecordState.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>ERecordState.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
 
 </Project>

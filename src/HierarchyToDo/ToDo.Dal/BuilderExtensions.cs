@@ -28,6 +28,8 @@ namespace ToDo.Dal
 				    .AddMapping<User>()
 				    .AddMapping<Project>()
 				    .AddMapping<Task>()
+					
+					.AddStruct<TaskState>()
 				    // проекции
 				    .AddProjection<Projections.User, User>()
 				    .AddProjection<Projections.UserWithRoles, User>()
