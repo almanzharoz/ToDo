@@ -37,7 +37,7 @@ namespace Core.ElasticSearch.Mapping
 
 		public ElasticMapping<TSettings> AddStruct<T>() where T : struct
 		{
-			_converters.TryAdd(typeof(T), new InsertObjectJsonConverter<T>());
+			_converters.TryAdd(typeof(T), new ObjectJsonConverter<T>());
 			return this;
 		}
 
