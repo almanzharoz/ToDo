@@ -1,4 +1,5 @@
-﻿@model IReadOnlyCollection<ToDo.Dal.Projections.UserWithRoles>
+﻿@using SharpFuncExt
+@model IReadOnlyCollection<ToDo.Dal.Projections.UserWithRoles>
 
 <div><a asp-action="AddUser" class="modal-link">добавить пользователя</a></div>
 <table class="table table-hover">
@@ -15,7 +16,7 @@
 		<tr>
 			<td>@m.Nick</td>
 			<td>
-				@foreach (var r in m.Roles)
+				@foreach (var r in m.Roles.DefaultIfNull())
 				{
 					<div>@r&nbsp;<a href="@Url.Action("DeleteRole", new {m.Id, role=r})" method="DELETE" class="modal-link">&times;</a></div>
 				}

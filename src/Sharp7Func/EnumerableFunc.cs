@@ -188,6 +188,11 @@ namespace SharpFuncExt
 			return array.NotNull() && array.Contains(element) ? func(element, array) : ifNotContains(element, array);
 		}
 
+		public static T DefaultIfNull<T, TValue>(this T arg) where T : IEnumerable<TValue>
+			=> arg == null ? (T)(IEnumerable<TValue>)new TValue[0] : arg;
+		public static T[] DefaultIfNull<T>(this T[] arg) => arg ?? new T[0];
+
+
 		#region Fluent-version
 		public static T IfIn<T, TArray, TResult>(this T arg, IEnumerable<TArray> array, TArray element, Func<T, TArray, IEnumerable<TArray>, TResult> func)
 		{

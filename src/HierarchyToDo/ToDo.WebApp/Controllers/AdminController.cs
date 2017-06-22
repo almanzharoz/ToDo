@@ -17,10 +17,9 @@ namespace ToDo.WebApp.Controllers
 	    public AdminController(AdminRepository repository) : base(repository)
 	    {
 	    }
-		[AllowAnonymous]
+
 		[HttpGet]
 		public IActionResult AddUser() => PartialIfAjax(new NewUserEditModel(){Roles = "user"}, x => View(x));
-		[AllowAnonymous]
 		[HttpPost]
 		public IActionResult AddUser(NewUserEditModel model)
 		    => ModelState.IsValid ?

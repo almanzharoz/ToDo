@@ -1,4 +1,6 @@
 ﻿@model string
-<form action="@Url.Action("AddRole", new {id = Model})">
+@using (Html.BeginForm("AddRole", "Admin", new {id = Model}, FormMethod.Post))
+{
 	<input name="role" placeholder="роль"/>
-</form>
+	<submit text="добавить"/>
+}
