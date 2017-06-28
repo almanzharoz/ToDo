@@ -40,7 +40,7 @@ namespace Core.ElasticSearch
 			connectionSettings.DisableDirectStreaming();
 #endif
 			connectionSettings.DefaultIndex(_settings.IndexName);
-			
+
 			_client = new ElasticClient(connectionSettings);
 			_logger = loggerFactory.CreateLogger<BaseRepository<TSettings>>();
 		}
