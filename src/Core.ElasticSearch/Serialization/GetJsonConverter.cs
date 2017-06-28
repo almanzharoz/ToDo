@@ -18,13 +18,16 @@ namespace Core.ElasticSearch.Serialization
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 		{
 			var jsonObject = JObject.Load(reader);
-			if (jsonObject["_id"] != null)
-				jsonObject["_source"]["id"] = jsonObject["_id"];
-			if (jsonObject["_version"] != null)
-				jsonObject["_source"]["version"] = jsonObject["_version"];
-			jsonObject["_source"]["_type"] = jsonObject["_type"];
-			if (jsonObject["_parent"] != null)
-				jsonObject["_source"]["parent"] = jsonObject["_parent"];
+			if (jsonObject["_source"] != null)
+			{
+				if (jsonObject["_id"] != null)
+					jsonObject["_source"]["id"] = jsonObject["_id"];
+				if (jsonObject["_version"] != null)
+					jsonObject["_source"]["version"] = jsonObject["_version"];
+				jsonObject["_source"]["_type"] = jsonObject["_type"];
+				if (jsonObject["_parent"] != null)
+					jsonObject["_source"]["parent"] = jsonObject["_parent"];
+			}
 			var result = new GetResponse<T>();
 			using (var r = jsonObject.CreateReader())
 				serializer.Populate(r, result);
