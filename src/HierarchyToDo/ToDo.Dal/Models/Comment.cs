@@ -16,7 +16,7 @@ namespace ToDo.Dal.Models
 		public int Version { get; set; }
 
 		[Keyword]
-		public Task Task { get; set; }
+		public Projections.Task Task { get; set; }
 		[Keyword]
 		public Comment Parent { get; set; }
 

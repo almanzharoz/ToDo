@@ -21,6 +21,8 @@ namespace Core.ElasticSearch.Serialization
 		{
 			if (((InnerValue)value).Value is IEntity)
 			{
+				if (String.IsNullOrWhiteSpace(((IEntity)((InnerValue)value).Value).Id))
+					throw new ArgumentNullException("Id");
 				writer.WriteValue(((IEntity)((InnerValue)value).Value).Id);
 				return;
 			}

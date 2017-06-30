@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace ToDo.Dal.Models
 {
-	public class Task : BaseEntityWithParent<Project, Project>, IWithName, IWithVersion, IWithCreated, IHasState, IWithUser
+	internal class Task : BaseEntityWithParent<Project, Project>, IWithName, IWithVersion, IWithCreated, IHasState, IWithUser
 	{
 		public DateTime Created { get; set; }
 		[Keyword]
