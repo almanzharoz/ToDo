@@ -6,31 +6,32 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Core.Tests
 {
-	[TestClass]
-	public abstract class BaseTest
-	{
-		protected TestRepository _repository;
+    [TestClass]
+    public abstract class BaseTest
+    {
+        protected TestRepository _repository;
 
-		[TestInitialize]
-		public void Setup()
-		{
-			var serviceProvider = new ServiceCollection()
-				.AddLogging()
-				.AddElastic<ElasticSettings>()
-					.AddRepository<TestRepository, ElasticSettings>()
-				.BuildServiceProvider();
+        [TestInitialize]
+        public void Setup()
+        {
+            var serviceProvider = new ServiceCollection()
+                .AddLogging()
+                .AddElastic<ElasticSettings>()
+                    .AddRepository<TestRepository, ElasticSettings>()
+                .BuildServiceProvider();
 
-			serviceProvider.UseElasticForTests<ElasticSettings>(map => map
+            serviceProvider.UseElasticForTests<ElasticSettings>(map => map
 
-				.AddMapping<Producer>()
-				.AddMapping<Category>()
-				.AddMapping<Product>()
+                .AddMapping<Producer>()
+                .AddMapping<Category>()
+                .AddMapping<Product>()
 
-				.AddProjection<Producer, Producer>()
-				.AddProjection<Projections.Category, Category>()
-				.AddProjection<Projections.Product, Product, Projections.Category, Category>());
+                .AddProjection<Producer, Producer>()
+                .AddProjection<Category, Category>()
+                .AddProjection<Product, Product, Category, Category>());
 
-			_repository = serviceProvider.GetService<TestRepository>();
-		}
-	}
+            _repository = serviceProvider.GetService<TestRepository>();
+            _repository.Clean();
+        }
+    }
 }

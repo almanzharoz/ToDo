@@ -10,7 +10,7 @@ namespace Core.Tests.Projections
 		public string Producer { get; set; }
 	}
 
-	public class Product : BaseEntityWithParent<Models.Category, Category>, IProjection<Models.Product>, IWithVersion
+	public class ProductProjection : BaseEntityWithParent<Models.Category, CategoryProjection>, IProjection<Models.Product>, IWithVersion
 	{
 		public int Version { get; set; }
 		[Keyword]

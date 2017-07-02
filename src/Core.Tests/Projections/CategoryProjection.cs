@@ -3,10 +3,10 @@ using Nest;
 
 namespace Core.Tests.Projections
 {
-	public class Category : BaseEntity, IProjection<Models.Category>
+	public class CategoryProjection : BaseEntity, IProjection<Models.Category>
 	{
 		[Keyword]
-		public Projections.Category Top { get; set; }
+		public Projections.CategoryProjection Top { get; set; }
 		public string Name { get; set; }
 	}
 }
