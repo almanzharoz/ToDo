@@ -58,15 +58,13 @@ namespace Core.Tests
         }
 
         [TestMethod]
-        public void GetObjectByIdWithoutAutoLoad()
+        public void GetObjectByIdWithoutAutoLoadAndWithoutParent()
         {
             var parentCategory = new Category() { Name = "Parent Category" };
             var category = new Category() { Name = "Category", Top = parentCategory };
-            var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
 
             _repository.Insert(parentCategory, true);
             _repository.Insert(category, true);
-            _repository.Insert(product, true);
 
             var loadCategory = _repository.Get<Category, Category>(category.Id, false);
 
@@ -75,8 +73,17 @@ namespace Core.Tests
             Assert.AreNotEqual(loadCategory, category);
             Assert.AreEqual(loadCategory.Name, category.Name);
             Assert.AreEqual(loadCategory.Id, category.Id);
+        }
 
-            var loadProduct = _repository.Get<Product, Product, Category, Category>(product.Id, loadCategory.Id, false);
+        [TestMethod]
+        public void GetObjectByIdWithoutAutoLoadAndWithParent()
+        {
+            var category = new Category() { Name = "Category"};
+            var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
+            _repository.Insert(category, true);
+            _repository.Insert(product, true);
+
+            var loadProduct = _repository.Get<Product, Product>(product.Id, false);
 
             Assert.IsNotNull(loadProduct);
             Assert.IsNull(loadProduct.Parent);
@@ -85,15 +92,13 @@ namespace Core.Tests
         }
 
         [TestMethod]
-        public void GetObjectByIdWithAutoLoad()
+        public void GetObjectByIdWithAutoLoadAndWithoutParent()
         {
             var parentCategory = new Category() { Name = "Parent Category" };
             var category = new Category() { Name = "Category", Top = parentCategory };
-            var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
 
             _repository.Insert(parentCategory, true);
             _repository.Insert(category, true);
-            _repository.Insert(product, true);
 
             var loadCategory = _repository.Get<Category, Category>(category.Id, true);
 
@@ -102,8 +107,18 @@ namespace Core.Tests
             Assert.AreNotEqual(loadCategory, category);
             Assert.AreEqual(loadCategory.Name, category.Name);
             Assert.AreEqual(loadCategory.Id, category.Id);
+        }
 
-            var loadProduct = _repository.Get<Product, Product, Category, Category>(product.Id, loadCategory.Id, true);
+        [TestMethod]
+        public void GetObjectByIdWithAutoLoadAndWithParent()
+        {
+            var category = new Category() { Name = "Category" };
+            var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
+
+            _repository.Insert(category, true);
+            _repository.Insert(product, true);
+
+            var loadProduct = _repository.Get<Product, Product, Category, Category>(product.Id, category.Id, true);
 
             Assert.IsNotNull(loadProduct);
             Assert.IsNotNull(loadProduct.Parent);
