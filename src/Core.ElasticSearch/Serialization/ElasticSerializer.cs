@@ -19,7 +19,11 @@ namespace Core.ElasticSearch.Serialization
 		private readonly ElasticMapping<TSettings> _mapping;
 		private static readonly InnerValueJsonConverter _innerValueJsonConverter = new InnerValueJsonConverter();
 
-		public ElasticSerializer(IConnectionSettingsValues settings, ElasticMapping<TSettings> mapping, RequestContainer<TSettings> container) : base(settings)
+		public ElasticSerializer(IConnectionSettingsValues settings, ElasticMapping<TSettings> mapping,
+			RequestContainer<TSettings> container) : base(settings
+				//,(serializerSettings, values) =>
+				//serializerSettings.ContractResolver = new SisoJsonDefaultContractResolver(settings, new List<Func<Type, JsonConverter>>())
+			)
 		{
 			_mapping = mapping;
 			_container = container;
