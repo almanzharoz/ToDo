@@ -29,9 +29,6 @@ namespace Core.Tests
                 .AddProjection<Producer, Producer>()
                 .AddProjection<Category, Category>()
                 .AddProjection<Product, Product, Category, Category>());
-
-            _repository = serviceProvider.GetService<TestRepository>();
-            _repository.Clean();
         }
     }
 }

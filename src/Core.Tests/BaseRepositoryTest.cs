@@ -10,7 +10,7 @@ using SharpFuncExt;
 namespace Core.Tests
 {
     [TestClass]
-    public class GetElasticTests : BaseTest
+    public class BaseRepositoryTest : BaseTest
     {
         [TestMethod]
         public void AddObjectWithoutParentAndRelated()
@@ -327,7 +327,7 @@ namespace Core.Tests
         }
 
         [TestMethod]
-        public void SearchCategoryByParentWithPagingAndWithoutLoad()
+        public void SearchCategoryByParentWithLambdaAndWithoutLoad()
         {
             var parentCategory = new Category() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
             _repository.Insert(parentCategory, true);
@@ -350,7 +350,7 @@ namespace Core.Tests
         }
 
         [TestMethod]
-        public void SearchCategoryByParentWithPagingAndWithLoad()
+        public void SearchCategoryByParentWithLambdaAndWithLoad()
         {
             var parentCategory = new Category() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
             _repository.Insert(parentCategory, true);
@@ -369,6 +369,57 @@ namespace Core.Tests
 
             Assert.AreEqual(childCategories.Count, 1);
             Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category1")));
+            Assert.IsNotNull(childCategories.FirstOrDefault().Top);
+        }
+
+
+        [TestMethod]
+        public void SearchCategoryByParentWithPagingAndWithoutLoad()
+        {
+            var parentCategory = new Category() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
+            _repository.Insert(parentCategory, true);
+            var childCategory1 = new Category() { Name = "Child Category1", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
+            _repository.Insert(childCategory1, true);
+            var childCategory2 = new Category() { Name = "Child Category2", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
+            _repository.Insert(childCategory2, true);
+            var childCategory3 = new Category() { Name = "Child Category3", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
+            _repository.Insert(childCategory3, true);
+            var category1 = new Category() { Name = "Category1", CreatedOnUtc = DateTime.UtcNow };
+            _repository.Insert(category1, true);
+            var category2 = new Category() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
+            _repository.Insert(category2, true);
+
+            var childCategories = _repository.SearchPager<Category, Category>(Query<Category>.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 0, 1, sort => sort.Descending(c => c.CreatedOnUtc), false);
+
+            Assert.AreEqual(childCategories.Count, 3);
+            Assert.AreEqual(childCategories.Limit, 1);
+            Assert.AreEqual(childCategories.Page, 0);
+            Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category3")));
+            Assert.IsNull(childCategories.FirstOrDefault().Top);
+        }
+
+        [TestMethod]
+        public void SearchCategoryByParentWithPagingAndWithLoad()
+        {
+            var parentCategory = new Category() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
+            _repository.Insert(parentCategory, true);
+            var childCategory1 = new Category() { Name = "Child Category1", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
+            _repository.Insert(childCategory1, true);
+            var childCategory2 = new Category() { Name = "Child Category2", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
+            _repository.Insert(childCategory2, true);
+            var childCategory3 = new Category() { Name = "Child Category3", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
+            _repository.Insert(childCategory3, true);
+            var category1 = new Category() { Name = "Category1", CreatedOnUtc = DateTime.UtcNow };
+            _repository.Insert(category1, true);
+            var category2 = new Category() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
+            _repository.Insert(category2, true);
+
+            var childCategories = _repository.SearchPager<Category, Category>(Query<Category>.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 0, 2, sort => sort.Descending(c => c.CreatedOnUtc), true);
+
+            Assert.AreEqual(childCategories.Count, 3);
+            Assert.AreEqual(childCategories.Limit, 1);
+            Assert.AreEqual(childCategories.Page, 0);
+            Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category3")));
             Assert.IsNotNull(childCategories.FirstOrDefault().Top);
         }
     }

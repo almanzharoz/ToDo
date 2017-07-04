@@ -117,13 +117,13 @@ namespace Core.Tests
         public new Task<int> RemoveAsync<T>(QueryContainer query) where T : class, IEntity
             => base.RemoveAsync<T>(query);
 
-        protected Pager<T, TProjection> SearchPager<T, TProjection>(QueryContainer query, int page, int take,
+        public new Pager<T, TProjection> SearchPager<T, TProjection>(QueryContainer query, int page, int take,
             Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, bool load = true)
             where TProjection : class, IProjection<T>
             where T : class, IEntity
             => base.SearchPager<T, TProjection>(query, page, take, sort, load);
 
-        protected Pager<T, TProjection> SearchPager<T, TProjection>(
+        public new Pager<T, TProjection> SearchPager<T, TProjection>(
             Func<QueryContainerDescriptor<T>, QueryContainer> query, int page, int take,
             Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, bool load = true)
             where TProjection : class, IProjection<T>
