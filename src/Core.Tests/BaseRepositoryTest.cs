@@ -76,6 +76,22 @@ namespace Core.Tests
         }
 
         [TestMethod]
+        public void GetProjectionObjectByIdWithoutAutoLoadAndWithoutParent()
+        {
+            var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
+
+            _repository.Insert(category, true);
+
+            var loadCategory = _repository.Get<Category, CategoryProjection>(category.Id, false);
+
+            Assert.IsNotNull(loadCategory);
+            Assert.IsNull(loadCategory.Top);
+            Assert.AreNotEqual(loadCategory, category);
+            Assert.AreEqual(loadCategory.Name, category.Name);
+            Assert.AreEqual(loadCategory.Id, category.Id);
+        }
+
+        [TestMethod]
         public void GetObjectByIdWithoutAutoLoadAndWithParent()
         {
             var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
@@ -84,6 +100,22 @@ namespace Core.Tests
             _repository.Insert(product, true);
 
             var loadProduct = _repository.Get<Product, Product>(product.Id, false);
+
+            Assert.IsNotNull(loadProduct);
+            Assert.IsNull(loadProduct.Parent);
+            Assert.IsNotNull(loadProduct.FullName);
+            Assert.AreEqual(loadProduct.FullName.Name, product.FullName.Name);
+        }
+
+        [TestMethod]
+        public void GetProjectionObjectByIdWithoutAutoLoadAndWithParent()
+        {
+            var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
+            var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
+            _repository.Insert(category, true);
+            _repository.Insert(product, true);
+
+            var loadProduct = _repository.Get<Product, ProductProjection>(product.Id, false);
 
             Assert.IsNotNull(loadProduct);
             Assert.IsNull(loadProduct.Parent);
@@ -110,6 +142,22 @@ namespace Core.Tests
         }
 
         [TestMethod]
+        public void GetProjectionObjectByIdWithAutoLoadAndWithoutParent()
+        {
+            var category = new Category() { Name = "Category"};
+
+            _repository.Insert(category, true);
+
+            var loadCategory = _repository.Get<Category, CategoryProjection>(category.Id, true);
+
+            Assert.IsNotNull(loadCategory);
+            Assert.IsNotNull(loadCategory.Top);
+            Assert.AreNotEqual(loadCategory, category);
+            Assert.AreEqual(loadCategory.Name, category.Name);
+            Assert.AreEqual(loadCategory.Id, category.Id);
+        }
+
+        [TestMethod]
         public void GetObjectByIdWithAutoLoadAndWithParent()
         {
             var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
@@ -119,6 +167,23 @@ namespace Core.Tests
             _repository.Insert(product, true);
 
             var loadProduct = _repository.Get<Product, Product, Category, Category>(product.Id, category.Id, true);
+
+            Assert.IsNotNull(loadProduct);
+            Assert.IsNotNull(loadProduct.Parent);
+            Assert.IsNotNull(loadProduct.FullName);
+            Assert.AreEqual(loadProduct.FullName.Name, product.FullName.Name);
+        }
+
+        [TestMethod]
+        public void GetProjectionObjectByIdWithAutoLoadAndWithParent()
+        {
+            var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
+            var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
+
+            _repository.Insert(category, true);
+            _repository.Insert(product, true);
+
+            var loadProduct = _repository.Get<Product, ProductProjection, Category, Category>(product.Id, category.Id, true);
 
             Assert.IsNotNull(loadProduct);
             Assert.IsNotNull(loadProduct.Parent);
@@ -210,7 +275,7 @@ namespace Core.Tests
         }
 
         [TestMethod]
-        public void RemoveObjectByInvelidId()
+        public void RemoveObjectByInvalidId()
         {
             var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
             category.Id = "NewId";
@@ -249,7 +314,26 @@ namespace Core.Tests
 
             var categories = _repository.Search<Category, Category>(Query<Category>.Match(x => x.Field(c => c.CreatedOnUtc).Query("category")));
 
-            Assert.AreEqual(categories.Count(c => c.Name.Equals("Test Category")), 1);
+            Assert.IsTrue(categories.Any(c => c.Name.Equals("Test Category")));
+        }
+
+        [TestMethod]
+        public void SearchSimpleCategoryProjection()
+        {
+            var category1 = new Category() { Name = "Test Category1", CreatedOnUtc = DateTime.UtcNow };
+            _repository.Insert(category1, true);
+            var category2 = new Category() { Name = "Test Category2", CreatedOnUtc = DateTime.UtcNow };
+            _repository.Insert(category2, true);
+            var category3 = new Category() { Name = "Test Category3", CreatedOnUtc = DateTime.UtcNow };
+            _repository.Insert(category3, true);
+            var category4 = new Category() { Name = "Test Category4", CreatedOnUtc = DateTime.UtcNow };
+            _repository.Insert(category4, true);
+            var category5 = new Category() { Name = "Test Category", CreatedOnUtc = DateTime.UtcNow };
+            _repository.Insert(category5, true);
+
+            var categories = _repository.Search<Category, CategoryProjection>(Query<Category>.Match(x => x.Field(c => c.CreatedOnUtc).Query("category")));
+
+            Assert.IsTrue(categories.Any(c => c.Name.Equals("Test Category")));
         }
 
         [TestMethod]
