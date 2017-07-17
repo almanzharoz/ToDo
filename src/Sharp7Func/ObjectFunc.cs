@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace SharpFuncExt
 {
+	// Про упаковку и generic https://habrahabr.ru/post/332640/
 	public static class ObjectFunc
 	{
 		internal static ConcurrentDictionary<string, Delegate> _lamdas = new ConcurrentDictionary<string, Delegate>();
@@ -94,22 +95,29 @@ namespace SharpFuncExt
 			=> new ValueTuple<TResult1, TResult2, TResult3, TResult4>(value1, value2, value3, value4);
 
 
-		public static TResult Is<TArg, T, TResult>(this TArg arg, Func<T, TResult> func, Func<TArg, TResult> funcNot) where T : TArg
+		//public static TResult Is<TArg, T, TResult>(this TArg arg, Func<T, TResult> func, Func<TArg, TResult> funcNot) where T : TArg
+		//{
+		//	if (arg is T)
+		//		return func((T)arg);
+		//	return funcNot(arg);
+		//}
+		//public static TArg Is<TArg, T, TResult>(this TArg arg, Func<T, TResult> func) where T : TArg
+		//{
+		//	if (arg is T)
+		//		func((T)arg);
+		//	return arg;
+		//}
+		//public static TArg Is<TArg, T>(this TArg arg, Action<T> func) where T : TArg
+		//{
+		//	if (arg is T)
+		//		func((T)arg);
+		//	return arg;
+		//}
+
+		public static TArg Is<TArg, T>(this TArg arg, Action<TArg> func)
 		{
 			if (arg is T)
-				return func((T)arg);
-			return funcNot(arg);
-		}
-		public static TArg Is<TArg, T, TResult>(this TArg arg, Func<T, TResult> func) where T : TArg
-		{
-			if (arg is T)
-				func((T)arg);
-			return arg;
-		}
-		public static TArg Is<TArg, T>(this TArg arg, Action<T> func) where T : TArg
-		{
-			if (arg is T)
-				func((T)arg);
+				func(arg);
 			return arg;
 		}
 

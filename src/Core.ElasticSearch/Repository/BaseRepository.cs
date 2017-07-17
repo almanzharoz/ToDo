@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Core.ElasticSearch.Domain;
+using Core.ElasticSearch.Exceptions;
 using Core.ElasticSearch.Mapping;
 using Core.ElasticSearch.Serialization;
 using Elasticsearch.Net;
@@ -167,7 +168,7 @@ namespace Core.ElasticSearch
 		public static T LogError<T>(this T arg, ILogger logger, string text) where T : IResponse
 			=> arg.IfNot(x => x.IsValid, x => logger
 				.Fluent(z => z.LogError($"{text}: {x.ServerError.ToString()}\r\n{x.DebugInformation}"))
-				.Throw(z => new Exception("Query error")));
+				.Throw(z => new QueryException(x.DebugInformation)));
 
 		public static T LogDebug<T>(this T arg, ILogger logger, string text = null) where T : IResponse
 		{

@@ -1,8 +1,10 @@
 using System;
 using System.Linq;
 using Core.ElasticSearch;
+using Core.ElasticSearch.Exceptions;
 using Core.Tests.Models;
 using Core.Tests.Projections;
+using Elasticsearch.Net;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Nest;
 using SharpFuncExt;
@@ -26,7 +28,10 @@ namespace Core.Tests
         {
             var parentCategory = new Category() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
             var childCategory = new Category() { Name = "Child Category", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
-            Assert.ThrowsException<Exception>(() => { _repository.Insert(childCategory, true); });
+            Assert.ThrowsException<UnexpectedElasticsearchClientException>(() =>
+            {
+		            _repository.Insert(childCategory, true);
+            });
         }
 
         [TestMethod]
@@ -44,7 +49,7 @@ namespace Core.Tests
         {
             var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
             var product = new Product() { Name = "Product", Parent = category };
-            Assert.ThrowsException<Exception>(() => { _repository.Insert(product, true); });
+            Assert.ThrowsException<QueryException>(() => _repository.Insert<Product, Category, Category>(product, category, true));
         }
 
         [TestMethod]
@@ -53,9 +58,12 @@ namespace Core.Tests
             var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
             _repository.Insert(category, true);
             var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
-            _repository.Insert(product, true);
+            _repository.Insert<Product, Category, Category>(product, category, true);
             Assert.IsNotNull(product.Id);
-        }
+            Assert.IsNotNull(product.Parent);
+            Assert.AreEqual(product.Parent.Id, category.Id);
+            Assert.AreEqual(product.Parent.Name, category.Name);
+		}
 
         [TestMethod]
         public void GetObjectByIdWithoutAutoLoadAndWithoutParent()
@@ -69,7 +77,9 @@ namespace Core.Tests
             var loadCategory = _repository.Get<Category, Category>(category.Id, false);
 
             Assert.IsNotNull(loadCategory);
-            Assert.IsNull(loadCategory.Top);
+            Assert.IsNotNull(loadCategory.Top);
+            Assert.AreEqual(loadCategory.Top.Id, parentCategory.Id);
+            Assert.IsNull(loadCategory.Top.Name);
             Assert.AreNotEqual(loadCategory, category);
             Assert.AreEqual(loadCategory.Name, category.Name);
             Assert.AreEqual(loadCategory.Id, category.Id);
@@ -97,12 +107,14 @@ namespace Core.Tests
             var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
             var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
             _repository.Insert(category, true);
-            _repository.Insert(product, true);
+            _repository.Insert<Product, Category, Category>(product, category, true);
 
-            var loadProduct = _repository.Get<Product, Product>(product.Id, false);
+            var loadProduct = _repository.Get<Product, Product, Category, Category>(product.Id, category.Id, false);
 
             Assert.IsNotNull(loadProduct);
-            Assert.IsNull(loadProduct.Parent);
+            Assert.IsNotNull(loadProduct.Parent);
+            Assert.AreEqual(loadProduct.Parent.Id, category.Id);
+            Assert.IsNull(loadProduct.Parent.Name);
             Assert.IsNotNull(loadProduct.FullName);
             Assert.AreEqual(loadProduct.FullName.Name, product.FullName.Name);
         }
@@ -113,12 +125,14 @@ namespace Core.Tests
             var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
             var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
             _repository.Insert(category, true);
-            _repository.Insert(product, true);
+            _repository.Insert<Product, Category, Category>(product, category, true);
 
-            var loadProduct = _repository.Get<Product, ProductProjection>(product.Id, false);
+            var loadProduct = _repository.Get<Product, ProductProjection, Category, Category>(product.Id, category.Id, false);
 
             Assert.IsNotNull(loadProduct);
-            Assert.IsNull(loadProduct.Parent);
+            Assert.IsNotNull(loadProduct.Parent);
+            Assert.AreEqual(loadProduct.Parent.Id, category.Id);
+            Assert.IsNull(loadProduct.Parent.Name);
             Assert.IsNotNull(loadProduct.FullName);
             Assert.AreEqual(loadProduct.FullName.Name, product.FullName.Name);
         }
@@ -136,6 +150,8 @@ namespace Core.Tests
 
             Assert.IsNotNull(loadCategory);
             Assert.IsNotNull(loadCategory.Top);
+            Assert.AreEqual(loadCategory.Top.Id, parentCategory.Id);
+            Assert.AreEqual(loadCategory.Top.Name, parentCategory.Name);
             Assert.AreNotEqual(loadCategory, category);
             Assert.AreEqual(loadCategory.Name, category.Name);
             Assert.AreEqual(loadCategory.Id, category.Id);
@@ -151,7 +167,7 @@ namespace Core.Tests
             var loadCategory = _repository.Get<Category, CategoryProjection>(category.Id, true);
 
             Assert.IsNotNull(loadCategory);
-            Assert.IsNotNull(loadCategory.Top);
+            Assert.IsNull(loadCategory.Top);
             Assert.AreNotEqual(loadCategory, category);
             Assert.AreEqual(loadCategory.Name, category.Name);
             Assert.AreEqual(loadCategory.Id, category.Id);
@@ -164,14 +180,16 @@ namespace Core.Tests
             var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
 
             _repository.Insert(category, true);
-            _repository.Insert(product, true);
+	        _repository.Insert<Product, Category, Category>(product, category, true);
 
-            var loadProduct = _repository.Get<Product, Product, Category, Category>(product.Id, category.Id, true);
+			var loadProduct = _repository.Get<Product, Product, Category, Category>(product.Id, category.Id, true);
 
             Assert.IsNotNull(loadProduct);
             Assert.IsNotNull(loadProduct.Parent);
             Assert.IsNotNull(loadProduct.FullName);
             Assert.AreEqual(loadProduct.FullName.Name, product.FullName.Name);
+            Assert.AreEqual(loadProduct.Parent.Id, product.Parent.Id);
+            Assert.AreEqual(loadProduct.Parent.Name, product.Parent.Name);
         }
 
         [TestMethod]
@@ -181,9 +199,9 @@ namespace Core.Tests
             var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
 
             _repository.Insert(category, true);
-            _repository.Insert(product, true);
+	        _repository.Insert<Product, Category, Category>(product, category, true);
 
-            var loadProduct = _repository.Get<Product, ProductProjection, Category, Category>(product.Id, category.Id, true);
+			var loadProduct = _repository.Get<Product, ProductProjection, Category, Category>(product.Id, category.Id, true);
 
             Assert.IsNotNull(loadProduct);
             Assert.IsNotNull(loadProduct.Parent);
@@ -212,7 +230,8 @@ namespace Core.Tests
             var category = new Category() { Name = "Category" };
             category.Name = "New Category";
             category.Id = "NewId";
-            Assert.ThrowsException<Exception>(() => _repository.Update(category, true));
+	        category.Version = 2;
+            Assert.ThrowsException<QueryException>(() => _repository.Update(category, true));
         }
 
         [TestMethod]
@@ -222,20 +241,15 @@ namespace Core.Tests
             _repository.Insert(category, true);
             category.Name = "New1 Category";
             _repository.Update(category, true);
-            category.Version--;
+            //category.Version--;
+			//TODO: ј нужно ли мен€ть версию на новую после обновлени€?
             category.Name = "New2 Category";
-            Assert.ThrowsException<Exception>(() => _repository.Update(category, true));
+            Assert.ThrowsException<QueryException>(() => _repository.Update(category, true));
 
             var loadCategory = _repository.Get<Category, Category>(category.Id, true);
 
             Assert.IsNotNull(loadCategory);
             Assert.AreEqual(loadCategory.Name, "New1 Category");
-        }
-
-        [TestMethod]
-        public void UpdateObjectByQueryWithInvalidQuery()
-        {
-            Assert.ThrowsException<Exception>(() => _repository.Update(Query<Category>.Ids(x => x.Values("NewId")), new UpdateByQueryBuilder<Category>().Set(x => x.Name, "New Category"), true));
         }
 
         [TestMethod]
@@ -279,7 +293,8 @@ namespace Core.Tests
         {
             var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
             category.Id = "NewId";
-            Assert.ThrowsException<Exception>(() => _repository.Remove(category));
+	        category.Version = 1;
+            Assert.ThrowsException<QueryException>(() => _repository.Remove(category));
         }
 
         [TestMethod]
@@ -290,12 +305,6 @@ namespace Core.Tests
             _repository.Remove<Category>(Query<Category>.Ids(x => x.Values(category.Id)));
             var loadCategory = _repository.Get<Category, Category>(category.Id, true);
             Assert.IsNull(loadCategory);
-        }
-
-        [TestMethod]
-        public void RemoveObjectByQueryWithInvalidQuery()
-        {
-            Assert.ThrowsException<Exception>(() => _repository.Remove<Category>(Query<Category>.Ids(x => x.Values("NewId"))));
         }
 
         [TestMethod]
@@ -312,8 +321,9 @@ namespace Core.Tests
             var category5 = new Category() { Name = "Test Category", CreatedOnUtc = DateTime.UtcNow };
             _repository.Insert(category5, true);
 
-            var categories = _repository.Search<Category, Category>(Query<Category>.Match(x => x.Field(c => c.CreatedOnUtc).Query("category")));
+            var categories = _repository.Search<Category, Category>(Query<Category>.Match(x => x.Field(c => c.Name).Query("category")));
 
+			Assert.AreEqual(categories.Count, 1);
             Assert.IsTrue(categories.Any(c => c.Name.Equals("Test Category")));
         }
 
@@ -331,8 +341,9 @@ namespace Core.Tests
             var category5 = new Category() { Name = "Test Category", CreatedOnUtc = DateTime.UtcNow };
             _repository.Insert(category5, true);
 
-            var categories = _repository.Search<Category, CategoryProjection>(Query<Category>.Match(x => x.Field(c => c.CreatedOnUtc).Query("category")));
+            var categories = _repository.Search<Category, CategoryProjection>(Query<Category>.Match(x => x.Field(c => c.Name).Query("category")));
 
+			Assert.AreEqual(categories.Count, 1);
             Assert.IsTrue(categories.Any(c => c.Name.Equals("Test Category")));
         }
 
@@ -361,7 +372,7 @@ namespace Core.Tests
             Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category2")));
             Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category3")));
             Assert.AreEqual(childCategories.FirstOrDefault().Name, "Child Category3");
-            Assert.IsNull(childCategories.FirstOrDefault().Top);
+            Assert.IsNull(childCategories.FirstOrDefault().Top.Name);
         }
 
         [TestMethod]
@@ -384,7 +395,8 @@ namespace Core.Tests
 
             Assert.AreEqual(childCategories.Count, 1);
             Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category2")));
-            Assert.IsNull(childCategories.FirstOrDefault().Top);
+            Assert.AreEqual(childCategories.FirstOrDefault().Top.Id, parentCategory.Id);
+            Assert.IsNull(childCategories.FirstOrDefault().Top.Name);
         }
 
         [TestMethod]
@@ -430,7 +442,8 @@ namespace Core.Tests
 
             Assert.AreEqual(childCategories.Count, 1);
             Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category1")));
-            Assert.IsNull(childCategories.FirstOrDefault().Top);
+            Assert.AreEqual(childCategories.FirstOrDefault().Top.Id, parentCategory.Id);
+            Assert.IsNull(childCategories.FirstOrDefault().Top.Name);
         }
 
         [TestMethod]
@@ -477,9 +490,9 @@ namespace Core.Tests
 
             Assert.AreEqual(childCategories.Count, 3);
             Assert.AreEqual(childCategories.Limit, 1);
-            Assert.AreEqual(childCategories.Page, 0);
+            Assert.AreEqual(childCategories.Page, 1);
             Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category3")));
-            Assert.IsNull(childCategories.FirstOrDefault().Top);
+            Assert.IsNull(childCategories.FirstOrDefault().Top.Name);
         }
 
         [TestMethod]
@@ -501,10 +514,12 @@ namespace Core.Tests
             var childCategories = _repository.SearchPager<Category, Category>(Query<Category>.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 0, 2, sort => sort.Descending(c => c.CreatedOnUtc), true);
 
             Assert.AreEqual(childCategories.Count, 3);
-            Assert.AreEqual(childCategories.Limit, 1);
-            Assert.AreEqual(childCategories.Page, 0);
+            Assert.AreEqual(childCategories.Limit, 2);
+            Assert.AreEqual(childCategories.Page, 1);
+            Assert.AreEqual(childCategories.Count(), 2);
             Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category3")));
             Assert.IsNotNull(childCategories.FirstOrDefault().Top);
+            Assert.IsNotNull(childCategories.FirstOrDefault().Top.Name);
         }
     }
 }

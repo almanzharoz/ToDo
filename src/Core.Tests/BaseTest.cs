@@ -1,6 +1,7 @@
 ﻿using Core.ElasticSearch;
 using Core.ElasticSearch.Mapping;
 using Core.Tests.Models;
+using Core.Tests.Projections;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -28,6 +29,8 @@ namespace Core.Tests
 
                 .AddProjection<Producer, Producer>()
                 .AddProjection<Category, Category>()
+                .AddProjection<CategoryProjection, Category>()
+                .AddProjection<ProductProjection, Product, Category, Category>()
                 .AddProjection<Product, Product, Category, Category>());
 
             _repository = serviceProvider.GetService<TestRepository>();

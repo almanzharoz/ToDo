@@ -11,7 +11,8 @@ namespace Core.ElasticSearch
 	{
 		protected bool Insert<T>(T entity, bool refresh) where T : class, IEntity
 			=> Try(
-				c => c.Index(entity, refresh.If(new Func<IndexDescriptor<T>, IIndexRequest>(x => x.Refresh(Refresh.True)), null)).Fluent(x => entity.Id = x.Id),
+				c => c.Index(entity, refresh.If(new Func<IndexDescriptor<T>, IIndexRequest>(x => x.Refresh(Refresh.True)), null)).Fluent(x => entity.Set(e=>e.Id, x.Id)
+				.Is<T,IWithVersion>(s => s.Set(e => ((IWithVersion)e).Version, (int)x.Version))),
 				r => r.Created,
 				RepositoryLoggingEvents.ES_INSERT);
 
