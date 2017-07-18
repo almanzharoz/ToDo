@@ -47,6 +47,8 @@ $(function() {
 			var url = $(this).attr("url");
 			var id = $(this).attr("set-id");
 			$(this).typeahead({
+				fitToElement: true,
+				autoSelect: true,
 				source: function(query, process) {
 					return $.get(url,
 						{ s: query },
@@ -54,9 +56,15 @@ $(function() {
 							return process(data);
 						});
 				},
-				afterSelect: function(item) {
+				afterSelect: function (item) {
 					$("#" + id).val(item.id);
 				}
 			});
 		});
+
+	$(document).on("blur", "input.typeahead", function() {
+		var cur = $(this).typeahead("getActive");
+		if (cur && cur.name === $(this).val())
+			$("#" + $(this).attr("set-id")).val(cur.id);
+	});
 });

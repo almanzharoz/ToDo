@@ -91,29 +91,31 @@ namespace Core.ElasticSearch
 				r => ((int)r.Updated, (int)r.Total),
 				RepositoryLoggingEvents.ES_UPDATEBYQUERY);
 
-		protected bool Remove<T>(T entity) where T : class, IEntity, IWithVersion
+		protected bool Remove<T, TModel>(T entity)
+			where T : class, IEntity, IWithVersion, IProjection<TModel>
+			where TModel : class, IEntity
 			=> Try(
-				c => c.Delete(DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, nameof(entity))), x => x.Version(entity.Version)),
+				c => c.Delete(DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, nameof(entity))), x => x.Version(entity.Version).Refresh(Refresh.True)),
 				r => r.Found,
 				RepositoryLoggingEvents.ES_REMOVE,
 				$"Remove (Id: {entity.Id})");
 
 		protected Task<bool> RemoveAsync<T>(T entity) where T : class, IEntity, IWithVersion
 			=> TryAsync(
-				c => c.DeleteAsync(DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, nameof(entity))), x => x.Version(entity.Version)),
+				c => c.DeleteAsync(DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, nameof(entity))), x => x.Version(entity.Version).Refresh(Refresh.True)),
 				r => r.Found,
 				RepositoryLoggingEvents.ES_REMOVE,
 				$"Remove (Id: {entity.Id})");
 
 		protected int Remove<T>(QueryContainer query) where T : class, IEntity
 			=> Try(
-				c => c.DeleteByQuery<T>(d => d.Query(q => q.Bool(b => b.Filter(query)))),
+				c => c.DeleteByQuery<T>(d => d.Query(q => q.Bool(b => b.Filter(query))).Refresh()),
 				r => (int)r.Deleted,
 				RepositoryLoggingEvents.ES_REMOVEBYQUERY);
 
 		protected Task<int> RemoveAsync<T>(QueryContainer query) where T : class, IEntity
 			=> TryAsync(
-				c => c.DeleteByQueryAsync<T>(d => d.Query(q => q.Bool(b => b.Filter(query)))),
+				c => c.DeleteByQueryAsync<T>(d => d.Query(q => q.Bool(b => b.Filter(query))).Refresh()),
 				r => (int)r.Deleted,
 				RepositoryLoggingEvents.ES_REMOVEBYQUERY);
 	}

@@ -37,7 +37,7 @@ namespace ToDo.Dal
 				    .AddProjection<Projections.Task, Task, Project, Project>(),
 			    rep =>
 			    {
-				    rep.AddUser("admin", "admin", "123", new[] {"admin"});
+				    rep.AddUser("admin", "admin", "123", new[] { EUserRole.Admin });
 			    });
     }
 }

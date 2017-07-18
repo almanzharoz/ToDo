@@ -1,4 +1,5 @@
-﻿@model ToDo.WebApp.Model.Admin.NewUserEditModel
+﻿@using ToDo.Dal.Models
+@model ToDo.WebApp.Model.Admin.NewUserEditModel
 <form asp-action="AddUser" method="post">
 	<table class="table">
 		<tr>
@@ -19,7 +20,10 @@
 		</tr>
 		<tr>
 			<th>Роли:</th>
-			<td>@Html.TextAreaFor(x => x.Roles)</td>
+			<td>
+				@Html.ListBoxFor(x => x.Roles, Enum.GetNames(typeof(EUserRole)).Select(x => new SelectListItem(){Text=x, Selected = Model.Roles.Any(z => z == (EUserRole)Enum.Parse(typeof(EUserRole), x))}))
+				@*@Html.TextAreaFor(x => x.Roles)*@
+			</td>
 		</tr>
 	</table>
 	<submit text="добавить" />

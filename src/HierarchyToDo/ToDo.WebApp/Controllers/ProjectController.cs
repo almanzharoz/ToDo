@@ -27,8 +27,9 @@ namespace ToDo.WebApp.Controllers
 
 		[HttpPost]
 		public IActionResult Edit(ProjectEditModel project)
-			=> ModelState.IsValid
-				? View("Saved", _service.SaveProject(project.Id, project.Update))
+			=> ModelState.If(x => project.Id != null ? _service.ProjectExists(project.Id, project.Name) : _service.ProjectExists(project.Name), x=>x.AddModelError("Name", "Project already exists"))
+			.IsValid
+				? View("Saved", _service.SaveProject(project.Id, p => p.Set(x => x.Name, project.Name)))
 				: View(project);
 
 		[HttpDelete]

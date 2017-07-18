@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Nest;
 using SharpFuncExt;
+using ToDo.Dal.Models;
 
 namespace ToDo.Dal.Repositories
 {
@@ -20,7 +21,7 @@ namespace ToDo.Dal.Repositories
 		{
 		}
 
-		public bool AddUser(string email, string name, string password, string[] roles)
+		public bool AddUser(string email, string name, string password, EUserRole[] roles)
 			=> Count<Models.User>(Query<Models.User>.Term(p => p.Email, email.ToLower()))
 				.If(p => p == 0, x =>
 					Insert(new Models.User()
@@ -33,11 +34,11 @@ namespace ToDo.Dal.Repositories
 
 		public IReadOnlyCollection<Projections.UserWithRoles> GetUsers() => Search<Models.User, Projections.UserWithRoles>(new QueryContainer());
 
-		public bool DeleteRole(string id, string role)
+		public bool DeleteRole(string id, EUserRole role)
 			=> Update(Query<Models.User>.Ids(x => x.Values(id)),
 					new UpdateByQueryBuilder<Models.User>().Remove(x => x.Roles, role)) > 0;
 
-		public bool AddRole(string id, string role)
+		public bool AddRole(string id, EUserRole role)
 			=> Update(Query<Models.User>.Ids(x => x.Values(id)),
 					new UpdateByQueryBuilder<Models.User>().Add(x => x.Roles, role)) > 0;
 
@@ -45,7 +46,8 @@ namespace ToDo.Dal.Repositories
 			=> Update(Query<Models.User>.Ids(x => x.Values(id)),
 					new UpdateByQueryBuilder<Models.User>().Set(x => x.Deny, deny)) > 0;
 
-		public bool DeleteUser(string id) => Remove<Models.User>(Query<Models.User>.Ids(x => x.Values(id))) > 0;
+		public bool DeleteUser(string id) => Remove<Projections.User, Models.User>(GetUser(id));
+		public Projections.UserWithRoles GetUser(string id) => Get<User, Projections.UserWithRoles>(id.HasNotNullArg("userId"));
 
 		public ISearchResponse<Projections.User> GetUsersNames(string s) =>
 			_client.Search<Models.User, Projections.User>(x => x.Query(q => q.Match(m => m.Field(p => p.Nick).Query(s))));

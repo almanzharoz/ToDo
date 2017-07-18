@@ -10,6 +10,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Core.ElasticSearch.Serialization
 {
+	// TODO: Попытка сдлетать readonly поля без JsonPropertyAttribute
 	public class SisoJsonDefaultContractResolver
 		: ElasticContractResolver
 	{

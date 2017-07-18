@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using ToDo.Dal;
+using ToDo.Dal.Models;
 using ToDo.Dal.Repositories;
 using ToDo.WebApp.Model;
 
@@ -38,7 +39,7 @@ namespace ToDo.WebApp.Controllers
 				new Claim("IP", Request.Host.Host, ClaimValueTypes.String),
 				new Claim("permission-foo", "grant")
 			};
-			claims.AddRange(user.Roles.Select(x => new Claim(ClaimTypes.Role, x)));
+			claims.AddRange((user.Roles ?? new []{ EUserRole.Anonym }).Select(x => new Claim(ClaimTypes.Role, x.ToString().ToLower())));
 
 			var identity = new ClaimsIdentity("MyCookieMiddlewareInstance");
 			identity.AddClaims(claims);
