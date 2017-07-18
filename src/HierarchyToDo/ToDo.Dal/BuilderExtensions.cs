@@ -14,15 +14,15 @@ namespace ToDo.Dal
 	    {
 		    services.AddElastic(new ElasticSettings(new Uri(url), indexName))
 				// репозитории
-				.AddRepository<AuthorizationRepository, ElasticSettings>()
-			    .AddRepository<AdminRepository, ElasticSettings>()
-			    .AddRepository<ProjectRepository, ElasticSettings>()
-			    .AddRepository<TaskRepository, ElasticSettings>();
+				.AddService<AuthorizationService, ElasticSettings>()
+			    .AddService<AdminService, ElasticSettings>()
+			    .AddService<ProjectService, ElasticSettings>()
+			    .AddService<TaskService, ElasticSettings>();
 		    return services;
 	    }
 
 	    public static IApplicationBuilder UseToDo(this IApplicationBuilder app) =>
-		    app.UseElastic<ElasticSettings, AdminRepository>(
+		    app.UseElastic<ElasticSettings, AdminService>(
 			    m => m
 				    // маппинг
 				    .AddMapping<User>()

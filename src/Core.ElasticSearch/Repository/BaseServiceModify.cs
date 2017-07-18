@@ -7,12 +7,14 @@ using SharpFuncExt;
 
 namespace Core.ElasticSearch
 {
-	public abstract partial class BaseRepository<TSettings>
+	public abstract partial class BaseService<TSettings>
 	{
 		protected bool Insert<T>(T entity, bool refresh) where T : class, IEntity
 			=> Try(
-				c => c.Index(entity, refresh.If(new Func<IndexDescriptor<T>, IIndexRequest>(x => x.Refresh(Refresh.True)), null)).Fluent(x => entity.Set(e=>e.Id, x.Id)
-				.Is<T,IWithVersion>(s => s.Set(e => ((IWithVersion)e).Version, (int)x.Version))),
+				c => c.Index(entity, refresh.If(new Func<IndexDescriptor<T>, IIndexRequest>(x => x.Refresh(Refresh.True)), null))
+					.Fluent(x => entity
+						.Set(e => e.Id, x.Id)
+						.Is<T, IWithVersion>(s => s.Set(e => ((IWithVersion) e).Version, (int) x.Version))),
 				r => r.Created,
 				RepositoryLoggingEvents.ES_INSERT);
 
@@ -24,7 +26,10 @@ namespace Core.ElasticSearch
 			where TParentProjection : IProjection<TParentModel>
 			=> Try(
 				c => c.Index(entity, s => s.If(refresh, a => a.Refresh(Refresh.True)).IfNotNull(parent, a => a.Parent(parent.Id)))
-					.Fluent(x => entity.Set(p => p.Id, x.Id).Set(p => p.Parent, parent)),
+					.Fluent(x => entity
+						.Set(p => p.Id, x.Id)
+						.Set(p => p.Parent, parent)
+						.Is<T, IWithVersion>(s => s.Set(e => ((IWithVersion) e).Version, (int) x.Version))),
 				r => r.Created,
 				RepositoryLoggingEvents.ES_INSERT);
 
@@ -36,15 +41,19 @@ namespace Core.ElasticSearch
 
 		protected Task<bool> InsertAsync<T>(T entity, bool refresh = true) where T : class, IEntity
 			=> TryAsync(
-				c => c.IndexAsync(entity, refresh.If(new Func<IndexDescriptor<T>, IIndexRequest>(x => x.Refresh(Refresh.True)), null)),
+				c => c.IndexAsync(entity,
+						refresh.If(new Func<IndexDescriptor<T>, IIndexRequest>(x => x.Refresh(Refresh.True)), null))
+					.Fluent(x => entity.Set(p => p.Id, x.Id)
+						.Is<T, IWithVersion>(s => s.Set(e => ((IWithVersion) e).Version, (int) x.Version))),
 				r => r.Created,
 				RepositoryLoggingEvents.ES_INSERT);
 
 		protected bool Update<T>(T entity, bool refresh) where T : class, IEntity, IWithVersion
 			=> Try(
 				c => c.Update(
-					DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, x => x.Version, nameof(entity))),
-					d => d.Version(entity.Version).Doc(entity).If(refresh, x => x.Refresh(Refresh.True))),
+						DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, x => x.Version, nameof(entity))),
+						d => d.Version(entity.Version).Doc(entity).If(refresh, x => x.Refresh(Refresh.True)))
+					.Fluent(r => entity.Set(p => p.Version, (int) r.Version)),
 				r => r.Result == Result.Updated,
 				RepositoryLoggingEvents.ES_UPDATE,
 				$"Update (Id: {entity?.Id})");
@@ -54,8 +63,9 @@ namespace Core.ElasticSearch
 		protected Task<bool> UpdateAsync<T>(T entity, bool refresh = true) where T : class, IEntity, IWithVersion
 			=> TryAsync(
 				c => c.UpdateAsync(
-					DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, x => x.Version, nameof(entity))),
-					d => d.Version(entity.Version).Doc(entity).If(refresh, x => x.Refresh(Refresh.True))),
+						DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, x => x.Version, nameof(entity))),
+						d => d.Version(entity.Version).Doc(entity).If(refresh, x => x.Refresh(Refresh.True)))
+					.Fluent(r => entity.Set(p => p.Version, (int) r.Version)),
 				r => r.Result == Result.Updated,
 				RepositoryLoggingEvents.ES_UPDATE,
 				$"Update (Id: {entity?.Id})");

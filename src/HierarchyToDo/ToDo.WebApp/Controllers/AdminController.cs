@@ -12,9 +12,9 @@ using ToDo.WebApp.Model.Admin;
 namespace ToDo.WebApp.Controllers
 {
 	[Authorize(Roles = "admin")]
-    public class AdminController : BaseController<AdminRepository>
+    public class AdminController : BaseController<AdminService>
     {
-	    public AdminController(AdminRepository repository) : base(repository)
+	    public AdminController(AdminService service) : base(service)
 	    {
 	    }
 
@@ -23,25 +23,25 @@ namespace ToDo.WebApp.Controllers
 		[HttpPost]
 		public IActionResult AddUser(NewUserEditModel model)
 		    => ModelState.IsValid ?
-			View("UserAdded", _repository.AddUser(model.Email, model.Name, model.Password, model.Roles.Split('\n').Select(x => x.Trim()).Where(StringFunc.IsNotNull).ToArray()))
+			View("UserAdded", _service.AddUser(model.Email, model.Name, model.Password, model.Roles.Split('\n').Select(x => x.Trim()).Where(StringFunc.IsNotNull).ToArray()))
 			: View(model);
 
 	    public IActionResult Users()
-		    => View(_repository.GetUsers());
+		    => View(_service.GetUsers());
 		[HttpPost]
 	    public IActionResult Deny(string id, bool deny)
-		    => View(deny.Extend(_repository.DenyUser(id.HasNotNullArg(nameof(id)), deny)));
+		    => View(deny.Extend(_service.DenyUser(id.HasNotNullArg(nameof(id)), deny)));
 		[HttpDelete]
 	    public IActionResult DeleteRole(string id, string role)
-		    => View(_repository.DeleteRole(id.HasNotNullArg(nameof(id)), role.HasNotNullArg(nameof(role))));
+		    => View(_service.DeleteRole(id.HasNotNullArg(nameof(id)), role.HasNotNullArg(nameof(role))));
 
 	    [HttpGet]
 	    public IActionResult AddRole(string id) => PartialIfAjax(id, "AddRole", x => View("AddRole", x));
 		[HttpPost]
 	    public IActionResult AddRole(string id, string role)
-		    => View("RoleAdded", _repository.AddRole(id.HasNotNullArg(nameof(id)), role.HasNotNullArg(nameof(role))));
+		    => View("RoleAdded", _service.AddRole(id.HasNotNullArg(nameof(id)), role.HasNotNullArg(nameof(role))));
 		[HttpDelete]
 		public IActionResult Delete(string id)
-		    => View(_repository.DeleteUser(id.HasNotNullArg(nameof(id))));
+		    => View(_service.DeleteUser(id.HasNotNullArg(nameof(id))));
 	}
 }

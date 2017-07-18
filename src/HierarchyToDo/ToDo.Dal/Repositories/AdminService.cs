@@ -11,11 +11,11 @@ using SharpFuncExt;
 
 namespace ToDo.Dal.Repositories
 {
-	public class AdminRepository : BaseToDoRepository
+	public class AdminService : BaseToDoService
 	{
 		private static readonly MD5 md5 = MD5.Create();
 
-		public AdminRepository(ILoggerFactory loggerFactory, ElasticSettings settings, ElasticMapping<ElasticSettings> mapping, RequestContainer<ElasticSettings> container, Projections.UserName user) 
+		public AdminService(ILoggerFactory loggerFactory, ElasticSettings settings, ElasticMapping<ElasticSettings> mapping, RequestContainer<ElasticSettings> container, Projections.UserName user) 
 			: base(loggerFactory, settings, mapping, container, user)
 		{
 		}

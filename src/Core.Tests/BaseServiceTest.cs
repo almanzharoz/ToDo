@@ -12,7 +12,7 @@ using SharpFuncExt;
 namespace Core.Tests
 {
     [TestClass]
-    public class BaseRepositoryTest : BaseTest
+    public class BaseServiceTest : BaseTest
     {
         [TestMethod]
         public void AddObjectWithoutParentAndRelated()
@@ -220,7 +220,7 @@ namespace Core.Tests
             var loadCategory = _repository.Get<Category, Category>(category.Id, true);
 
             Assert.IsNotNull(loadCategory);
-            Assert.AreNotEqual(loadCategory.Version, category.Version);
+            Assert.AreEqual(loadCategory.Version, category.Version);
             Assert.AreEqual(loadCategory.Name, "New Category");
         }
 
@@ -241,10 +241,9 @@ namespace Core.Tests
             _repository.Insert(category, true);
             category.Name = "New1 Category";
             _repository.Update(category, true);
-            //category.Version--;
-			//TODO: ј нужно ли мен€ть версию на новую после обновлени€?
+            category.Version--;
             category.Name = "New2 Category";
-            Assert.ThrowsException<QueryException>(() => _repository.Update(category, true));
+            Assert.ThrowsException<VersionException>(() => _repository.Update(category, true));
 
             var loadCategory = _repository.Get<Category, Category>(category.Id, true);
 
@@ -294,7 +293,7 @@ namespace Core.Tests
             var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
             category.Id = "NewId";
 	        category.Version = 1;
-            Assert.ThrowsException<QueryException>(() => _repository.Remove(category));
+            Assert.ThrowsException<VersionException>(() => _repository.Remove(category));
         }
 
         [TestMethod]
@@ -511,7 +510,7 @@ namespace Core.Tests
             var category2 = new Category() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
             _repository.Insert(category2, true);
 
-            var childCategories = _repository.SearchPager<Category, Category>(Query<Category>.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 0, 2, sort => sort.Descending(c => c.CreatedOnUtc), true);
+            var childCategories = _repository.SearchPager<Category, Category>(Query<Category>.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 1, 2, sort => sort.Descending(c => c.CreatedOnUtc), true);
 
             Assert.AreEqual(childCategories.Count, 3);
             Assert.AreEqual(childCategories.Limit, 2);

@@ -23,22 +23,22 @@ namespace Core.ElasticSearch
 			=> AddElastic<TSettings>(services, new TSettings());
 		
 
-		public static IServiceCollection AddRepository<T, TSettings>(this IServiceCollection services)
-			where T : BaseRepository<TSettings>
+		public static IServiceCollection AddService<T, TSettings>(this IServiceCollection services)
+			where T : BaseService<TSettings>
 			where TSettings : BaseElasticSettings
 		{
 			services.AddScoped<T>();
 			return services;
 		}
 
-		public static IApplicationBuilder UseElastic<TSettings, TRepository>(this IApplicationBuilder app, Action<ElasticMapping<TSettings>> mappingFactory, Action<TRepository> initFunc)
+		public static IApplicationBuilder UseElastic<TSettings, TService>(this IApplicationBuilder app, Action<ElasticMapping<TSettings>> mappingFactory, Action<TService> initFunc)
 			where TSettings : BaseElasticSettings
-			where TRepository : BaseRepository<TSettings>
+			where TService : BaseService<TSettings>
 
 		{
 			var mapping = app.ApplicationServices.GetService<ElasticMapping<TSettings>>();
 			mappingFactory(mapping);
-			mapping.Build(initFunc, app.ApplicationServices.GetService<TRepository>());
+			mapping.Build(initFunc, app.ApplicationServices.GetService<TService>());
 			return app;
 		}
 
@@ -61,14 +61,14 @@ namespace Core.ElasticSearch
 			mapping.Build(null);
 		}
 
-		public static void UseElastic<TSettings, TRepository>(this IServiceProvider services, Action<ElasticMapping<TSettings>> mappingFactory, Action<TRepository> initFunc)
+		public static void UseElastic<TSettings, TService>(this IServiceProvider services, Action<ElasticMapping<TSettings>> mappingFactory, Action<TService> initFunc)
 			where TSettings : BaseElasticSettings
-			where TRepository : BaseRepository<TSettings>
+			where TService : BaseService<TSettings>
 
 		{
 			var mapping = services.GetService<ElasticMapping<TSettings>>();
 			mappingFactory(mapping);
-			mapping.Build(initFunc, services.GetService<TRepository>());
+			mapping.Build(initFunc, services.GetService<TService>());
 		}
 	}
 }

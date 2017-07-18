@@ -12,9 +12,9 @@ using ToDo.Dal.Projections;
 
 namespace ToDo.Dal.Repositories
 {
-	public class ProjectRepository : BaseToDoRepository
+	public class ProjectService : BaseToDoService
 	{
-		public ProjectRepository(ILoggerFactory loggerFactory, ElasticSettings settings,
+		public ProjectService(ILoggerFactory loggerFactory, ElasticSettings settings,
 			ElasticMapping<ElasticSettings> mapping, RequestContainer<ElasticSettings> container, UserName user)
 			: base(loggerFactory, settings, mapping, container, user)
 		{

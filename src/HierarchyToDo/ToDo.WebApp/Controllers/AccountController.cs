@@ -11,9 +11,9 @@ using ToDo.WebApp.Model;
 
 namespace ToDo.WebApp.Controllers
 {
-	public class AccountController : BaseController<AuthorizationRepository>
+	public class AccountController : BaseController<AuthorizationService>
 	{
-		public AccountController(AuthorizationRepository repository) : base(repository)
+		public AccountController(AuthorizationService service) : base(service)
 		{
 		}
 
@@ -27,7 +27,7 @@ namespace ToDo.WebApp.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Login(LoginViewModel vm)
 		{
-			var user = _repository.TryLogin(vm.Login.Trim().ToLower(), vm.Pass.Trim());
+			var user = _service.TryLogin(vm.Login.Trim().ToLower(), vm.Pass.Trim());
 			if (user == null)
 				return View(vm);
 

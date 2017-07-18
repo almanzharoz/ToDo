@@ -10,7 +10,7 @@ using SharpFuncExt;
 
 namespace Core.ElasticSearch
 {
-	public abstract partial class BaseRepository<TSettings>
+	public abstract partial class BaseService<TSettings>
 	{
 		protected Task<IReadOnlyCollection<TProjection>> SearchAsync<T, TProjection>(QueryContainer query, int take = 0,
 			int skip = 0, bool load = true)
