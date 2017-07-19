@@ -81,11 +81,11 @@ namespace Core.Tests
         public new bool Insert<T>(T entity, bool refresh) where T : class, IEntity
             => base.Insert<T>(entity, refresh);
 
-        public new bool Insert<T, TParentModel, TParentProjection>(T entity, TParentProjection parent, bool refresh)
+        public new bool Insert<T, TParentModel, TParentProjection>(T entity, bool refresh)
             where T : class, IEntity, IWithParent<TParentModel, TParentProjection>
             where TParentModel : class, IEntity
             where TParentProjection : IProjection<TParentModel>
-            => base.Insert<T, TParentModel, TParentProjection>(entity, parent, refresh);
+            => base.Insert<T, TParentModel, TParentProjection>(entity, refresh);
 
         public new Task<bool> InsertAsync<T>(T entity, bool refresh = true) where T : class, IEntity
             => base.InsertAsync<T>(entity, refresh);

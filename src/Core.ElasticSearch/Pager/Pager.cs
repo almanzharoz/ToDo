@@ -13,13 +13,14 @@ namespace Core.ElasticSearch
 	    private readonly IReadOnlyCollection<T> _items;
 		public int Page { get; }
 		public int Limit { get; }
-	    public int Count { get; }
+	    public int Count => _items.Count;
+	    public int Total { get; }
 
-		public Pager(int page, int limit, int count, IReadOnlyCollection<T> items)
+		public Pager(int page, int limit, int total, IReadOnlyCollection<T> items)
 		{
-			Page = page < 1 ? 1 : page;
+			Page = page < 1 ? 1 : page; // 0 и 1 - всегда первая страница
 		    Limit = limit;
-		    Count = count;
+		    Total = total;
 		    _items = items;
 	    }
 

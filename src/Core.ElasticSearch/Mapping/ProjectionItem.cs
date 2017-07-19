@@ -16,6 +16,26 @@ namespace Core.ElasticSearch.Mapping
 		JsonConverter GetJsonConverter(IRequestContainer container);
 	}
 
+	internal abstract class BaseProjectionItem<T, TMapping> : IProjectionItem
+		where T : class, IProjection<TMapping>, new()
+		where TMapping : class, IEntity
+	{
+		protected BaseProjectionItem(MappingItem<TMapping> mappingItem)
+		{
+			MappingItem = mappingItem;
+			Fields = typeof(T).GetFields();
+			var errorFields = mappingItem.CheckFields(Fields);
+			if (errorFields.Any())
+				throw new Exception($"Not found fields for \"{typeof(T).Name}\": {String.Join(", ", errorFields)}");
+		}
+
+		public string[] Fields { get; }
+		public IMappingItem MappingItem { get; }
+
+		public JsonConverter GetJsonConverter(IRequestContainer container)
+			=> new ClassJsonConverter<T>(container);
+	}
+
 	internal class ProjectionItem<T, TMapping> : IProjectionItem 
 		where T : class, IProjection<TMapping>, new() 
 		where TMapping : class, IEntity
@@ -53,6 +73,7 @@ namespace Core.ElasticSearch.Mapping
 
 		public string[] Fields { get; }
 		public IMappingItem MappingItem { get; }
+		//TODO: Добавить возможность не указывать тип парента в методах репозитории
 
 		public JsonConverter GetJsonConverter(IRequestContainer container)
 			=> new ParentJsonConverter<T, TParentModel, TParentProjection>(container);

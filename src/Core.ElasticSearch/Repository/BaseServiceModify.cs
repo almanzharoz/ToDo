@@ -20,24 +20,23 @@ namespace Core.ElasticSearch
 
 		protected bool Insert<T>(T entity) where T : class, IEntity => Insert(entity, true);
 
-		protected bool Insert<T, TParentModel, TParentProjection>(T entity, TParentProjection parent, bool refresh)
+		protected bool Insert<T, TParentModel, TParentProjection>(T entity, bool refresh)
 			where T : class, IEntity, IWithParent<TParentModel, TParentProjection>
 			where TParentModel : class, IEntity
 			where TParentProjection : IProjection<TParentModel>
 			=> Try(
-				c => c.Index(entity, s => s.If(refresh, a => a.Refresh(Refresh.True)).IfNotNull(parent, a => a.Parent(parent.Id)))
+				c => c.Index(entity, s => s.If(refresh, a => a.Refresh(Refresh.True)).IfNotNull(entity.Parent, a => a.Parent(entity.Parent.Id)))
 					.Fluent(x => entity
 						.Set(p => p.Id, x.Id)
-						.Set(p => p.Parent, parent)
 						.Is<T, IWithVersion>(s => s.Set(e => ((IWithVersion) e).Version, (int) x.Version))),
 				r => r.Created,
 				RepositoryLoggingEvents.ES_INSERT);
 
-		protected bool Insert<T, TParentModel, TParentProjection>(T entity, TParentProjection parent)
+		protected bool Insert<T, TParentModel, TParentProjection>(T entity)
 			where T : class, IEntity, IWithParent<TParentModel, TParentProjection>
 			where TParentModel : class, IEntity
 			where TParentProjection : IProjection<TParentModel> 
-			=> Insert<T, TParentModel, TParentProjection>(entity, parent, true);
+			=> Insert<T, TParentModel, TParentProjection>(entity, true);
 
 		protected Task<bool> InsertAsync<T>(T entity, bool refresh = true) where T : class, IEntity
 			=> TryAsync(

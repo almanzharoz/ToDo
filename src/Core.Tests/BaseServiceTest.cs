@@ -487,7 +487,7 @@ namespace Core.Tests
 
             var childCategories = _repository.SearchPager<Category, Category>(Query<Category>.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 0, 1, sort => sort.Descending(c => c.CreatedOnUtc), false);
 
-            Assert.AreEqual(childCategories.Count, 3);
+            Assert.AreEqual(childCategories.Total, 3);
             Assert.AreEqual(childCategories.Limit, 1);
             Assert.AreEqual(childCategories.Page, 1);
             Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category3")));
@@ -510,12 +510,12 @@ namespace Core.Tests
             var category2 = new Category() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
             _repository.Insert(category2, true);
 
-            var childCategories = _repository.SearchPager<Category, Category>(Query<Category>.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 1, 2, sort => sort.Descending(c => c.CreatedOnUtc), true);
+			var childCategories = _repository.SearchPager<Category, Category>(Query<Category>.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 1, 2, sort => sort.Descending(c => c.CreatedOnUtc), true);
 
-            Assert.AreEqual(childCategories.Count, 3);
+            Assert.AreEqual(childCategories.Total, 3);
             Assert.AreEqual(childCategories.Limit, 2);
             Assert.AreEqual(childCategories.Page, 1);
-            Assert.AreEqual(childCategories.Count(), 2);
+            Assert.AreEqual(childCategories.Count, 2);
             Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category3")));
             Assert.IsNotNull(childCategories.FirstOrDefault().Top);
             Assert.IsNotNull(childCategories.FirstOrDefault().Top.Name);

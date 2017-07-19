@@ -20,7 +20,7 @@ namespace Core.ElasticSearch.Serialization
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
 		{
 			writer.WriteStartObject();
-			foreach (var property in value.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+			foreach (var property in value.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)) // TODO: добавить выбор полей в маппинг
 			{
 				if (property.Name == "Id" || property.Name == "Version" || property.Name == "Parent")
 					continue;
