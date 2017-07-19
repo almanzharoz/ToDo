@@ -1,6 +1,7 @@
 ﻿using Core.ElasticSearch;
 using Core.ElasticSearch.Mapping;
 using Core.Tests.Models;
+using Core.Tests.Projections;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -9,7 +10,7 @@ namespace Core.Tests
     [TestClass]
     public abstract class BaseTest
     {
-        protected TestRepository _repository;
+        protected TestService _repository;
 
         [TestInitialize]
         public void Setup()
@@ -17,7 +18,7 @@ namespace Core.Tests
             var serviceProvider = new ServiceCollection()
                 .AddLogging()
                 .AddElastic<ElasticSettings>()
-                    .AddRepository<TestRepository, ElasticSettings>()
+                    .AddService<TestService, ElasticSettings>()
                 .BuildServiceProvider();
 
             serviceProvider.UseElasticForTests<ElasticSettings>(map => map
@@ -28,9 +29,11 @@ namespace Core.Tests
 
                 .AddProjection<Producer, Producer>()
                 .AddProjection<Category, Category>()
+                .AddProjection<CategoryProjection, Category>()
+                .AddProjection<ProductProjection, Product, Category, Category>()
                 .AddProjection<Product, Product, Category, Category>());
 
-	        _repository = serviceProvider.GetService<TestRepository>();
+            _repository = serviceProvider.GetService<TestService>();
         }
     }
 }

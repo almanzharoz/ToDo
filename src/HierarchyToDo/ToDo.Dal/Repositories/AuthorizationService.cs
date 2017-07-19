@@ -12,11 +12,11 @@ using ToDo.Dal.Projections;
 
 namespace ToDo.Dal.Repositories
 {
-	public class AuthorizationRepository : BaseToDoRepository
+	public class AuthorizationService : BaseToDoService
 	{
 		private static readonly MD5 md5 = MD5.Create();
 
-		public AuthorizationRepository(ILoggerFactory loggerFactory, ElasticSettings settings,
+		public AuthorizationService(ILoggerFactory loggerFactory, ElasticSettings settings,
 			ElasticMapping<ElasticSettings> mapping, RequestContainer<ElasticSettings> container, UserName user)
 			: base(loggerFactory, settings, mapping, container, user)
 		{

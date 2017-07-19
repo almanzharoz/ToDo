@@ -1,15 +1,17 @@
 ﻿using Core.ElasticSearch.Domain;
+using Newtonsoft.Json;
 using SharpFuncExt;
 using ToDo.Dal.Interfaces;
 using ToDo.Dal.Models;
 
 namespace ToDo.Dal.Projections
 {
-	public class User : IProjection<Models.User>
+	public class User : BaseEntity, IProjection<Models.User>, IWithVersion
 	{
-		public string Id { get; set; }
-		public string Nick { get; set; }
+		[JsonProperty]
+		public string Nick { get; private set; }
 		public bool Deny { get; set; }
+		public int Version { get; set; }
 
 		public static implicit operator User(UserName userName) => userName.IfNotNullOrDefault(x=>new User { Id = x.Id });
 		public static implicit operator User(string userName) => userName.IfNotNullOrDefault(x => new User { Id = x });
@@ -34,11 +36,15 @@ namespace ToDo.Dal.Projections
 		{
 			return Id?.GetHashCode() ?? 0;
 		}
+
 	}
 
 	public class UserWithRoles : User
 	{
-		public string[] Roles { get; set; }
+		[JsonProperty]
+		public EUserRole[] Roles { get; private set; }
+		[JsonProperty]
+		public string Email { get; private set; }
 	}
 
 	public class UserName

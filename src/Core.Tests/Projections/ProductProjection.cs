@@ -1,4 +1,5 @@
 ﻿using Core.ElasticSearch.Domain;
+using Core.Tests.Models;
 using Nest;
 using Newtonsoft.Json;
 
@@ -11,11 +12,13 @@ namespace Core.Tests.Projections
 		public string Producer { get; set; }
 	}
 
-	public class ProductProjection : BaseEntityWithParent<Models.Category, CategoryProjection>, IProjection<Models.Product>, IWithVersion
+	public class ProductProjection : IWithParent<Models.Category, Models.Category>, IProjection<Models.Product>
 	{
-		public int Version { get; set; }
-		[JsonProperty]
-		[Keyword]
+        public string Id { get; set; }
+        public string Name { get; set; }
+        [JsonProperty]
 		public FullName FullName { get; private set; }
-	}
+        [JsonIgnore]
+        public Category Parent { get; set; }
+    }
 }

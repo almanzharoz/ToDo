@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using ToDo.Dal;
+using ToDo.Dal.Models;
 using ToDo.Dal.Repositories;
 using ToDo.WebApp.Model;
 
 namespace ToDo.WebApp.Controllers
 {
-	public class AccountController : BaseController<AuthorizationRepository>
+	public class AccountController : BaseController<AuthorizationService>
 	{
-		public AccountController(AuthorizationRepository repository) : base(repository)
+		public AccountController(AuthorizationService service) : base(service)
 		{
 		}
 
@@ -27,7 +28,7 @@ namespace ToDo.WebApp.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Login(LoginViewModel vm)
 		{
-			var user = _repository.TryLogin(vm.Login.Trim().ToLower(), vm.Pass.Trim());
+			var user = _service.TryLogin(vm.Login.Trim().ToLower(), vm.Pass.Trim());
 			if (user == null)
 				return View(vm);
 
@@ -38,7 +39,7 @@ namespace ToDo.WebApp.Controllers
 				new Claim("IP", Request.Host.Host, ClaimValueTypes.String),
 				new Claim("permission-foo", "grant")
 			};
-			claims.AddRange(user.Roles.Select(x => new Claim(ClaimTypes.Role, x)));
+			claims.AddRange((user.Roles ?? new []{ EUserRole.Anonym }).Select(x => new Claim(ClaimTypes.Role, x.ToString().ToLower())));
 
 			var identity = new ClaimsIdentity("MyCookieMiddlewareInstance");
 			identity.AddClaims(claims);

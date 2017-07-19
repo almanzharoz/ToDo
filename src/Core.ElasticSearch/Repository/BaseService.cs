@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Core.ElasticSearch.Domain;
+using Core.ElasticSearch.Exceptions;
 using Core.ElasticSearch.Mapping;
 using Core.ElasticSearch.Serialization;
 using Elasticsearch.Net;
@@ -14,7 +15,7 @@ using SharpFuncExt;
 
 namespace Core.ElasticSearch
 {
-	public abstract partial class BaseRepository<TSettings> 
+	public abstract partial class BaseService<TSettings> 
 		where TSettings : BaseElasticSettings
 	{
 		protected readonly ILogger _logger;
@@ -23,7 +24,7 @@ namespace Core.ElasticSearch
 		private readonly TSettings _settings;
 		private readonly ElasticMapping<TSettings> _mapping;
 
-		protected BaseRepository(ILoggerFactory loggerFactory, TSettings settings, ElasticMapping<TSettings> mapping, RequestContainer<TSettings> container)
+		protected BaseService(ILoggerFactory loggerFactory, TSettings settings, ElasticMapping<TSettings> mapping, RequestContainer<TSettings> container)
 		{
 			_container = container;
 			_settings = settings;
@@ -42,7 +43,7 @@ namespace Core.ElasticSearch
 			connectionSettings.DefaultIndex(_settings.IndexName);
 
 			_client = new ElasticClient(connectionSettings);
-			_logger = loggerFactory.CreateLogger<BaseRepository<TSettings>>();
+			_logger = loggerFactory.CreateLogger<BaseService<TSettings>>();
 		}
 
 		protected async Task LoadAsync()
@@ -167,7 +168,8 @@ namespace Core.ElasticSearch
 		public static T LogError<T>(this T arg, ILogger logger, string text) where T : IResponse
 			=> arg.IfNot(x => x.IsValid, x => logger
 				.Fluent(z => z.LogError($"{text}: {x.ServerError.ToString()}\r\n{x.DebugInformation}"))
-				.Throw(z => new Exception("Query error")));
+				.Switch(l => x.ServerError.Error.Type == "version_conflict_engine_exception", l => throw new VersionException())
+				.SwitchDefault(z => throw new QueryException(x.DebugInformation)));
 
 		public static T LogDebug<T>(this T arg, ILogger logger, string text = null) where T : IResponse
 		{

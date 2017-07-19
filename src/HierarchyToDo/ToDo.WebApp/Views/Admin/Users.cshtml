@@ -6,6 +6,7 @@
 	<thead>
 	<tr>
 		<th>Имя</th>
+		<th>Login</th>
 		<th>Роли</th>
 		<td>&nbsp;</td>
 	</tr>
@@ -15,6 +16,7 @@
 	{
 		<tr>
 			<td>@m.Nick</td>
+			<td>@m.Email</td>
 			<td>
 				@foreach (var r in m.Roles.DefaultIfNull())
 				{

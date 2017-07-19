@@ -11,10 +11,10 @@ using ToDo.WebApp.Model;
 namespace ToDo.WebApp.Controllers
 {
 	[Authorize(Roles = "manager")]
-	public class ProjectController : BaseController<ProjectRepository>
+	public class ProjectController : BaseController<ProjectService>
 	{
 		private readonly ILogger<ProjectController> _logger;
-		public ProjectController(ILoggerFactory loggerFactory, ProjectRepository repository) : base(repository)
+		public ProjectController(ILoggerFactory loggerFactory, ProjectService service) : base(service)
 		{
 			_logger = loggerFactory.CreateLogger<ProjectController>();
 		}
@@ -23,36 +23,37 @@ namespace ToDo.WebApp.Controllers
 		public IActionResult Add() => View(new ProjectEditModel());
 
 		[HttpGet]
-		public IActionResult Edit(string id) => View(new ProjectEditModel(_repository.GetProject(id)));
+		public IActionResult Edit(string id) => View(new ProjectEditModel(_service.GetProject(id)));
 
 		[HttpPost]
 		public IActionResult Edit(ProjectEditModel project)
-			=> ModelState.IsValid
-				? View("Saved", _repository.SaveProject(project.Id, project.Update))
+			=> ModelState.If(x => project.Id != null ? _service.ProjectExists(project.Id, project.Name) : _service.ProjectExists(project.Name), x=>x.AddModelError("Name", "Project already exists"))
+			.IsValid
+				? View("Saved", _service.SaveProject(project.Id, p => p.Set(x => x.Name, project.Name)))
 				: View(project);
 
 		[HttpDelete]
 		public IActionResult Delete(string id, int version) =>
 			View(id.HasNotNullArg(nameof(id))
 				.Try(
-					x => _repository.Delete(x, version.HasNotNullArg(nameof(version))),
+					x => _service.Delete(x, version.HasNotNullArg(nameof(version))),
 					(x, e) =>
 					{
 						_logger.LogCritical($"Project (id: {x}) delete error: {e}");
 						return false;
 					}));
 
-		public IActionResult Index() => View(_repository.GetMyProjectsWithCount());
+		public IActionResult Index() => View(_service.GetMyProjectsWithCount());
 
 		[HttpGet]
 		public IActionResult AddUser(string id) => View("AddUser", id);
 		[HttpPost]
-		public IActionResult AddUser(string id, string user) => View("UserAdding", _repository.AddUser(id, user));
+		public IActionResult AddUser(string id, string user) => View("UserAdding", _service.AddUser(id, user));
 		[HttpDelete]
-		public IActionResult DeleteUser(string id, string user) => View(_repository.DeleteUser(id, user));
+		public IActionResult DeleteUser(string id, string user) => View(_service.DeleteUser(id, user));
 
 		public IActionResult GetUsers(string id, string s) =>
-			Json(_repository.GetUsersNames(id, s).Select(x => new {x.Id, Name = x.Nick}));
+			Json(_service.GetUsersNames(id, s).Select(x => new {x.Id, Name = x.Nick}));
 
 	}
 }

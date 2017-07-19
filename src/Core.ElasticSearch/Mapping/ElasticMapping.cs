@@ -112,7 +112,7 @@ namespace Core.ElasticSearch.Mapping
 		}
 
 		internal void Build<TRepository>(Action<TRepository> initFunc, TRepository repository)
-			where TRepository : BaseRepository<TSettings>
+			where TRepository : BaseService<TSettings>
 			=> Build(() => initFunc.IfNotNull(f => f(repository)));
 
 		internal void Drop()

@@ -11,11 +11,11 @@ using ToDo.Dal.Projections;
 
 namespace ToDo.Dal.Repositories
 {
-	public abstract class BaseToDoRepository : BaseRepository<ElasticSettings>
+	public abstract class BaseToDoService : BaseService<ElasticSettings>
 	{
 		protected readonly UserName _user;
 
-		protected BaseToDoRepository(ILoggerFactory loggerFactory, ElasticSettings settings, ElasticMapping<ElasticSettings> mapping, RequestContainer<ElasticSettings> container, UserName user) 
+		protected BaseToDoService(ILoggerFactory loggerFactory, ElasticSettings settings, ElasticMapping<ElasticSettings> mapping, RequestContainer<ElasticSettings> container, UserName user) 
 			: base(loggerFactory, settings, mapping, container)
 		{
 			_user = user;

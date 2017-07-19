@@ -8,14 +8,14 @@ using ToDo.Dal.Repositories;
 
 namespace ToDo.WebApp.Controllers
 {
-	public abstract class BaseController<TRepository> : Controller 
-		where TRepository : BaseToDoRepository
+	public abstract class BaseController<TService> : Controller 
+		where TService : BaseToDoService
 	{
-		protected readonly TRepository _repository;
+		protected readonly TService _service;
 
-		protected BaseController(TRepository repository)
+		protected BaseController(TService service)
 		{
-			_repository = repository;
+			_service = service;
 		}
 
 		protected bool IsAjax => Request.Headers.ContainsKey("X-Requested-With") &&

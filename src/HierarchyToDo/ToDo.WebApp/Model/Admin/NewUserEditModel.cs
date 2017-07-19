@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ToDo.Dal.Models;
 
 namespace ToDo.WebApp.Model.Admin
 {
@@ -13,6 +14,6 @@ namespace ToDo.WebApp.Model.Admin
 		[Compare("Password")]
 		public string ConfirmPassword { get; set; }
 		[Required]
-		public string Roles { get; set; }
+		public EUserRole[] Roles { get; set; }
 	}
 }

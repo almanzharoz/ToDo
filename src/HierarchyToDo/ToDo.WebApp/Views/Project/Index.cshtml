@@ -32,7 +32,7 @@
 			}
 			<td>
 				<a href="@Url.Action("Edit", new {p.Key.Id})" class="modal-link">редактировать</a>
-				<a href="@Url.Action("Delete", "Project", new {p.Key.Id, p.Key.Version})" method="DELETE">удалить</a>
+				<a href="@Url.Action("Delete", "Project", new {p.Key.Id, p.Key.Version})" class="modal-link" method="DELETE">удалить</a>
 			</td>
 		</tr>
 	}

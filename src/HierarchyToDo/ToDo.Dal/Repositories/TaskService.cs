@@ -14,9 +14,9 @@ using Task = ToDo.Dal.Projections.Task;
 
 namespace ToDo.Dal.Repositories
 {
-	public class TaskRepository : BaseToDoRepository
+	public class TaskService : BaseToDoService
 	{
-		public TaskRepository(ILoggerFactory loggerFactory, ElasticSettings settings, ElasticMapping<ElasticSettings> mapping, RequestContainer<ElasticSettings> container, UserName user) 
+		public TaskService(ILoggerFactory loggerFactory, ElasticSettings settings, ElasticMapping<ElasticSettings> mapping, RequestContainer<ElasticSettings> container, UserName user) 
 			: base(loggerFactory, settings, mapping, container, user)
 		{
 		}

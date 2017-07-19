@@ -1,6 +1,8 @@
-﻿@model string
-@using (Html.BeginForm("AddRole", "Admin", new {id = Model}, FormMethod.Post))
+﻿@using ToDo.Dal.Models
+@model ValueTuple<string, ToDo.Dal.Projections.UserWithRoles>
+@using (Html.BeginForm("AddRole", "Admin", new {id=Model.Item1}, FormMethod.Post))
 {
-	<input name="role" placeholder="роль"/>
+	@*<input name="role" placeholder="роль"/>*@
+	@Html.DropDownList("role", Enum.GetNames(typeof(EUserRole)).Select(x => new SelectListItem() { Text = x, Disabled = Model.Item2.Roles.Contains((EUserRole)Enum.Parse(typeof(EUserRole), x)) }))
 	<submit text="добавить"/>
 }

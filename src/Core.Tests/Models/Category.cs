@@ -1,6 +1,7 @@
 ﻿using System;
 using Core.ElasticSearch.Domain;
 using Nest;
+using Newtonsoft.Json;
 
 namespace Core.Tests.Models
 {
@@ -9,6 +10,7 @@ namespace Core.Tests.Models
         [Keyword]
 		public Category Top { get; set; }
 		public string Name { get; set; }
+        [JsonIgnore]
         public int Version { get; set; }
         public DateTime CreatedOnUtc { get; set; }
     }
