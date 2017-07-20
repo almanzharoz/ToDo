@@ -30,8 +30,8 @@ namespace Core.Tests
                 .AddProjection<Producer, Producer>()
                 .AddProjection<Category, Category>()
                 .AddProjection<CategoryProjection, Category>()
-                .AddProjection<ProductProjection, Product, Category, Category>()
-                .AddProjection<Product, Product, Category, Category>());
+                .AddProjection<ProductProjection, Product, Category>()
+                .AddProjection<Product, Product, Category>());
 
             _repository = serviceProvider.GetService<TestService>();
         }

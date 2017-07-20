@@ -11,10 +11,10 @@ namespace Core.ElasticSearch
 {
 	public abstract partial class BaseService<TSettings>
 	{
-		protected Pager<T, TProjection> SearchPager<T, TProjection>(QueryContainer query, int page, int take,
+		protected Pager<TProjection> SearchPager<T, TProjection>(QueryContainer query, int page, int take,
 			Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, bool load = true)
 			where TProjection : class, IProjection<T>
-			where T : class, IEntity
+			where T : class, IModel // Нужно для SortDescriptor<T>, чтобы использовать любое поля для сортировки, а не только поля из проекции
 			=> _mapping.GetProjectionItem<TProjection>()
 				.Convert(
 					projection => Try(
@@ -23,15 +23,15 @@ namespace Core.ElasticSearch
 								.Source(s => s.Includes(f => f.Fields(projection.Fields)))
 								.Query(q => q.Bool(b => b.Filter(query)))
 								.IfNotNull(sort, y => y.Sort(sort))
-								.If(y => typeof(TProjection).GetInterfaces().Any(z => z == typeof(IWithVersion)), y => y.Version())
+								.If(y => typeof(T).GetInterfaces().Any(z => z == typeof(IWithVersion)), y => y.Version())
 								.IfNotNull(take, y => y.Take(take).Skip((page > 0 ? page - 1 : 0) * take))),
-						r => new Pager<T, TProjection>(page, take, (int) r.Total, r.Documents.If(load, Load)),
+						r => new Pager<TProjection>(page, take, (int) r.Total, r.Documents.If(load, Load)),
 						RepositoryLoggingEvents.ES_SEARCH));
 
-		protected Pager<T, TProjection> SearchPager<T, TProjection>(Func<QueryContainerDescriptor<T>, QueryContainer> query, int page, int take,
+		protected Pager<TProjection> SearchPager<T, TProjection>(Func<QueryContainerDescriptor<T>, QueryContainer> query, int page, int take,
 			Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, bool load = true)
 			where TProjection : class, IProjection<T>
-			where T : class, IEntity
+			where T : class, IModel
 			=> _mapping.GetProjectionItem<TProjection>()
 				.Convert(
 					projection => Try(
@@ -40,9 +40,9 @@ namespace Core.ElasticSearch
 								.Source(s => s.Includes(f => f.Fields(projection.Fields)))
 								.Query(query)
 								.IfNotNull(sort, y => y.Sort(sort))
-								.If(y => typeof(TProjection).GetInterfaces().Any(z => z == typeof(IWithVersion)), y => y.Version())
+								.If(y => typeof(T).GetInterfaces().Any(z => z == typeof(IWithVersion)), y => y.Version())
 								.IfNotNull(take, y => y.Take(take).Skip((page > 0 ? page - 1 : 0) * take))),
-						r => new Pager<T, TProjection>(page, take, (int)r.Total, r.Documents.If(load, Load)),
+						r => new Pager<TProjection>(page, take, (int)r.Total, r.Documents.If(load, Load)),
 						RepositoryLoggingEvents.ES_SEARCH));
 	}
 }

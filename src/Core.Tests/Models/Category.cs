@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace Core.Tests.Models
 {
-	public class Category : BaseEntity, IProjection<Category>, IWithVersion
+	public class Category : BaseEntity, IModel, IProjection<Category>, IWithVersion
     {
         [Keyword]
 		public Category Top { get; set; }

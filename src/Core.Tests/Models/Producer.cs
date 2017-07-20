@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Core.Tests.Models
 {
-	public class Producer : BaseEntity, IProjection<Producer>, IWithVersion
+	public class Producer : BaseEntity, IModel, IProjection<Producer>, IWithVersion
 	{
 		public string Name { get; set; }
         [JsonIgnore]

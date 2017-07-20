@@ -12,14 +12,13 @@ namespace Core.ElasticSearch
 {
 	public abstract partial class BaseService<TSettings>
 	{
-		protected Task<IReadOnlyCollection<TProjection>> SearchAsync<T, TProjection>(QueryContainer query, int take = 0,
+		protected Task<IReadOnlyCollection<T>> SearchAsync<T>(QueryContainer query, int take = 0,
 			int skip = 0, bool load = true)
-			where TProjection : class, IProjection<T>
-			where T : class, IEntity
-			=> _mapping.GetProjectionItem<TProjection>()
+			where T : class, IProjection
+			=> _mapping.GetProjectionItem<T>()
 				.Convert(
 					projection => TryAsync(
-						c => c.SearchAsync<TProjection>(
+						c => c.SearchAsync<T>(
 							x => x.Type(projection.MappingItem.TypeName)
 								.Source(s => s.Includes(f => f.Fields(projection.Fields)))
 								.Query(q => q.Bool(b => b.Filter(query)))
@@ -31,7 +30,7 @@ namespace Core.ElasticSearch
 		protected IReadOnlyCollection<TProjection> Search<T, TProjection>(QueryContainer query,
 			Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, int take = 0, int skip = 0, bool load = true)
 			where TProjection : class, IProjection<T>
-			where T : class, IEntity
+			where T : class, IModel
 			=> _mapping.GetProjectionItem<TProjection>()
 				.Convert(
 					projection => Try(
@@ -49,7 +48,7 @@ namespace Core.ElasticSearch
 		protected IReadOnlyCollection<TProjection> Search<T, TProjection>(Func<QueryContainerDescriptor<T>, QueryContainer> query,
 			Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, int page = 0, int take = 0, bool load = true)
 			where TProjection : class, IProjection<T>
-			where T : class, IEntity
+			where T : class, IModel
 			=> _mapping.GetProjectionItem<TProjection>()
 				.Convert(
 					projection => Try(
@@ -63,42 +62,38 @@ namespace Core.ElasticSearch
 						r => r.Documents.If(load, Load),
 						RepositoryLoggingEvents.ES_SEARCH));
 
-		protected TProjection Get<T, TProjection>(string id, bool load = true)
-			where TProjection : class, IProjection<T>
-			where T : class, IEntity
-			=> _mapping.GetProjectionItem<TProjection>()
+		protected T Get<T>(string id, bool load = true)
+			where T : class, IProjection
+			=> _mapping.GetProjectionItem<T>()
 				.Convert(
 					projection => Try(
 						c => c.Get(
-							DocumentPath<TProjection>.Id(new Id(id.HasNotNullArg(nameof(id)))).Type(projection.MappingItem.TypeName),
+							DocumentPath<T>.Id(new Id(id.HasNotNullArg(nameof(id)))).Type(projection.MappingItem.TypeName),
 							x => x.SourceInclude(projection.Fields)),
 						r => r.Source.If(load, Load),
 						RepositoryLoggingEvents.ES_GET,
 						$"Get (Id: {id})"));
 
-		protected TProjection Get<T, TProjection, TParent, TParentProjection>(string id, string parent, bool load = true)
-			where TProjection : class, IProjection<T>
-			where T : class, IEntity, IWithParent<TParent, TParentProjection>
-			where TParent : class, IEntity
-			where TParentProjection : IProjection<TParent>
-			=> _mapping.GetProjectionItem<TProjection>()
+		protected T Get<T, TParent>(string id, string parent, bool load = true)
+			where T : class, IProjection, IWithParent<TParent>
+			where TParent : class, IProjection
+			=> _mapping.GetProjectionItem<T>()
 				.Convert(
 					projection => Try(
 						c => c.Get(
-							DocumentPath<TProjection>.Id(new Id(id.HasNotNullArg(nameof(id)))).Type(projection.MappingItem.TypeName),
+							DocumentPath<T>.Id(new Id(id.HasNotNullArg(nameof(id)))).Type(projection.MappingItem.TypeName),
 							x => x.Parent(parent).SourceInclude(projection.Fields)),
 						r => r.Source.If(load, Load),
 						RepositoryLoggingEvents.ES_GET,
 						$"Get (Id: {id})"));
 
-		protected Task<TProjection> GetAsync<T, TProjection>(string id, bool load = true)
-			where TProjection : class, IProjection<T>
-			where T : class, IEntity
-			=> _mapping.GetProjectionItem<TProjection>()
+		protected Task<T> GetAsync<T>(string id, bool load = true)
+			where T : class, IProjection
+			=> _mapping.GetProjectionItem<T>()
 				.Convert(
 					projection => TryAsync(
 						c => c.GetAsync(
-							DocumentPath<TProjection>.Id(new Id(id.HasNotNullArg(nameof(id)))).Type(projection.MappingItem.TypeName),
+							DocumentPath<T>.Id(new Id(id.HasNotNullArg(nameof(id)))).Type(projection.MappingItem.TypeName),
 							x => x.SourceInclude(projection.Fields)),
 						r => r.Source // загруженный объект
 							.IfAsync(load, LoadAsync), // загрузка полей

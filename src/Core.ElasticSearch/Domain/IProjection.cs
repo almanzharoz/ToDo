@@ -1,7 +1,12 @@
 ﻿
 namespace Core.ElasticSearch.Domain
 {
-	public interface IProjection<T> : IEntity where T : class, IEntity
+	public interface IProjection : IEntity
+	{
+		
+	}
+
+	public interface IProjection<T> : IProjection where T : class, IModel
 	{
 		
 	}

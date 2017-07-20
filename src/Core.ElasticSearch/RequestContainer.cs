@@ -12,7 +12,7 @@ namespace Core.ElasticSearch
 {
 	internal interface IRequestContainer
 	{
-		T GetOrAdd<T>(string key, bool load) where T : IEntity, new();
+		T GetOrAdd<T>(string key, bool load) where T : BaseEntity, new();
 		IEntity Get(string key);
 		IEnumerable<(IEnumerable<string> types, IEnumerable<string> fields, IEnumerable<string> ids)> PopEntitiesForLoad();
 	}
@@ -36,7 +36,7 @@ namespace Core.ElasticSearch
 			_mapping = mapping;
 		}
 
-		public T GetOrAdd<T>(string key, bool load) where T : IEntity, new()
+		public T GetOrAdd<T>(string key, bool load) where T : BaseEntity, new()
 		{
 			var type = typeof(T);
 			return (T) _cache.AddOrUpdate(key,

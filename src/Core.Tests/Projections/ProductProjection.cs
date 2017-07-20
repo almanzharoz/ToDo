@@ -12,9 +12,8 @@ namespace Core.Tests.Projections
 		public string Producer { get; set; }
 	}
 
-	public class ProductProjection : IWithParent<Models.Category, Models.Category>, IProjection<Models.Product>
+	public class ProductProjection : BaseEntity, IWithParent<Models.Category>, IProjection<Models.Product>
 	{
-        public string Id { get; set; }
         public string Name { get; set; }
         [JsonProperty]
 		public FullName FullName { get; private set; }

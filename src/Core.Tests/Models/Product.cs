@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace Core.Tests.Models
 {
-	public class Product : BaseEntityWithParent<Models.Category, Models.Category>, IWithVersion, IProjection<Product>
+	public class Product : BaseEntityWithParent<Models.Category>, IModel, IWithVersion, IProjection<Product>
 	{
 		public string Name { get; set; }
         [JsonIgnore]

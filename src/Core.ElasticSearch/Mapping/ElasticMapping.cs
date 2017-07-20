@@ -24,48 +24,73 @@ namespace Core.ElasticSearch.Mapping
 		{
 			_settings = settings;
 			_logger = loggerFactory.CreateLogger<ElasticMapping<TSettings>>();
-			_converters.TryAdd(typeof(GetResponse<IEntity>), new GetJsonConverter<IEntity>());
-			_converters.TryAdd(typeof(SearchResponse<IEntity>), new SearchJsonConverter<IEntity>());
+			_converters.TryAdd(typeof(GetResponse<IProjection>), new GetJsonConverter<IProjection>());
+			_converters.TryAdd(typeof(SearchResponse<IProjection>), new SearchJsonConverter<IProjection>());
+			//_converters.TryAdd(typeof(IndexResponse), new InsertResultJsonConverter());
 		}
 
-		public ElasticMapping<TSettings> AddMapping<T>() where T : class, IEntity
+		/// <summary>
+		/// Регистрирует маппинг
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
+		public ElasticMapping<TSettings> AddMapping<T>() where T : class, IModel
 		{
-			_mapping.AddOrUpdate(typeof(T), x => new MappingItem<T>(), (t, m) => throw new Exception($"Mapping for type \"{typeof(T).Name}\" already exists."));
-			_converters.TryAdd(typeof(T), new InsertJsonConverter<T>());
+			_mapping.AddOrUpdate(typeof(T), x => new MappingItem<T, TSettings>(_settings), (t, m) => throw new Exception($"Mapping for type \"{typeof(T).Name}\" already exists."));
+			_converters.TryAdd(typeof(T), new InsertJsonConverter<T>()); // объекты этого типа доступны только для вставки
 			return this;
 		}
 
+		/// <summary>
+		/// Регистрирует внутренний документ
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
 		public ElasticMapping<TSettings> AddStruct<T>() where T : struct
 		{
 			_converters.TryAdd(typeof(T), new ObjectJsonConverter<T>());
 			return this;
 		}
 
+		/// <summary>
+		/// Регистрирует проекцию
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <typeparam name="TMapping"></typeparam>
+		/// <returns></returns>
 		public ElasticMapping<TSettings> AddProjection<T, TMapping>()
-			where T : class, IProjection<TMapping>, new()
-			where TMapping : class, IEntity
+			where T : BaseEntity, IProjection<TMapping>, new()
+			where TMapping : class, IModel
 		{
 			_projection.AddOrUpdate(typeof(T), x =>
 				{
-					var result = new ProjectionItem<T, TMapping>((MappingItem<TMapping>) _mapping.GetOrAdd(typeof(TMapping),
+					var result = new ProjectionItem<T, TMapping, TSettings>((MappingItem<TMapping, TSettings>) _mapping.GetOrAdd(typeof(TMapping),
 						y => throw new Exception($"Not found mapping for type \"{y.Name}\"")));
 					_converters.TryAdd(typeof(GetResponse<T>), new GetJsonConverter<T>());
 					_converters.TryAdd(typeof(SearchResponse<T>), new SearchJsonConverter<T>());
+					//_converters.TryAdd(typeof(UpdateResponse<T>), new UpdateResultJsonConverter<T>());
 					return result;
 				},
 				(t, m) => throw new Exception($"Projection for type \"{typeof(T).Name}\" already exists."));
 			return this;
 		}
 
-		public ElasticMapping<TSettings> AddProjection<T, TMapping, TParent, TParentMapping>()
-			where T : class, IProjection<TMapping>, IWithParent<TParentMapping, TParent>, new()
-			where TMapping : class, IEntity, IWithParent<TParentMapping, TParent>
-			where TParent : class, IProjection<TParentMapping>, new()
-			where TParentMapping : class, IEntity, new()
+		/// <summary>
+		/// Регистрирует проекцию типа с парентом
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <typeparam name="TMapping"></typeparam>
+		/// <typeparam name="TParent"></typeparam>
+		/// <typeparam name="TParentMapping"></typeparam>
+		/// <returns></returns>
+		public ElasticMapping<TSettings> AddProjection<T, TMapping, TParent>()
+			where T : BaseEntity, IProjection<TMapping>, IWithParent<TParent>, new()
+			where TMapping : class, IModel, IWithParent<TParent>
+			where TParent : BaseEntity, IProjection, new()
 		{
 			_projection.AddOrUpdate(typeof(T), x =>
 				{
-					var result = new ProjectionWithParentItem<T, TMapping, TParentMapping, TParent>((MappingItem<TMapping>)_mapping.GetOrAdd(typeof(TMapping),
+					var result = new ProjectionWithParentItem<T, TMapping, TParent, TSettings>((MappingItem<TMapping, TSettings>)_mapping.GetOrAdd(typeof(TMapping),
 						y => throw new Exception($"Not found mapping for type \"{y.Name}\"")));
 					_converters.TryAdd(typeof(GetResponse<T>), new GetJsonConverter<T>());
 					_converters.TryAdd(typeof(SearchResponse<T>), new SearchJsonConverter<T>());
@@ -142,7 +167,7 @@ namespace Core.ElasticSearch.Mapping
 		internal IProjectionItem GetProjectionItem(Type type)
 			=> _projection[type];
 
-		internal IProjectionItem GetProjectionItem<T>()
+		internal IProjectionItem GetProjectionItem<T>() where T : IProjection
 			=> _projection[typeof(T)];
 	}
 }

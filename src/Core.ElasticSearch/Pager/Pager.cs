@@ -6,9 +6,8 @@ using Core.ElasticSearch.Domain;
 
 namespace Core.ElasticSearch
 {
-    public class Pager<TModel, T> : IReadOnlyCollection<T>
-		where T : IProjection<TModel>
-		where TModel : class, IEntity
+    public class Pager<T> : IReadOnlyCollection<T>
+		where T : IProjection
     {
 	    private readonly IReadOnlyCollection<T> _items;
 		public int Page { get; }

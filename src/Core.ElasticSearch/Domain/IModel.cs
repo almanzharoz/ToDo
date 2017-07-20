@@ -1,7 +1,7 @@
 ﻿namespace Core.ElasticSearch.Domain
 {
-	public interface IEntity
+	public interface IModel : IEntity
 	{
-		string Id { get; }
+		
 	}
 }

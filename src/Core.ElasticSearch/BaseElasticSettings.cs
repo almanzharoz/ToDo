@@ -12,8 +12,8 @@ namespace Core.ElasticSearch
 
 		protected BaseElasticSettings(Uri url, string indexName)
 		{
-			IndexName = indexName;
 			Url = url;
+			IndexName = indexName;
 		}
 	}
 }

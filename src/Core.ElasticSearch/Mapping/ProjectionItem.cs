@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Core.ElasticSearch.Domain;
 using Core.ElasticSearch.Serialization;
+using Nest;
 using Newtonsoft.Json;
 
 namespace Core.ElasticSearch.Mapping
@@ -12,70 +13,58 @@ namespace Core.ElasticSearch.Mapping
 	internal interface IProjectionItem
 	{
 		string[] Fields { get; }
+		PropertyInfo[] Properties { get; }
 		IMappingItem MappingItem { get; }
 		JsonConverter GetJsonConverter(IRequestContainer container);
 	}
 
-	internal abstract class BaseProjectionItem<T, TMapping> : IProjectionItem
-		where T : class, IProjection<TMapping>, new()
-		where TMapping : class, IEntity
+	internal abstract class BaseProjectionItem<T, TMapping, TSettings> : IProjectionItem
+		where T : BaseEntity, IProjection<TMapping>, new()
+		where TMapping : class, IModel
+		where TSettings : BaseElasticSettings
 	{
-		protected BaseProjectionItem(MappingItem<TMapping> mappingItem)
+		protected BaseProjectionItem(MappingItem<TMapping, TSettings> mappingItem)
 		{
 			MappingItem = mappingItem;
 			Fields = typeof(T).GetFields();
+			Properties = typeof(T).GetProperties();
 			var errorFields = mappingItem.CheckFields(Fields);
 			if (errorFields.Any())
 				throw new Exception($"Not found fields for \"{typeof(T).Name}\": {String.Join(", ", errorFields)}");
 		}
 
 		public string[] Fields { get; }
+		public PropertyInfo[] Properties { get; }
 		public IMappingItem MappingItem { get; }
 
-		public JsonConverter GetJsonConverter(IRequestContainer container)
+		public abstract JsonConverter GetJsonConverter(IRequestContainer container);
+	}
+
+	internal class ProjectionItem<T, TMapping, TSettings> : BaseProjectionItem<T, TMapping, TSettings>
+		where T : BaseEntity, IProjection<TMapping>, new() 
+		where TMapping : class, IModel
+		where TSettings : BaseElasticSettings
+	{
+		public ProjectionItem(MappingItem<TMapping, TSettings> mappingItem) : base(mappingItem)
+		{
+		}
+
+		public override JsonConverter GetJsonConverter(IRequestContainer container)
 			=> new ClassJsonConverter<T>(container);
 	}
 
-	internal class ProjectionItem<T, TMapping> : IProjectionItem 
-		where T : class, IProjection<TMapping>, new() 
-		where TMapping : class, IEntity
+	internal class ProjectionWithParentItem<T, TMapping, TParent, TSettings> : BaseProjectionItem<T, TMapping, TSettings>
+		where T : BaseEntity, IProjection<TMapping>, IWithParent<TParent>, new()
+		where TMapping : class, IModel
+		where TParent : BaseEntity, IProjection, new()
+		where TSettings : BaseElasticSettings
 	{
-		public ProjectionItem(MappingItem<TMapping> mappingItem)
+		public ProjectionWithParentItem(MappingItem<TMapping, TSettings> mappingItem) : base(mappingItem)
 		{
-			MappingItem = mappingItem;
-			Fields = typeof(T).GetFields();
-			var errorFields = mappingItem.CheckFields(Fields);
-			if (errorFields.Any())
-				throw new Exception($"Not found fields for \"{typeof(T).Name}\": {String.Join(", ", errorFields)}");
+			// TODO: Сделать проверку типа парента
 		}
 
-		public string[] Fields { get; }
-		public IMappingItem MappingItem { get; }
-
-		public JsonConverter GetJsonConverter(IRequestContainer container)
-			=> new ClassJsonConverter<T>(container);
-	}
-
-	internal class ProjectionWithParentItem<T, TMapping, TParentModel, TParentProjection> : IProjectionItem
-		where T : class, IProjection<TMapping>, IWithParent<TParentModel, TParentProjection>, new()
-		where TMapping : class, IEntity
-		where TParentModel : class, IEntity, new()
-		where TParentProjection : IProjection<TParentModel>, new()
-	{
-		public ProjectionWithParentItem(MappingItem<TMapping> mappingItem)
-		{
-			MappingItem = mappingItem;
-			Fields = typeof(T).GetFields();
-			var errorFields = mappingItem.CheckFields(Fields);
-			if (errorFields.Any())
-				throw new Exception($"Not found fields for \"{typeof(T).Name}\": {String.Join(", ", errorFields)}");
-		}
-
-		public string[] Fields { get; }
-		public IMappingItem MappingItem { get; }
-		//TODO: Добавить возможность не указывать тип парента в методах репозитории
-
-		public JsonConverter GetJsonConverter(IRequestContainer container)
-			=> new ParentJsonConverter<T, TParentModel, TParentProjection>(container);
+		public override JsonConverter GetJsonConverter(IRequestContainer container)
+			=> new ParentJsonConverter<T, TParent>(container);
 	}
 }

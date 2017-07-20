@@ -2,13 +2,17 @@
 
 namespace Core.ElasticSearch.Domain
 {
-	public class BaseEntityWithParent<T, TProjection> : IEntity, IWithParent<T, TProjection>
-		where T : class, IEntity
-		where TProjection : IProjection<T>
+	public class BaseEntityWithParent<T> : BaseEntity, IWithParent<T>
+		where T : IProjection
 	{
 		[JsonIgnore]
-		public string Id { get; set; }
+		public T Parent { get; set; }
+	}
+
+	public class BaseEntityWithParentAndVersion<T> : BaseEntityWithVersion, IWithParent<T>
+		where T : IProjection
+	{
 		[JsonIgnore]
-		public TProjection Parent { get; set; }
+		public T Parent { get; set; }
 	}
 }

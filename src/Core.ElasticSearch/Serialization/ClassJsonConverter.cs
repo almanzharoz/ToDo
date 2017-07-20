@@ -21,7 +21,7 @@ namespace Core.ElasticSearch.Serialization
 		}
 	}
 
-	internal class ClassJsonConverter<T> : JsonConverter where T : IEntity, new()
+	internal class ClassJsonConverter<T> : JsonConverter where T : BaseEntity, new()
 	{
 		private readonly IRequestContainer _entityContainer;
 		public ClassJsonConverter(IRequestContainer entityContainer)
@@ -58,7 +58,7 @@ namespace Core.ElasticSearch.Serialization
 			if (jsonObject.TryGetValue("parent", out var parent))
 				_entityContainer.GetOrAdd<T>(parent.Value<string>(), true);
 			if (target is IWithVersion && jsonObject.TryGetValue("version", out var v))
-				((IWithVersion) target).Version = (int)v;
+				((BaseEntityWithVersion) target).Version = (int)v;
 			return target;
 		}
 

@@ -49,7 +49,7 @@ namespace Core.Tests
         {
             var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
             var product = new Product() { Name = "Product", Parent = category };
-            Assert.ThrowsException<QueryException>(() => _repository.Insert<Product, Category, Category>(product, category, true));
+            Assert.ThrowsException<QueryException>(() => _repository.Insert<Product, Category>(product, true));
         }
 
         [TestMethod]
@@ -58,7 +58,7 @@ namespace Core.Tests
             var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
             _repository.Insert(category, true);
             var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
-            _repository.Insert<Product, Category, Category>(product, category, true);
+            _repository.Insert<Product, Category>(product, true);
             Assert.IsNotNull(product.Id);
             Assert.IsNotNull(product.Parent);
             Assert.AreEqual(product.Parent.Id, category.Id);
@@ -74,7 +74,7 @@ namespace Core.Tests
             _repository.Insert(parentCategory, true);
             _repository.Insert(category, true);
 
-            var loadCategory = _repository.Get<Category, Category>(category.Id, false);
+            var loadCategory = _repository.Get<Category>(category.Id, false);
 
             Assert.IsNotNull(loadCategory);
             Assert.IsNotNull(loadCategory.Top);
@@ -92,7 +92,7 @@ namespace Core.Tests
 
             _repository.Insert(category, true);
 
-            var loadCategory = _repository.Get<Category, CategoryProjection>(category.Id, false);
+            var loadCategory = _repository.Get<CategoryProjection>(category.Id, false);
 
             Assert.IsNotNull(loadCategory);
             Assert.IsNull(loadCategory.Top);
@@ -107,9 +107,9 @@ namespace Core.Tests
             var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
             var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
             _repository.Insert(category, true);
-            _repository.Insert<Product, Category, Category>(product, category, true);
+            _repository.Insert<Product, Category>(product, true);
 
-            var loadProduct = _repository.Get<Product, Product, Category, Category>(product.Id, category.Id, false);
+            var loadProduct = _repository.Get<Product, Category>(product.Id, category.Id, false);
 
             Assert.IsNotNull(loadProduct);
             Assert.IsNotNull(loadProduct.Parent);
@@ -125,9 +125,9 @@ namespace Core.Tests
             var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
             var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
             _repository.Insert(category, true);
-            _repository.Insert<Product, Category, Category>(product, category, true);
+            _repository.Insert<Product, Category>(product, true);
 
-            var loadProduct = _repository.Get<Product, ProductProjection, Category, Category>(product.Id, category.Id, false);
+            var loadProduct = _repository.Get<ProductProjection, Category>(product.Id, category.Id, false);
 
             Assert.IsNotNull(loadProduct);
             Assert.IsNotNull(loadProduct.Parent);
@@ -146,7 +146,7 @@ namespace Core.Tests
             _repository.Insert(parentCategory, true);
             _repository.Insert(category, true);
 
-            var loadCategory = _repository.Get<Category, Category>(category.Id, true);
+            var loadCategory = _repository.Get<Category>(category.Id, true);
 
             Assert.IsNotNull(loadCategory);
             Assert.IsNotNull(loadCategory.Top);
@@ -164,7 +164,7 @@ namespace Core.Tests
 
             _repository.Insert(category, true);
 
-            var loadCategory = _repository.Get<Category, CategoryProjection>(category.Id, true);
+            var loadCategory = _repository.Get<CategoryProjection>(category.Id, true);
 
             Assert.IsNotNull(loadCategory);
             Assert.IsNull(loadCategory.Top);
@@ -180,9 +180,9 @@ namespace Core.Tests
             var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
 
             _repository.Insert(category, true);
-	        _repository.Insert<Product, Category, Category>(product, category, true);
+	        _repository.Insert<Product, Category>(product, true);
 
-			var loadProduct = _repository.Get<Product, Product, Category, Category>(product.Id, category.Id, true);
+			var loadProduct = _repository.Get<Product, Category>(product.Id, category.Id, true);
 
             Assert.IsNotNull(loadProduct);
             Assert.IsNotNull(loadProduct.Parent);
@@ -199,9 +199,9 @@ namespace Core.Tests
             var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
 
             _repository.Insert(category, true);
-	        _repository.Insert<Product, Category, Category>(product, category, true);
+	        _repository.Insert<Product, Category>(product, true);
 
-			var loadProduct = _repository.Get<Product, ProductProjection, Category, Category>(product.Id, category.Id, true);
+			var loadProduct = _repository.Get<ProductProjection, Category>(product.Id, category.Id, true);
 
             Assert.IsNotNull(loadProduct);
             Assert.IsNotNull(loadProduct.Parent);
@@ -217,22 +217,22 @@ namespace Core.Tests
             category.Name = "New Category";
             _repository.Update(category, true);
 
-            var loadCategory = _repository.Get<Category, Category>(category.Id, true);
+            var loadCategory = _repository.Get<Category>(category.Id, true);
 
             Assert.IsNotNull(loadCategory);
             Assert.AreEqual(loadCategory.Version, category.Version);
             Assert.AreEqual(loadCategory.Name, "New Category");
         }
 
-        [TestMethod]
-        public void UpdateObjectSimplyWithInvalidObjectId()
-        {
-            var category = new Category() { Name = "Category" };
-            category.Name = "New Category";
-            category.Id = "NewId";
-	        category.Version = 2;
-            Assert.ThrowsException<QueryException>(() => _repository.Update(category, true));
-        }
+        //[TestMethod]
+        //public void UpdateObjectSimplyWithInvalidObjectId()
+        //{
+        //    var category = new Category() { Name = "Category" };
+        //    category.Name = "New Category";
+        //    category.Id = "NewId";
+	       // category.Version = 2;
+        //    Assert.ThrowsException<QueryException>(() => _repository.Update(category, true));
+        //}
 
         [TestMethod]
         public void UpdateObjectSimplyWithAnotherVersion()
@@ -245,7 +245,7 @@ namespace Core.Tests
             category.Name = "New2 Category";
             Assert.ThrowsException<VersionException>(() => _repository.Update(category, true));
 
-            var loadCategory = _repository.Get<Category, Category>(category.Id, true);
+            var loadCategory = _repository.Get<Category>(category.Id, true);
 
             Assert.IsNotNull(loadCategory);
             Assert.AreEqual(loadCategory.Name, "New1 Category");
@@ -258,7 +258,7 @@ namespace Core.Tests
             _repository.Insert(category, true);
             _repository.Update(Query<Category>.Ids(x => x.Values(category.Id)), new UpdateByQueryBuilder<Category>().Set(x => x.Name, "New Category"), true);
 
-            var loadCategory = _repository.Get<Category, Category>(category.Id, true);
+            var loadCategory = _repository.Get<Category>(category.Id, true);
 
             Assert.IsNotNull(loadCategory);
             Assert.AreEqual(loadCategory.Name, "New Category");
@@ -271,7 +271,7 @@ namespace Core.Tests
             _repository.Insert(category, true);
             _repository.Update(Query<Category>.Ids(x => x.Values(category.Id)), new UpdateByQueryBuilder<Category>().Unset(x => x.Name), true);
 
-            var loadCategory = _repository.Get<Category, Category>(category.Id, true);
+            var loadCategory = _repository.Get<Category>(category.Id, true);
 
             Assert.IsNotNull(loadCategory);
             Assert.IsNull(loadCategory.Name);
@@ -283,18 +283,19 @@ namespace Core.Tests
             var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
             _repository.Insert(category, true);
             _repository.Remove(category);
-            var loadCategory = _repository.Get<Category, Category>(category.Id, true);
+            var loadCategory = _repository.Get<Category>(category.Id, true);
             Assert.IsNull(loadCategory);
         }
 
-        [TestMethod]
-        public void RemoveObjectByInvalidId()
-        {
-            var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
-            category.Id = "NewId";
-	        category.Version = 1;
-            Assert.ThrowsException<VersionException>(() => _repository.Remove(category));
-        }
+		// Ограничил такое поведение на уровне компиляции (Id - internal set)
+        //[TestMethod]
+        //public void RemoveObjectByInvalidId()
+        //{
+        //    var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
+        //    category.Id = "NewId";
+	       // category.Version = 1;
+        //    Assert.ThrowsException<VersionException>(() => _repository.Remove(category));
+        //}
 
         [TestMethod]
         public void RemoveObjectByQuery()
@@ -302,7 +303,7 @@ namespace Core.Tests
             var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
             _repository.Insert(category, true);
             _repository.Remove<Category>(Query<Category>.Ids(x => x.Values(category.Id)));
-            var loadCategory = _repository.Get<Category, Category>(category.Id, true);
+            var loadCategory = _repository.Get<Category>(category.Id, true);
             Assert.IsNull(loadCategory);
         }
 

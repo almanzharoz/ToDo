@@ -11,22 +11,28 @@ namespace Core.ElasticSearch.Mapping
 {
 	internal interface IMappingItem
 	{
+		string IndexName { get; }
 		string TypeName { get; }
 		IPutMappingResponse Map(ElasticClient client);
 		MappingsDescriptor Map(MappingsDescriptor descriptor);
 	}
-	internal class MappingItem<T> : IMappingItem where T : class, IEntity
+
+	internal class MappingItem<T, TSettings> : IMappingItem 
+		where T : class, IModel
+		where TSettings : BaseElasticSettings
 	{
 		private readonly IEnumerable<string> _fields;
-		public MappingItem()
+		public MappingItem(TSettings settings)
 		{
 			_fields = typeof(T).GetFields();
 			TypeName = typeof(T).GetTypeInfo().GetCustomAttribute<ElasticsearchTypeAttribute>()?.Name ?? typeof(T).Name.ToLower();
+			IndexName = settings.IndexName;
 		}
 
 		public IEnumerable<string> CheckFields(IEnumerable<string> fields)
 			=> fields.Except(_fields).ToImmutableArray();
 
+		public string IndexName { get; }
 		public string TypeName { get; }
 
 		public IPutMappingResponse Map(ElasticClient client) => client.Map<T>(x => x.AutoMap()

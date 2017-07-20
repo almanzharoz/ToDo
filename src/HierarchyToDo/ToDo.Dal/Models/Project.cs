@@ -9,6 +9,7 @@ namespace ToDo.Dal.Models
     {
 		[JsonIgnore]
 		public int Version { get; set; }
+		//[Text(Analyzer = "not_analyzed")]
 		public string Name { get; set; }
 		[Keyword]
 	    public Projections.User User { get; set; }

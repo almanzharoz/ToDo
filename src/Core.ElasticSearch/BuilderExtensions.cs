@@ -14,7 +14,8 @@ namespace Core.ElasticSearch
 		{
 			services.AddSingleton<TSettings>(settings)
 				.AddSingleton<ElasticMapping<TSettings>>()
-				.AddScoped<RequestContainer<TSettings>>();
+				.AddScoped<RequestContainer<TSettings>>()
+				.AddScoped<ElasticClient<TSettings>>();
 			return services;
 		}
 

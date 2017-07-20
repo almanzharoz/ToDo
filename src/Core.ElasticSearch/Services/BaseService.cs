@@ -24,25 +24,12 @@ namespace Core.ElasticSearch
 		private readonly TSettings _settings;
 		private readonly ElasticMapping<TSettings> _mapping;
 
-		protected BaseService(ILoggerFactory loggerFactory, TSettings settings, ElasticMapping<TSettings> mapping, RequestContainer<TSettings> container)
+		protected BaseService(ILoggerFactory loggerFactory, TSettings settings, ElasticMapping<TSettings> mapping, RequestContainer<TSettings> container, ElasticClient<TSettings> client)
 		{
 			_container = container;
 			_settings = settings;
 			_mapping = mapping;
-			var connectionPool = new StaticConnectionPool(new[] { _settings.Url });
-			var connectionSettings = new ConnectionSettings(connectionPool, new HttpConnection(), new SerializerFactory(values => new ElasticSerializer<TSettings>(values, _mapping, container)));
-
-			connectionSettings.DefaultFieldNameInferrer(x => x.ToLower());
-			connectionSettings.DisablePing();
-			connectionSettings.DisableAutomaticProxyDetection();
-			//connectionSettings.EnableDebugMode(x => { x.AuditTrail.Clear(); });
-#if DEBUG
-			connectionSettings.PrettyJson();
-			connectionSettings.DisableDirectStreaming();
-#endif
-			connectionSettings.DefaultIndex(_settings.IndexName);
-
-			_client = new ElasticClient(connectionSettings);
+			_client = client.Client;
 			_logger = loggerFactory.CreateLogger<BaseService<TSettings>>();
 		}
 
@@ -56,12 +43,12 @@ namespace Core.ElasticSearch
 				{
 #if DEBUG
 					_logger.LogDebug($"Loading data: {Newtonsoft.Json.JsonConvert.SerializeObject(item)}");
-					_logger.LogDebug((await _client.SearchAsync<IEntity>(x => x
+					_logger.LogDebug((await _client.SearchAsync<IProjection>(x => x
 						.Type(Types.Type(item.types))
 						.Source(s => s.Includes(f => f.Fields(item.fields.ToArray())))
 						.Query(q => q.Ids(id => id.Values(item.ids))))).DebugInformation);
 #else
-				await _client.SearchAsync<IEntity>(x => x
+				await _client.SearchAsync<IProjection>(x => x
 					.Type(Types.Type(item.types))
 					.Source(s => s.Includes(f => f.Fields(item.fields.ToArray())))
 					.Query(q => q.Ids(id => id.Values(item.ids))));
@@ -82,12 +69,12 @@ namespace Core.ElasticSearch
 				{
 #if DEBUG
 					_logger.LogDebug($"Loading data: {Newtonsoft.Json.JsonConvert.SerializeObject(item)}");
-					_logger.LogDebug((_client.Search<IEntity>(x => x
+					_logger.LogDebug((_client.Search<IProjection>(x => x
 						.Type(Types.Type(item.types))
 						.Source(s => s.Includes(f => f.Fields(item.fields.ToArray())))
 						.Query(q => q.Ids(id => id.Values(item.ids))))).DebugInformation);
 #else
-				_client.Search<IEntity>(x => x
+				_client.Search<IProjection>(x => x
 					.Type(Types.Type(item.types))
 					.Source(s => s.Includes(f => f.Fields(item.fields.ToArray())))
 					.Query(q => q.Ids(id => id.Values(item.ids))));

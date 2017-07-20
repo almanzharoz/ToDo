@@ -2,6 +2,6 @@
 {
 	public interface IWithVersion
 	{
-		int Version { get; set; }
+		int Version { get; }
 	}
 }

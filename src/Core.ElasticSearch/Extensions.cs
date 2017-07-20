@@ -41,5 +41,10 @@ namespace Core.ElasticSearch
 			}
 			return fields.ToArray();
 		}
+
+		public static PropertyInfo[] GetProperties(this Type type) =>
+			type.GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.Instance)
+				.Where(x => x.Name != "Id" && x.Name != "Version" && x.Name != "Parent")
+				.ToArray();
 	}
 }
