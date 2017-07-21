@@ -224,32 +224,33 @@ namespace Core.Tests
             Assert.AreEqual(loadCategory.Name, "New Category");
         }
 
-        //[TestMethod]
-        //public void UpdateObjectSimplyWithInvalidObjectId()
-        //{
-        //    var category = new Category() { Name = "Category" };
-        //    category.Name = "New Category";
-        //    category.Id = "NewId";
-	       // category.Version = 2;
-        //    Assert.ThrowsException<QueryException>(() => _repository.Update(category, true));
-        //}
+		//[TestMethod]
+		//public void UpdateObjectSimplyWithInvalidObjectId()
+		//{
+		//    var category = new Category() { Name = "Category" };
+		//    category.Name = "New Category";
+		//    category.Id = "NewId";
+		// category.Version = 2;
+		//    Assert.ThrowsException<QueryException>(() => _repository.Update(category, true));
+		//}
 
-        [TestMethod]
-        public void UpdateObjectSimplyWithAnotherVersion()
-        {
-            var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category, true);
-            category.Name = "New1 Category";
-            _repository.Update(category, true);
-            category.Version--;
-            category.Name = "New2 Category";
-            Assert.ThrowsException<VersionException>(() => _repository.Update(category, true));
+		// Тест больше не актуален, т.к. нельзя никак получить проекции и управлять номером версии в ней. А так же нельзя никак обновить проекцию в базе созданную из вне движка.
+		//[TestMethod]
+  //      public void UpdateObjectSimplyWithAnotherVersion()
+  //      {
+  //          var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
+  //          _repository.Insert(category, true);
+  //          category.Name = "New1 Category";
+  //          _repository.Update(category, true);
+  //          category.Version--;
+  //          category.Name = "New2 Category";
+  //          Assert.ThrowsException<VersionException>(() => _repository.Update(category, true));
 
-            var loadCategory = _repository.Get<Category>(category.Id, true);
+  //          var loadCategory = _repository.Get<Category>(category.Id, true);
 
-            Assert.IsNotNull(loadCategory);
-            Assert.AreEqual(loadCategory.Name, "New1 Category");
-        }
+  //          Assert.IsNotNull(loadCategory);
+  //          Assert.AreEqual(loadCategory.Name, "New1 Category");
+  //      }
 
         [TestMethod]
         public void UpdateObjectByQueryFuncSet()

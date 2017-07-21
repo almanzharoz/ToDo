@@ -5,13 +5,11 @@ using Newtonsoft.Json;
 
 namespace Core.Tests.Models
 {
-	public class Category : BaseEntity, IModel, IProjection<Category>, IWithVersion
+	public class Category : BaseEntityWithVersion, IModel, IProjection<Category>
     {
         [Keyword]
 		public Category Top { get; set; }
 		public string Name { get; set; }
-        [JsonIgnore]
-        public int Version { get; set; }
         public DateTime CreatedOnUtc { get; set; }
     }
 }

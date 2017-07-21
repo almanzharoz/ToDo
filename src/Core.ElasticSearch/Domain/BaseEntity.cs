@@ -9,11 +9,8 @@ namespace Core.ElasticSearch.Domain
 		public string Id { get; internal set; }
 	}
 
-	public class BaseEntityWithVersion : IEntity, IWithVersion
+	public class BaseEntityWithVersion : BaseEntity, IWithVersion
 	{
-		[JsonProperty]
-		[JsonIgnore]
-		public string Id { get; internal set; }
 		[JsonProperty]
 		[JsonIgnore]
 		public int Version { get; internal set; }

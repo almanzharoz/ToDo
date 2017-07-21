@@ -46,24 +46,24 @@ namespace Core.ElasticSearch
 				r => r.Created,
 				RepositoryLoggingEvents.ES_INSERT);
 
-		protected bool Update<T>(T entity, bool refresh) where T : class, IProjection, IWithVersion
+		protected bool Update<T>(T entity, bool refresh) where T : BaseEntityWithVersion, IProjection
 			=> Try(
 				c => c.Update(
 						DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, x => x.Version, nameof(entity))),
 						d => d.Version(entity.Version).Doc(entity).If(refresh, x => x.Refresh(Refresh.True)))
-					.Fluent(r => entity.Set(p => p.Version, (int) r.Version)),
+					.Fluent(r => entity.Version = (int) r.Version),
 				r => r.Result == Result.Updated,
 				RepositoryLoggingEvents.ES_UPDATE,
 				$"Update (Id: {entity?.Id})");
 
-		protected bool Update<T>(T entity) where T : class, IProjection, IWithVersion => Update(entity, true);
+		protected bool Update<T>(T entity) where T : BaseEntityWithVersion, IProjection => Update(entity, true);
 
-		protected Task<bool> UpdateAsync<T>(T entity, bool refresh = true) where T : class, IProjection, IWithVersion
+		protected Task<bool> UpdateAsync<T>(T entity, bool refresh = true) where T : BaseEntityWithVersion, IProjection, IWithVersion
 			=> TryAsync(
 				c => c.UpdateAsync(
 						DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, x => x.Version, nameof(entity))),
 						d => d.Version(entity.Version).Doc(entity).If(refresh, x => x.Refresh(Refresh.True)))
-					.Fluent(r => entity.Set(p => p.Version, (int) r.Version)),
+					.Fluent(r => entity.Version = (int)r.Version),
 				r => r.Result == Result.Updated,
 				RepositoryLoggingEvents.ES_UPDATE,
 				$"Update (Id: {entity?.Id})");

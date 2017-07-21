@@ -73,10 +73,10 @@ namespace Core.Tests
         public new Task<bool> InsertAsync<T>(T entity, bool refresh = true) where T : BaseEntity, IModel
             => base.InsertAsync<T>(entity, refresh);
 
-        public new bool Update<T>(T entity, bool refresh) where T : class, IProjection, IWithVersion
+        public new bool Update<T>(T entity, bool refresh) where T : BaseEntityWithVersion, IProjection, IWithVersion
             => base.Update<T>(entity, refresh);
 
-        public new Task<bool> UpdateAsync<T>(T entity, bool refresh = true) where T : class, IProjection, IWithVersion
+        public new Task<bool> UpdateAsync<T>(T entity, bool refresh = true) where T : BaseEntityWithVersion, IProjection, IWithVersion
             => base.UpdateAsync<T>(entity, refresh);
 
         public new int Update<T>(QueryContainer query, UpdateByQueryBuilder<T> update, bool refresh = true)
