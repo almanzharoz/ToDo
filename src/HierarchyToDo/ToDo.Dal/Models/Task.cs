@@ -8,14 +8,12 @@ using Newtonsoft.Json;
 
 namespace ToDo.Dal.Models
 {
-	internal class Task : BaseEntityWithParent<Project, Project>, IWithName, IWithVersion, IWithCreated, IHasState, IWithUser
+	internal class Task : BaseEntityWithParentAndVersion<Project>, IModel, IWithName, IWithCreated, IHasState, IWithUser
 	{
 		public DateTime Created { get; set; }
 		[Keyword]
 		public Projections.User User { get; set; }
 
-		[JsonIgnore]
-		public int Version { get; set; }
 		public ERecordState State { get; set; }
 		public TaskState[] States { get; set; }
 
@@ -34,6 +32,7 @@ namespace ToDo.Dal.Models
 		public int ActualTime { get; set; }
 		public DateTime Deadline { get; set; }
 
+		[Keyword]
 		public string Name { get; set; }
 	}
 }

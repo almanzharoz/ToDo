@@ -6,7 +6,7 @@ using ToDo.Dal.Interfaces;
 
 namespace ToDo.Dal.Models
 {
-	public class User : BaseEntity, IWithVersion
+	public class User : BaseEntityWithVersion, IModel, IProjection
 	{
 		[Text(Analyzer = "autocomplete", Fielddata = true)]
 		public string Nick { get; set; }
@@ -17,7 +17,5 @@ namespace ToDo.Dal.Models
 		[Keyword]
 		public EUserRole[] Roles { get; set; }
 		public bool Deny { get; set; }
-		[JsonIgnore]
-		public int Version { get; set; }
 	}
 }

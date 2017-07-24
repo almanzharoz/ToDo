@@ -29,7 +29,8 @@ namespace Core.ElasticSearch.Mapping
 			where TMapping : class, IModel, IWithParent<TParent>
 			where TParent : BaseEntity, IProjection, new();
 
-		string GetIndexName<T>();
+		string GetIndexName<T>() where T : IProjection;
+		string GetTypeName<T>() where T : IProjection;
 	}
 
 	internal class ElasticMapping<TSettings> : IElasticMapping<TSettings> where TSettings : BaseElasticSettings
@@ -61,8 +62,11 @@ namespace Core.ElasticSearch.Mapping
 			return this;
 		}
 
-		public string GetIndexName<T>() => _mapping[typeof(T)].IndexName;
+		public string GetIndexName<T>() where T : IProjection
+			=> _projection[typeof(T)].MappingItem.IndexName;
 
+		public string GetTypeName<T>() where T : IProjection
+			=> _projection[typeof(T)].MappingItem.TypeName;
 
 		/// <summary>
 		/// Регистрирует внутренний документ

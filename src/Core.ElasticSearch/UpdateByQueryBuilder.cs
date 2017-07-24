@@ -8,7 +8,7 @@ using SharpFuncExt;
 
 namespace Core.ElasticSearch
 {
-    public class UpdateByQueryBuilder<T> where T : IEntity
+    public class UpdateByQueryBuilder<T> where T : IEntity, IUpdateProjection
 	{
 		private StringBuilder _script = new StringBuilder();
 		private readonly IDictionary<string, object> _paramsDictionary = new Dictionary<string, object>();

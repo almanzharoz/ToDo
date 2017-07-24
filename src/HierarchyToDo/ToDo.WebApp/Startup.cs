@@ -57,7 +57,7 @@ namespace ToDo.WebApp
 		        return null;
 	        });
 
-	        services.AddToDo("http://localhost:9200", "todo");
+	        services.AddToDo("http://localhost:9200");
         }
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

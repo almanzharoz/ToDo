@@ -9,7 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="wwwroot\js\bootstrap-wysiwyg.js" />
     <Content Include="wwwroot\js\bootstrap3-typeahead.min.js" />
   </ItemGroup>
   <ItemGroup>

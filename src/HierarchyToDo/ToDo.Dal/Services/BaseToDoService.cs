@@ -15,8 +15,8 @@ namespace ToDo.Dal.Repositories
 	{
 		protected readonly UserName _user;
 
-		protected BaseToDoService(ILoggerFactory loggerFactory, ElasticSettings settings, ElasticMapping<ElasticSettings> mapping, RequestContainer<ElasticSettings> container, UserName user) 
-			: base(loggerFactory, settings, mapping, container)
+		protected BaseToDoService(ILoggerFactory loggerFactory, ElasticSettings settings, ElasticScopeFactory<ElasticSettings> factory, UserName user) 
+			: base(loggerFactory, settings, factory)
 		{
 			_user = user;
 		}
@@ -27,7 +27,7 @@ namespace ToDo.Dal.Repositories
 		/// <typeparam name="T"></typeparam>
 		/// <param name="query"></param>
 		/// <returns></returns>
-		protected QueryContainer UserQuery<T>(QueryContainer query) where T : class, IWithUser
+		protected QueryContainer UserQuery<T>(QueryContainer query) where T : class, IWithUser, ISearchProjection
 			=> Query<T>.Term(p => p.User, _user.HasNotNullArg("user").Id) && query;
 
 		protected QueryContainer TaskQuery(QueryContainer query)
@@ -42,11 +42,11 @@ namespace ToDo.Dal.Repositories
 				                                                f.Ids(id => id.Values(project.HasNotNullArg(nameof(project))))))))
 			   && query;
 
-		public bool Save<T>(string id, Func<string, T> getEntity, Func<T, T> update)
-			where T : class, IEntity, IWithUser, IWithVersion, new()
-			=> id.IfNull(
-				() => Insert(update(new T() { User = _user })),
-				a => Update(update(getEntity(a).HasNotNullArg("entity"))
-					.ThrowIf(x => x.Id != id, x => new Exception("Not equals ids"))));
+		//public bool Save<T>(string id, Func<string, T> getEntity, Func<T, T> update)
+		//	where T : class, IEntity, IWithUser, IWithVersion, new()
+		//	=> id.IfNull(
+		//		() => Insert(update(new T() { User = _user })),
+		//		a => Update(update(getEntity(a).HasNotNullArg("entity"))
+		//			.ThrowIf(x => x.Id != id, x => new Exception("Not equals ids"))));
 	}
 }

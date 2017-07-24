@@ -5,11 +5,9 @@ using ToDo.Dal.Interfaces;
 
 namespace ToDo.Dal.Models
 {
-    public class Project : BaseEntity, IProjection<Project>, IWithName, IWithUser, IWithVersion
+    public class Project : BaseEntityWithVersion, IModel, IProjection<Project>, IWithName, IWithUser, ISearchProjection, IInsertProjection, IUpdateProjection, IRemoveProjection
     {
-		[JsonIgnore]
-		public int Version { get; set; }
-		//[Text(Analyzer = "not_analyzed")]
+	    [Keyword]
 		public string Name { get; set; }
 		[Keyword]
 	    public Projections.User User { get; set; }

@@ -37,6 +37,7 @@ namespace Core.ElasticSearch.Mapping
 
 		public IPutMappingResponse Map(ElasticClient client, Func<Type, IMappingItem> getMappingItem)
 			=> client.Map<T>(x => x.AutoMap()
+				.Index(IndexName)
 				.Fluent(g => GetParentType()
 					.IfNotNull(z => g.Parent(getMappingItem(z).TypeName))));
 

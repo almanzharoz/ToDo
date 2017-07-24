@@ -19,7 +19,7 @@ namespace Core.ElasticSearch
 		where TSettings : BaseElasticSettings
 	{
 		protected readonly ILogger _logger;
-		protected readonly ElasticClient _client;
+		private readonly ElasticClient _client;
 		private readonly RequestContainer<TSettings> _container;
 		private readonly TSettings _settings;
 		private readonly ElasticMapping<TSettings> _mapping;

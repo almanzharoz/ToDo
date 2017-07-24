@@ -7,6 +7,11 @@ namespace Core.ElasticSearch.Domain
 		[JsonProperty]
 		[JsonIgnore]
 		public string Id { get; internal set; }
+
+		protected void SetId(string id)
+		{
+			Id = id;
+		}
 	}
 
 	public class BaseEntityWithVersion : BaseEntity, IWithVersion

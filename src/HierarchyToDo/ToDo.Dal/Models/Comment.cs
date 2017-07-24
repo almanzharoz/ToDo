@@ -6,14 +6,12 @@ using Newtonsoft.Json;
 
 namespace ToDo.Dal.Models
 {
-	public class Comment : BaseEntity, IWithVersion, IWithUser, IWithCreated, IWithFiles
+	public class Comment : BaseEntityWithVersion, IWithUser, IWithCreated, IWithFiles
 	{
 		[Keyword]
 		public Projections.User User { get; set; }
 		public DateTime Created { get; set; }
 		public bool Deleted { get; set; }
-		[JsonIgnore]
-		public int Version { get; set; }
 
 		[Keyword]
 		public Projections.Task Task { get; set; }

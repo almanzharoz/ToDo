@@ -10,9 +10,9 @@ namespace ToDo.Dal
 {
     public static class BuilderExtensions
     {
-	    public static IServiceCollection AddToDo(this IServiceCollection services, string url, string indexName)
+	    public static IServiceCollection AddToDo(this IServiceCollection services, string url)
 	    {
-		    services.AddElastic(new ElasticSettings(new Uri(url), indexName))
+		    services.AddElastic(new ElasticSettings(new Uri(url)))
 				// репозитории
 				.AddService<AuthorizationService, ElasticSettings>()
 			    .AddService<AdminService, ElasticSettings>()
@@ -25,16 +25,17 @@ namespace ToDo.Dal
 		    app.UseElastic<ElasticSettings, AdminService>(
 			    m => m
 				    // маппинг
-				    .AddMapping<User>()
-				    .AddMapping<Project>()
-				    .AddMapping<Task>()
-					
+				    .AddMapping<User>(x => x.IndexName)
+				    .AddMapping<Project>(x => x.IndexName)
+				    .AddMapping<Task>(x => x.IndexName)
+					// внутренние документы
 					.AddStruct<TaskState>()
 				    // проекции
 				    .AddProjection<Projections.User, User>()
 				    .AddProjection<Projections.UserWithRoles, User>()
+				    .AddProjection<Projections.NewUser, User>()
 				    .AddProjection<Project, Project>()
-				    .AddProjection<Projections.Task, Task, Project, Project>(),
+				    .AddProjection<Projections.Task, Task, Project>(),
 			    rep =>
 			    {
 				    rep.AddUser("admin", "admin", "123", new[] { EUserRole.Admin });

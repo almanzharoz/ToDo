@@ -17,15 +17,15 @@ namespace ToDo.Dal.Repositories
 		private static readonly MD5 md5 = MD5.Create();
 
 		public AuthorizationService(ILoggerFactory loggerFactory, ElasticSettings settings,
-			ElasticMapping<ElasticSettings> mapping, RequestContainer<ElasticSettings> container, UserName user)
-			: base(loggerFactory, settings, mapping, container, user)
+			ElasticScopeFactory<ElasticSettings> factory, UserName user)
+			: base(loggerFactory, settings, factory, user)
 		{
 		}
 
 		public UserWithRoles TryLogin(string email, string password)
 			=> Search<Models.User, UserWithRoles>(
 					Query<Models.User>.Term(x => x.Email, email) &&
-					Query<Models.User>.Term(x => x.Deny, false) &&
+					!Query<Models.User>.Term(x => x.Deny, true) &&
 					Query<Models.User>.Term(x => x.Password, Base64UrlTextEncoder.Encode(md5.ComputeHash(Encoding.UTF8.GetBytes(password)))), null, 1)
 				.FirstOrDefault();
 	}

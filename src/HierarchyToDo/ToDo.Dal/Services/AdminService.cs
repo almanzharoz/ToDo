@@ -16,15 +16,15 @@ namespace ToDo.Dal.Repositories
 	{
 		private static readonly MD5 md5 = MD5.Create();
 
-		public AdminService(ILoggerFactory loggerFactory, ElasticSettings settings, ElasticMapping<ElasticSettings> mapping, RequestContainer<ElasticSettings> container, Projections.UserName user) 
-			: base(loggerFactory, settings, mapping, container, user)
+		public AdminService(ILoggerFactory loggerFactory, ElasticSettings settings, ElasticScopeFactory<ElasticSettings> factory, Projections.UserName user) 
+			: base(loggerFactory, settings, factory, user)
 		{
 		}
 
 		public bool AddUser(string email, string name, string password, EUserRole[] roles)
-			=> Count<Models.User>(Query<Models.User>.Term(p => p.Email, email.ToLower()))
+			=> Count<Projections.UserWithRoles>(Query<Projections.UserWithRoles>.Term(p => p.Email, email.ToLower()))
 				.If(p => p == 0, x =>
-					Insert(new Models.User()
+					Insert(new Projections.NewUser()
 					{
 						Email = email.ToLower(),
 						Nick = name ?? email,
@@ -35,21 +35,21 @@ namespace ToDo.Dal.Repositories
 		public IReadOnlyCollection<Projections.UserWithRoles> GetUsers() => Search<Models.User, Projections.UserWithRoles>(new QueryContainer());
 
 		public bool DeleteRole(string id, EUserRole role)
-			=> Update(Query<Models.User>.Ids(x => x.Values(id)),
-					new UpdateByQueryBuilder<Models.User>().Remove(x => x.Roles, role)) > 0;
+			=> Update(Query<Projections.UserWithRoles>.Ids(x => x.Values(id)),
+					new UpdateByQueryBuilder<Projections.UserWithRoles>().Remove(x => x.Roles, role)) > 0;
 
 		public bool AddRole(string id, EUserRole role)
-			=> Update(Query<Models.User>.Ids(x => x.Values(id)),
-					new UpdateByQueryBuilder<Models.User>().Add(x => x.Roles, role)) > 0;
+			=> Update(Query<Projections.UserWithRoles>.Ids(x => x.Values(id)),
+					new UpdateByQueryBuilder<Projections.UserWithRoles>().Add(x => x.Roles, role)) > 0;
 
 		public bool DenyUser(string id, bool deny)
-			=> Update(Query<Models.User>.Ids(x => x.Values(id)),
-					new UpdateByQueryBuilder<Models.User>().Set(x => x.Deny, deny)) > 0;
+			=> Update(Query<Projections.UserWithRoles>.Ids(x => x.Values(id)),
+					new UpdateByQueryBuilder<Projections.UserWithRoles>().Set(x => x.Deny, deny)) > 0;
 
-		public bool DeleteUser(string id) => Remove<Projections.User, Models.User>(GetUser(id));
-		public Projections.UserWithRoles GetUser(string id) => Get<User, Projections.UserWithRoles>(id.HasNotNullArg("userId"));
+		public bool DeleteUser(string id) => Remove<Projections.User>(GetUser(id));
+		public Projections.UserWithRoles GetUser(string id) => Get<Projections.UserWithRoles>(id.HasNotNullArg("userId"));
 
-		public ISearchResponse<Projections.User> GetUsersNames(string s) =>
-			_client.Search<Models.User, Projections.User>(x => x.Query(q => q.Match(m => m.Field(p => p.Nick).Query(s))));
+		public IReadOnlyCollection<Projections.User> GetUsersNames(string s) =>
+			Search<Models.User, Projections.User>(q => q.Match(m => m.Field(p => p.Nick).Query(s)));
 	}
 }

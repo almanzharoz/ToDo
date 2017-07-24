@@ -6,11 +6,10 @@ using TaskState = ToDo.Dal.Models.TaskState;
 
 namespace ToDo.Dal.Projections
 {
-	public class Task : BaseEntityWithParent<Models.Project, Models.Project>, IProjection<Models.Task>, IWithUser, IWithVersion
+	public class Task : BaseEntityWithParentAndVersion<Models.Project>, IProjection<Models.Task>, IWithUser, ISearchProjection, IInsertProjection
 	{
 		[Keyword]
 		public User User { get; set; }
-		public int Version { get; set; }
 		public string Name { get; set; }
 		public DateTime Created { get; set; }
 		[Keyword]

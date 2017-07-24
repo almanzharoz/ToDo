@@ -16,8 +16,8 @@ namespace ToDo.Dal.Repositories
 {
 	public class TaskService : BaseToDoService
 	{
-		public TaskService(ILoggerFactory loggerFactory, ElasticSettings settings, ElasticMapping<ElasticSettings> mapping, RequestContainer<ElasticSettings> container, UserName user) 
-			: base(loggerFactory, settings, mapping, container, user)
+		public TaskService(ILoggerFactory loggerFactory, ElasticSettings settings, ElasticScopeFactory<ElasticSettings> factory, UserName user) 
+			: base(loggerFactory, settings, factory, user)
 		{
 		}
 
@@ -41,7 +41,7 @@ namespace ToDo.Dal.Repositories
 
 		public bool AddTask(string projectId, string parentTask, string name, string note, DateTime deadline,
 			int estimatedTime, UserName assign) =>
-			Insert<Models.Task, Project, Project>(new Models.Task
+			Insert<Task, Project>(new Task
 			{
 				User = _user,
 				Created = DateTime.Now,
@@ -51,8 +51,9 @@ namespace ToDo.Dal.Repositories
 				Deadline = deadline,
 				EstimatedTime = estimatedTime,
 				ParentTask = parentTask.IfNotNullOrDefault(GetTask),
-				Assign = assign
-			}, GetProject(projectId.HasNotNullArg(nameof(projectId))).HasNotNullArg("project"));
+				Assign = assign,
+				Parent = GetProject(projectId.HasNotNullArg(nameof(projectId))).HasNotNullArg("project")
+			});
 
 		public IReadOnlyCollection<Task> GetMyTasks(string id) =>
 			Search<Models.Task, Task>(UserQuery<Task>(null), s => s.Descending(p => p.Created));
@@ -66,7 +67,7 @@ namespace ToDo.Dal.Repositories
 				sort => sort.Ascending(p => p.Nick), 0, 10);
 
 		public int GetChildrenCount(Task task) =>
-			Count<Models.Task>(TaskQuery(Query<Models.Task>.Term(p => p.ParentTask, task.Id), task.Parent.Id));
+			Count<Task>(TaskQuery(Query<Models.Task>.Term(p => p.ParentTask, task.Id), task.Parent.Id));
 
 		private IEnumerable<Task> GetParents(Task task)
 		{

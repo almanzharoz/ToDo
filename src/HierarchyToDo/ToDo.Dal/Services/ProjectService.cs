@@ -16,8 +16,8 @@ namespace ToDo.Dal.Repositories
 	public class ProjectService : BaseToDoService
 	{
 		public ProjectService(ILoggerFactory loggerFactory, ElasticSettings settings,
-			ElasticMapping<ElasticSettings> mapping, RequestContainer<ElasticSettings> container, UserName user)
-			: base(loggerFactory, settings, mapping, container, user)
+			ElasticScopeFactory<ElasticSettings> factory, UserName user)
+			: base(loggerFactory, settings, factory, user)
 		{
 		}
 
@@ -25,12 +25,9 @@ namespace ToDo.Dal.Repositories
 			Search<Project, Project>(UserQuery<Project>(null));
 
 		public IReadOnlyCollection<KeyValuePair<Project, int>> GetMyProjectsWithCount() =>
-			_client.Search<Project>(s => s.Version().Query(
-					q => Query<Project>.HasChild<Models.Task>(c => c.ScoreMode(ChildScoreMode.Sum).Query(cq => cq.MatchAll())) ||
-						q.Bool(b => b.Filter(UserQuery<Project>(null)))))
-				.Fluent(Load)
-				.Hits.Select(x => new KeyValuePair<Project, int>(x.Source, (int) x.Score))
-				.ToArray();
+			SearchWithScore<Project, Project>(
+				q => Query<Project>.HasChild<Models.Task>(c => c.ScoreMode(ChildScoreMode.Sum).Query(cq => cq.MatchAll())) ||
+					q.Bool(b => b.Filter(UserQuery<Project>(null))));
 
 		public Project GetProject(string id) =>
 			Search<Project, Project>(UserQuery<Project>(Query<Project>.Ids(x => x.Values(id))))
@@ -43,7 +40,7 @@ namespace ToDo.Dal.Repositories
 					.ThrowIf(x => x.Id != id, x => new Exception("Not equals ids"))));
 
 		public bool Delete(string id, int version) =>
-			Remove<Project, Project>(
+			Remove<Project>(
 				GetProject(id)
 					.HasNotNullArg("project")
 					.ThrowIf(x => x.Version != version, x => new Exception("version not equals")));
