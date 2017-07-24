@@ -9,9 +9,9 @@ namespace ToDo.Dal.Models
 	public enum EUserRole
 	{
 		[EnumMember(Value = "anonym")]
-		Anonym,
+		Anonym = 1,
 		[EnumMember(Value = "user")]
-		User,
+		User = 2,
 		[EnumMember(Value = "manager")]
 		Manager,
 		[EnumMember(Value = "admin")]

@@ -3,6 +3,6 @@
 @using (Html.BeginForm("AddRole", "Admin", new {id=Model.Item1}, FormMethod.Post))
 {
 	@*<input name="role" placeholder="роль"/>*@
-	@Html.DropDownList("role", Enum.GetNames(typeof(EUserRole)).Select(x => new SelectListItem() { Text = x, Disabled = Model.Item2.Roles.Contains((EUserRole)Enum.Parse(typeof(EUserRole), x)) }))
+	@Html.DropDownList("role", Enum.GetNames(typeof(EUserRole)).Select(x => new SelectListItem() { Text = x, Disabled = Model.Item2.Roles != null && Model.Item2.Roles.Contains((EUserRole)Enum.Parse(typeof(EUserRole), x)) }))
 	<submit text="добавить"/>
 }
