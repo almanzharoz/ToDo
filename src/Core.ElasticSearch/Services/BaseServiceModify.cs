@@ -11,7 +11,7 @@ namespace Core.ElasticSearch
 	{
 		protected bool Insert<T>(T entity, bool refresh) where T : BaseEntity, IModel
 			=> Try(
-				c => c.Index(entity, refresh.If(new Func<IndexDescriptor<T>, IIndexRequest>(x => x.Refresh(Refresh.True)), null))
+				c => c.Index(entity, s => s.Index(_mapping.GetIndexName<T>()).If(refresh, x => x.Refresh(Refresh.True)))
 					.Fluent(x => entity
 						.Is<T, BaseEntityWithVersion>(s => (s as BaseEntityWithVersion).Version = (int) x.Version)
 						.Id = x.Id),
@@ -24,7 +24,7 @@ namespace Core.ElasticSearch
 			where T : BaseEntity, IModel, IWithParent<TParent>
 			where TParent : IProjection
 			=> Try(
-				c => c.Index(entity, s => s.If(refresh, a => a.Refresh(Refresh.True)).IfNotNull(entity.Parent, a => a.Parent(entity.Parent.Id)))
+				c => c.Index(entity, s => s.Index(_mapping.GetIndexName<T>()).If(refresh, a => a.Refresh(Refresh.True)).IfNotNull(entity.Parent, a => a.Parent(entity.Parent.Id)))
 					.Fluent(x => entity
 						.Is<T, BaseEntityWithVersion>(s => (s as BaseEntityWithVersion).Version = (int)x.Version)
 						.Id = x.Id),
@@ -38,8 +38,7 @@ namespace Core.ElasticSearch
 
 		protected Task<bool> InsertAsync<T>(T entity, bool refresh = true) where T : BaseEntity, IModel
 			=> TryAsync(
-				c => c.IndexAsync(entity,
-						refresh.If(new Func<IndexDescriptor<T>, IIndexRequest>(x => x.Refresh(Refresh.True)), null))
+				c => c.IndexAsync(entity, s => s.Index(_mapping.GetIndexName<T>()).If(refresh, x => x.Refresh(Refresh.True)))
 					.Fluent(x => entity
 						.Is<T, BaseEntityWithVersion>(s => (s as BaseEntityWithVersion).Version = (int) x.Version)
 						.Id = x.Id),
@@ -50,7 +49,7 @@ namespace Core.ElasticSearch
 			=> Try(
 				c => c.Update(
 						DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, x => x.Version, nameof(entity))),
-						d => d.Version(entity.Version).Doc(entity).If(refresh, x => x.Refresh(Refresh.True)))
+						d => d.Index(_mapping.GetIndexName<T>()).Version(entity.Version).Doc(entity).If(refresh, x => x.Refresh(Refresh.True)))
 					.Fluent(r => entity.Version = (int) r.Version),
 				r => r.Result == Result.Updated,
 				RepositoryLoggingEvents.ES_UPDATE,
@@ -62,7 +61,7 @@ namespace Core.ElasticSearch
 			=> TryAsync(
 				c => c.UpdateAsync(
 						DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, x => x.Version, nameof(entity))),
-						d => d.Version(entity.Version).Doc(entity).If(refresh, x => x.Refresh(Refresh.True)))
+						d => d.Index(_mapping.GetIndexName<T>()).Version(entity.Version).Doc(entity).If(refresh, x => x.Refresh(Refresh.True)))
 					.Fluent(r => entity.Version = (int)r.Version),
 				r => r.Result == Result.Updated,
 				RepositoryLoggingEvents.ES_UPDATE,
@@ -71,6 +70,7 @@ namespace Core.ElasticSearch
 		protected int Update<T>(QueryContainer query, UpdateByQueryBuilder<T> update, bool refresh = true) where T : class, IEntity, IWithVersion
 			=> Try(
 				c => c.UpdateByQuery<T>(x => x
+					.Index(_mapping.GetIndexName<T>())
 					.Query(q => q.Bool(b => b.Filter(query)))
 					.Version()
 					.If(refresh, y => y.Refresh())
@@ -82,6 +82,7 @@ namespace Core.ElasticSearch
 			where T : class, IEntity, IWithVersion
 			=> TryAsync(
 				c => c.UpdateByQueryAsync<T>(x => x
+					.Index(_mapping.GetIndexName<T>())
 					.Query(q => q.Bool(b => b.Filter(query)))
 					.Version()
 					.If(refresh, y => y.Refresh())
@@ -92,27 +93,27 @@ namespace Core.ElasticSearch
 		protected bool Remove<T>(T entity)
 			where T : class, IWithVersion, IProjection
 			=> Try(
-				c => c.Delete(DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, nameof(entity))), x => x.Version(entity.Version.HasNotNullArg("version")).Refresh(Refresh.True)),
+				c => c.Delete(DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, nameof(entity))), x => x.Index(_mapping.GetIndexName<T>()).Version(entity.Version.HasNotNullArg("version")).Refresh(Refresh.True)),
 				r => r.Found,
 				RepositoryLoggingEvents.ES_REMOVE,
 				$"Remove (Id: {entity.Id})");
 
 		protected Task<bool> RemoveAsync<T>(T entity) where T : class, IProjection, IWithVersion
 			=> TryAsync(
-				c => c.DeleteAsync(DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, nameof(entity))), x => x.Version(entity.Version).Refresh(Refresh.True)),
+				c => c.DeleteAsync(DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, nameof(entity))), x => x.Index(_mapping.GetIndexName<T>()).Version(entity.Version).Refresh(Refresh.True)),
 				r => r.Found,
 				RepositoryLoggingEvents.ES_REMOVE,
 				$"Remove (Id: {entity.Id})");
 
 		protected int Remove<T>(QueryContainer query) where T : class, IEntity
 			=> Try(
-				c => c.DeleteByQuery<T>(d => d.Query(q => q.Bool(b => b.Filter(query))).Refresh()),
+				c => c.DeleteByQuery<T>(d => d.Query(q => q.Bool(b => b.Filter(query))).Index(_mapping.GetIndexName<T>()).Refresh()),
 				r => (int)r.Deleted,
 				RepositoryLoggingEvents.ES_REMOVEBYQUERY);
 
 		protected Task<int> RemoveAsync<T>(QueryContainer query) where T : class, IEntity
 			=> TryAsync(
-				c => c.DeleteByQueryAsync<T>(d => d.Query(q => q.Bool(b => b.Filter(query))).Refresh()),
+				c => c.DeleteByQueryAsync<T>(d => d.Query(q => q.Bool(b => b.Filter(query))).Index(_mapping.GetIndexName<T>()).Refresh()),
 				r => (int)r.Deleted,
 				RepositoryLoggingEvents.ES_REMOVEBYQUERY);
 	}

@@ -522,5 +522,37 @@ namespace Core.Tests
             Assert.IsNotNull(childCategories.FirstOrDefault().Top);
             Assert.IsNotNull(childCategories.FirstOrDefault().Top.Name);
         }
-    }
+
+	    [TestMethod]
+	    public void InsertIntoAnotherIndex()
+	    {
+		    var producer = new Producer {Name = "Producer1"};
+		    _repository.Insert(producer, true);
+
+		    var loaded = _repository.Get<Producer>(producer.Id);
+
+			Assert.AreEqual(loaded.Name, producer.Name);
+	    }
+
+	    [TestMethod]
+	    public void InsertIntoAnotherIndexWithJoin()
+	    {
+		    var producer = new Producer { Name = "Producer1" };
+		    _repository.Insert(producer, true);
+
+			var category = new Category {Name = "Category1"};
+		    _repository.Insert(category, true);
+
+		    var product = new Product {Name = "Product1", Producer = producer, Parent = category};
+		    _repository.Insert<Product, Category>(product, true);
+
+			var loaded = _repository.Get<Product, Category>(product.Id, category.Id, true);
+
+		    Assert.AreEqual(loaded.Name, product.Name);
+		    Assert.AreEqual(loaded.Producer.Id, product.Producer.Id);
+		    Assert.AreEqual(loaded.Producer.Name, product.Producer.Name);
+		    Assert.AreEqual(loaded.Parent.Id, product.Parent.Id);
+		    Assert.AreEqual(loaded.Parent.Name, product.Parent.Name);
+		}
+	}
 }

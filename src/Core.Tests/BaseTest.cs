@@ -23,9 +23,9 @@ namespace Core.Tests
 
             serviceProvider.UseElasticForTests<ElasticSettings>(map => map
 
-                .AddMapping<Producer>()
-                .AddMapping<Category>()
-                .AddMapping<Product>()
+                .AddMapping<Producer>(x => x.SecondIndex)
+                .AddMapping<Category>(x => x.FirstIndex)
+                .AddMapping<Product>(x => x.FirstIndex)
 
                 .AddProjection<Producer, Producer>()
                 .AddProjection<Category, Category>()

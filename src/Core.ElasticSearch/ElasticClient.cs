@@ -23,7 +23,6 @@ namespace Core.ElasticSearch
 			connectionSettings.PrettyJson();
 			connectionSettings.DisableDirectStreaming();
 #endif
-			connectionSettings.DefaultIndex(settings.IndexName);
 
 			Client = new ElasticClient(connectionSettings);
 		}

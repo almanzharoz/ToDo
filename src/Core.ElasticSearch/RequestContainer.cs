@@ -90,23 +90,17 @@ namespace Core.ElasticSearch
 				_loadBag = new ConcurrentBag<IEntity>();
 			}
 			// группировать по MappingItem
-			var result = new List<(string index, IEnumerable<string> types, IEnumerable<string> fields, IEnumerable<string> ids)>();
+			var result =
+				new List<(string index, IEnumerable<string> types, IEnumerable<string> fields, IEnumerable<string> ids)>();
+			var i = 0;
 			foreach (var item in items.GroupBy(x => x.GetType())
-				.Select(x => (projection: _mapping.GetProjectionItem(x.Key), ids: x.Select(y => y.Id).ToArray()))
-				.GroupBy(x => x.projection.MappingItem))
+				.Select(x => (projection: _mapping.GetProjectionItem(x.Key), ids: x.Select(y => y.Id).ToArray())))
 			{
-				while (result.Count < item.Count())
-					result.Add((index: null, types: new string[0], fields: new string[0], ids: new string[0]));
-				var i = 0;
-				foreach (var inner in item)
-				{
-					result[i] = (
-						index: item.Key.IndexName,
-						types: result[i].types.Union(new[] {item.Key.TypeName}),
-						fields: result[i].fields.Union(inner.projection.Fields),
-						ids: result[i].ids.Union(inner.ids));
-					i++;
-				}
+				result.Add((
+					index: item.projection.MappingItem.IndexName,
+					types: new[] {item.projection.MappingItem.TypeName},
+					fields: item.projection.Fields,
+					ids: item.ids));
 			}
 			return result;
 		}

@@ -19,7 +19,9 @@ namespace Core.ElasticSearch
 				.Convert(
 					projection => Try(
 						c => c.Search<T, TProjection>(
-							x => x.Type(projection.MappingItem.TypeName)
+							x => x
+								.Index(projection.MappingItem.IndexName)
+								.Type(projection.MappingItem.TypeName)
 								.Source(s => s.Includes(f => f.Fields(projection.Fields)))
 								.Query(q => q.Bool(b => b.Filter(query)))
 								.IfNotNull(sort, y => y.Sort(sort))
@@ -28,7 +30,8 @@ namespace Core.ElasticSearch
 						r => new Pager<TProjection>(page, take, (int) r.Total, r.Documents.If(load, Load)),
 						RepositoryLoggingEvents.ES_SEARCH));
 
-		protected Pager<TProjection> SearchPager<T, TProjection>(Func<QueryContainerDescriptor<T>, QueryContainer> query, int page, int take,
+		protected Pager<TProjection> SearchPager<T, TProjection>(Func<QueryContainerDescriptor<T>, QueryContainer> query,
+			int page, int take,
 			Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, bool load = true)
 			where TProjection : class, IProjection<T>
 			where T : class, IModel
@@ -36,13 +39,15 @@ namespace Core.ElasticSearch
 				.Convert(
 					projection => Try(
 						c => c.Search<T, TProjection>(
-							x => x.Type(projection.MappingItem.TypeName)
+							x => x
+								.Index(projection.MappingItem.IndexName)
+								.Type(projection.MappingItem.TypeName)
 								.Source(s => s.Includes(f => f.Fields(projection.Fields)))
 								.Query(query)
 								.IfNotNull(sort, y => y.Sort(sort))
 								.If(y => typeof(T).GetInterfaces().Any(z => z == typeof(IWithVersion)), y => y.Version())
 								.IfNotNull(take, y => y.Take(take).Skip((page > 0 ? page - 1 : 0) * take))),
-						r => new Pager<TProjection>(page, take, (int)r.Total, r.Documents.If(load, Load)),
+						r => new Pager<TProjection>(page, take, (int) r.Total, r.Documents.If(load, Load)),
 						RepositoryLoggingEvents.ES_SEARCH));
 	}
 }

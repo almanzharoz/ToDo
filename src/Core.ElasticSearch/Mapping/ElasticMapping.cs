@@ -1,7 +1,8 @@
 ﻿ using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Threading;
+ using System.Linq;
+ using System.Threading;
  using BenchmarkDotNet.Extensions;
  using Core.ElasticSearch.Domain;
 using Core.ElasticSearch.Serialization;
@@ -15,7 +16,7 @@ namespace Core.ElasticSearch.Mapping
 {
 	public interface IElasticMapping<TSettings> where TSettings : BaseElasticSettings
 	{
-		IElasticMapping<TSettings> AddMapping<T>() where T : class, IModel;
+		IElasticMapping<TSettings> AddMapping<T>(Func<TSettings, string> indexName) where T : class, IModel;
 		IElasticMapping<TSettings> AddStruct<T>() where T : struct;
 
 		IElasticMapping<TSettings> AddProjection<T, TMapping>()
@@ -26,6 +27,8 @@ namespace Core.ElasticSearch.Mapping
 			where T : BaseEntity, IProjection<TMapping>, IWithParent<TParent>, new()
 			where TMapping : class, IModel, IWithParent<TParent>
 			where TParent : BaseEntity, IProjection, new();
+
+		string GetIndexName<T>();
 	}
 
 	internal class ElasticMapping<TSettings> : IElasticMapping<TSettings> where TSettings : BaseElasticSettings
@@ -49,12 +52,16 @@ namespace Core.ElasticSearch.Mapping
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
-		public IElasticMapping<TSettings> AddMapping<T>() where T : class, IModel
+		public IElasticMapping<TSettings> AddMapping<T>(Func<TSettings, string> indexName) where T : class, IModel
 		{
-			_mapping.AddOrUpdate(typeof(T), x => new MappingItem<T, TSettings>(_settings), (t, m) => throw new Exception($"Mapping for type \"{typeof(T).Name}\" already exists."));
+			_mapping.AddOrUpdate(typeof(T), x => new MappingItem<T, TSettings>(_settings, indexName),
+				(t, m) => throw new Exception($"Mapping for type \"{typeof(T).Name}\" already exists."));
 			_converters.TryAdd(typeof(T), new InsertJsonConverter<T>()); // объекты этого типа доступны только для вставки
 			return this;
 		}
+
+		public string GetIndexName<T>() => _mapping[typeof(T)].IndexName;
+
 
 		/// <summary>
 		/// Регистрирует внутренний документ
@@ -128,27 +135,29 @@ namespace Core.ElasticSearch.Mapping
 			connectionSettings.PrettyJson();
 			connectionSettings.DisableDirectStreaming();
 #endif
-			connectionSettings.DefaultIndex(_settings.IndexName);
 
 			var client = new ElasticClient(connectionSettings);
-			
-			if (!client.IndexExists(_settings.IndexName).Exists)
-				// https://github.com/elastic/elasticsearch-dsl-py/issues/535
-				client.CreateIndex(_settings.IndexName, x => x
-						.Settings(s => s
-							.Analysis(a => a
-								.Analyzers(an => an.Custom("autocomplete", t => t.Tokenizer("autocomplete_token").Filters("lowercase")))
-								.Tokenizers(t => t.EdgeNGram("autocomplete_token",
-									e => e.MinGram(1).MaxGram(10).TokenChars(TokenChar.Letter, TokenChar.Digit)))))
-						.Mappings(z => z.Each(_mapping, m => m.Value.Map(z, _mapping.GetValueOrDefault))))
-					.IfNot(x => x.IsValid, x => x
-						.LogError(_logger, "Mapping error:\r\n" + x.DebugInformation)
-						.Throw(t => new Exception("Create index error")), x => initAction.IfNotNull(f => f()));
-			else
-				_mapping.Each(m => m.Value.Map(client, _mapping.GetValueOrDefault)
-					.IfNot(x => x.IsValid, x => x
-						.LogError(_logger, "Mapping error:\r\n" + x.DebugInformation)
-						.Throw(t => new Exception("Mapping error"))));
+
+			foreach (var mapping in _mapping.GroupBy(s => s.Value.IndexName))
+			{
+				if (!client.IndexExists(mapping.Key).Exists)
+					// https://github.com/elastic/elasticsearch-dsl-py/issues/535
+					client.CreateIndex(mapping.Key, x => x
+							.Settings(s => s
+								.Analysis(a => a
+									.Analyzers(an => an.Custom("autocomplete", t => t.Tokenizer("autocomplete_token").Filters("lowercase")))
+									.Tokenizers(t => t.EdgeNGram("autocomplete_token",
+										e => e.MinGram(1).MaxGram(10).TokenChars(TokenChar.Letter, TokenChar.Digit)))))
+							.Mappings(z => z.Each(mapping, m => m.Value.Map(z, _mapping.GetValueOrDefault))))
+						.IfNot(x => x.IsValid, x => x
+							.LogError(_logger, "Mapping error:\r\n" + x.DebugInformation)
+							.Throw(t => new Exception("Create index error")), x => initAction.IfNotNull(f => f()));
+				else
+					mapping.Each(m => m.Value.Map(client, _mapping.GetValueOrDefault)
+						.IfNot(x => x.IsValid, x => x
+							.LogError(_logger, "Mapping error:\r\n" + x.DebugInformation)
+							.Throw(t => new Exception("Mapping error"))));
+			}
 		}
 
 		internal void Build<TRepository>(Action<TRepository> initFunc, TRepository repository)
@@ -165,12 +174,12 @@ namespace Core.ElasticSearch.Mapping
 			connectionSettings.PrettyJson();
 			connectionSettings.DisableDirectStreaming();
 #endif
-			connectionSettings.DefaultIndex(_settings.IndexName);
 
 			var client = new ElasticClient(connectionSettings);
 
-			if (client.IndexExists(_settings.IndexName).Exists)
-				client.DeleteIndex(_settings.IndexName);
+			foreach (var indexName in _mapping.Select(s => s.Value.IndexName).Distinct())
+				if (client.IndexExists(indexName).Exists)
+					client.DeleteIndex(indexName);
 		}
 
 		internal bool TryGetResponseJsonConverter(Type type, out JsonConverter result)

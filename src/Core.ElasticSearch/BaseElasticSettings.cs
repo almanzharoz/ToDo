@@ -8,12 +8,10 @@ namespace Core.ElasticSearch
 	public abstract class BaseElasticSettings
 	{
 		public Uri Url { get; }
-		public string IndexName { get; }
 
-		protected BaseElasticSettings(Uri url, string indexName)
+		protected BaseElasticSettings(Uri url)
 		{
 			Url = url;
-			IndexName = indexName;
 		}
 	}
 }

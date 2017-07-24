@@ -22,11 +22,11 @@ namespace Core.ElasticSearch.Mapping
 		where TSettings : BaseElasticSettings
 	{
 		private readonly IEnumerable<string> _fields;
-		public MappingItem(TSettings settings)
+		public MappingItem(TSettings settings, Func<TSettings, string> indexName)
 		{
 			_fields = typeof(T).GetFields();
 			TypeName = typeof(T).GetTypeInfo().GetCustomAttribute<ElasticsearchTypeAttribute>()?.Name ?? typeof(T).Name.ToLower();
-			IndexName = settings.IndexName;
+			IndexName = indexName(settings);
 		}
 
 		public IEnumerable<string> CheckFields(IEnumerable<string> fields)
