@@ -2,7 +2,8 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Threading;
-using Core.ElasticSearch.Domain;
+ using BenchmarkDotNet.Extensions;
+ using Core.ElasticSearch.Domain;
 using Core.ElasticSearch.Serialization;
 using Elasticsearch.Net;
 using Microsoft.Extensions.Logging;
@@ -139,12 +140,12 @@ namespace Core.ElasticSearch.Mapping
 								.Analyzers(an => an.Custom("autocomplete", t => t.Tokenizer("autocomplete_token").Filters("lowercase")))
 								.Tokenizers(t => t.EdgeNGram("autocomplete_token",
 									e => e.MinGram(1).MaxGram(10).TokenChars(TokenChar.Letter, TokenChar.Digit)))))
-						.Mappings(z => z.Each(_mapping, m => m.Value.Map(z))))
+						.Mappings(z => z.Each(_mapping, m => m.Value.Map(z, _mapping.GetValueOrDefault))))
 					.IfNot(x => x.IsValid, x => x
 						.LogError(_logger, "Mapping error:\r\n" + x.DebugInformation)
 						.Throw(t => new Exception("Create index error")), x => initAction.IfNotNull(f => f()));
 			else
-				_mapping.Each(m => m.Value.Map(client)
+				_mapping.Each(m => m.Value.Map(client, _mapping.GetValueOrDefault)
 					.IfNot(x => x.IsValid, x => x
 						.LogError(_logger, "Mapping error:\r\n" + x.DebugInformation)
 						.Throw(t => new Exception("Mapping error"))));

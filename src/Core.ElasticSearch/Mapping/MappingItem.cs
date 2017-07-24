@@ -13,8 +13,8 @@ namespace Core.ElasticSearch.Mapping
 	{
 		string IndexName { get; }
 		string TypeName { get; }
-		IPutMappingResponse Map(ElasticClient client);
-		MappingsDescriptor Map(MappingsDescriptor descriptor);
+		IPutMappingResponse Map(ElasticClient client, Func<Type, IMappingItem> getMappingItem);
+		MappingsDescriptor Map(MappingsDescriptor descriptor, Func<Type, IMappingItem> getMappingItem);
 	}
 
 	internal class MappingItem<T, TSettings> : IMappingItem 
@@ -35,21 +35,22 @@ namespace Core.ElasticSearch.Mapping
 		public string IndexName { get; }
 		public string TypeName { get; }
 
-		public IPutMappingResponse Map(ElasticClient client) => client.Map<T>(x => x.AutoMap()
-			.If(typeof(T).GetTypeInfo().GetInterfaces().Any(z => z.Name.IndexOf("IWithParent") == 0),
-				z => z.Parent(typeof(T).GetTypeInfo()
-					.GetInterfaces()
-					.First(y => y.Name.IndexOf("IWithParent") == 0)
-					.GenericTypeArguments.First()
-					.Name.ToLower()))); //TODO: доставать имя типа из маппинга
+		public IPutMappingResponse Map(ElasticClient client, Func<Type, IMappingItem> getMappingItem)
+			=> client.Map<T>(x => x.AutoMap()
+				.Fluent(g => GetParentType()
+					.IfNotNull(z => g.Parent(getMappingItem(z).TypeName))));
 
-		public MappingsDescriptor Map(MappingsDescriptor descriptor)
+		public MappingsDescriptor Map(MappingsDescriptor descriptor, Func<Type, IMappingItem> getMappingItem)
 			=> descriptor.Map<T>(x => x.AutoMap()
-				.If(typeof(T).GetTypeInfo().GetInterfaces().Any(z => z.Name.IndexOf("IWithParent") == 0),
-					z => z.Parent(typeof(T).GetTypeInfo()
-						.GetInterfaces()
-						.First(y => y.Name.IndexOf("IWithParent") == 0)
-						.GenericTypeArguments.First()
-						.Name.ToLower()))); //TODO: доставать имя типа из маппинга
+				.Fluent(g => GetParentType()
+					.IfNotNull(z => g.Parent(getMappingItem(z).TypeName))));
+
+		private Type GetParentType()
+			=> typeof(T).GetTypeInfo()
+				.GetInterfaces()
+				.FirstOrDefault(y => y.Name.IndexOf("IWithParent") == 0)
+				?.GenericTypeArguments.FirstOrDefault();
+
+		// TODO: Проверять тип парента, чтобы не было возможности указать парентом другой тип (IWithParent<T> where T : IModel)
 	}
 }
