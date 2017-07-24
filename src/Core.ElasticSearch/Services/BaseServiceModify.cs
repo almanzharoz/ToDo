@@ -91,27 +91,27 @@ namespace Core.ElasticSearch
 				RepositoryLoggingEvents.ES_UPDATEBYQUERY);
 
 		protected bool Remove<T>(T entity)
-			where T : class, IWithVersion, IProjection
+			where T : class, IWithVersion, IProjection, IRemoveProjection
 			=> Try(
 				c => c.Delete(DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, nameof(entity))), x => x.Index(_mapping.GetIndexName<T>()).Version(entity.Version.HasNotNullArg("version")).Refresh(Refresh.True)),
 				r => r.Found,
 				RepositoryLoggingEvents.ES_REMOVE,
 				$"Remove (Id: {entity.Id})");
 
-		protected Task<bool> RemoveAsync<T>(T entity) where T : class, IProjection, IWithVersion
+		protected Task<bool> RemoveAsync<T>(T entity) where T : class, IProjection, IRemoveProjection, IWithVersion
 			=> TryAsync(
 				c => c.DeleteAsync(DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, nameof(entity))), x => x.Index(_mapping.GetIndexName<T>()).Version(entity.Version).Refresh(Refresh.True)),
 				r => r.Found,
 				RepositoryLoggingEvents.ES_REMOVE,
 				$"Remove (Id: {entity.Id})");
 
-		protected int Remove<T>(QueryContainer query) where T : class, IEntity
+		protected int Remove<T>(QueryContainer query) where T : class, IEntity, IRemoveProjection
 			=> Try(
 				c => c.DeleteByQuery<T>(d => d.Query(q => q.Bool(b => b.Filter(query))).Index(_mapping.GetIndexName<T>()).Refresh()),
 				r => (int)r.Deleted,
 				RepositoryLoggingEvents.ES_REMOVEBYQUERY);
 
-		protected Task<int> RemoveAsync<T>(QueryContainer query) where T : class, IEntity
+		protected Task<int> RemoveAsync<T>(QueryContainer query) where T : class, IEntity, IRemoveProjection
 			=> TryAsync(
 				c => c.DeleteByQueryAsync<T>(d => d.Query(q => q.Bool(b => b.Filter(query))).Index(_mapping.GetIndexName<T>()).Refresh()),
 				r => (int)r.Deleted,

@@ -18,7 +18,6 @@ namespace Core.ElasticSearch
 			connectionSettings.DefaultFieldNameInferrer(x => x.ToLower());
 			connectionSettings.DisablePing();
 			connectionSettings.DisableAutomaticProxyDetection();
-			//connectionSettings.EnableDebugMode(x => { x.AuditTrail.Clear(); });
 #if DEBUG
 			connectionSettings.PrettyJson();
 			connectionSettings.DisableDirectStreaming();

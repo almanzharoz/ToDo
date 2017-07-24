@@ -34,6 +34,13 @@ namespace Core.ElasticSearch.Domain
 	{
 
 	}
+	/// <summary>
+	/// Использование проекции для удаления
+	/// </summary>
+	public interface IRemoveProjection : IEntity
+	{
+
+	}
 
 
 

@@ -89,17 +89,17 @@ namespace Core.Tests
             => base.UpdateAsync<T>(query, update, refresh);
 
         public new bool Remove<T>(T entity) 
-			where T : class, IProjection, IWithVersion
-            => base.Remove<T>(entity);
+			where T : class, IProjection, IWithVersion, IRemoveProjection
+			=> base.Remove<T>(entity);
 
-        public new Task<bool> RemoveAsync<T>(T entity) where T : class, IProjection, IWithVersion
-            => base.RemoveAsync<T>(entity);
+        public new Task<bool> RemoveAsync<T>(T entity) where T : class, IProjection, IWithVersion, IRemoveProjection
+			=> base.RemoveAsync<T>(entity);
 
-        public new int Remove<T>(QueryContainer query) where T : class, IEntity
-            => base.Remove<T>(query);
+        public new int Remove<T>(QueryContainer query) where T : class, IEntity, IRemoveProjection
+			=> base.Remove<T>(query);
 
-        public new Task<int> RemoveAsync<T>(QueryContainer query) where T : class, IEntity
-            => base.RemoveAsync<T>(query);
+        public new Task<int> RemoveAsync<T>(QueryContainer query) where T : class, IEntity, IRemoveProjection
+			=> base.RemoveAsync<T>(query);
 
         public new Pager<TProjection> SearchPager<T, TProjection>(QueryContainer query, int page, int take,
             Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, bool load = true)
