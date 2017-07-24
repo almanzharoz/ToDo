@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Core.ElasticSearch.Domain;
+using Core.ElasticSearch.Mapping;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -24,18 +25,18 @@ namespace Core.ElasticSearch.Serialization
 	internal class ClassJsonConverter<T> : JsonConverter where T : BaseEntity, new()
 	{
 		private readonly IRequestContainer _entityContainer;
-		public ClassJsonConverter(IRequestContainer entityContainer)
+		private readonly IProjectionItem _projectionItem;
+		public ClassJsonConverter(IProjectionItem projectionItem, IRequestContainer entityContainer)
 		{
 			_entityContainer = entityContainer;
+			_projectionItem = projectionItem;
 		}
 
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
 		{
 			writer.WriteStartObject();
-			foreach (var property in value.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+			foreach (var property in _projectionItem.Properties)
 			{
-				if (property.Name == "Id" || property.Name == "Version" || property.Name == "Parent")
-					continue;
 				var v = property.GetValue(value);
 				if (v == null)
 					continue;

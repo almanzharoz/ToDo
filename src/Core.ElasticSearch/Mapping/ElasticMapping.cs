@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Threading;
@@ -12,7 +12,22 @@ using SharpFuncExt;
 
 namespace Core.ElasticSearch.Mapping
 {
-	public class ElasticMapping<TSettings> where TSettings : BaseElasticSettings
+	public interface IElasticMapping<TSettings> where TSettings : BaseElasticSettings
+	{
+		IElasticMapping<TSettings> AddMapping<T>() where T : class, IModel;
+		IElasticMapping<TSettings> AddStruct<T>() where T : struct;
+
+		IElasticMapping<TSettings> AddProjection<T, TMapping>()
+			where T : BaseEntity, IProjection<TMapping>, new()
+			where TMapping : class, IModel;
+
+		IElasticMapping<TSettings> AddProjection<T, TMapping, TParent>()
+			where T : BaseEntity, IProjection<TMapping>, IWithParent<TParent>, new()
+			where TMapping : class, IModel, IWithParent<TParent>
+			where TParent : BaseEntity, IProjection, new();
+	}
+
+	internal class ElasticMapping<TSettings> : IElasticMapping<TSettings> where TSettings : BaseElasticSettings
 	{
 		private readonly ConcurrentDictionary<Type, IMappingItem> _mapping = new ConcurrentDictionary<Type, IMappingItem>();
 		private readonly ConcurrentDictionary<Type, IProjectionItem> _projection = new ConcurrentDictionary<Type, IProjectionItem>();
@@ -26,7 +41,6 @@ namespace Core.ElasticSearch.Mapping
 			_logger = loggerFactory.CreateLogger<ElasticMapping<TSettings>>();
 			_converters.TryAdd(typeof(GetResponse<IProjection>), new GetJsonConverter<IProjection>());
 			_converters.TryAdd(typeof(SearchResponse<IProjection>), new SearchJsonConverter<IProjection>());
-			//_converters.TryAdd(typeof(IndexResponse), new InsertResultJsonConverter());
 		}
 
 		/// <summary>
@@ -34,7 +48,7 @@ namespace Core.ElasticSearch.Mapping
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
-		public ElasticMapping<TSettings> AddMapping<T>() where T : class, IModel
+		public IElasticMapping<TSettings> AddMapping<T>() where T : class, IModel
 		{
 			_mapping.AddOrUpdate(typeof(T), x => new MappingItem<T, TSettings>(_settings), (t, m) => throw new Exception($"Mapping for type \"{typeof(T).Name}\" already exists."));
 			_converters.TryAdd(typeof(T), new InsertJsonConverter<T>()); // объекты этого типа доступны только для вставки
@@ -46,7 +60,7 @@ namespace Core.ElasticSearch.Mapping
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
-		public ElasticMapping<TSettings> AddStruct<T>() where T : struct
+		public IElasticMapping<TSettings> AddStruct<T>() where T : struct
 		{
 			_converters.TryAdd(typeof(T), new ObjectJsonConverter<T>());
 			return this;
@@ -58,7 +72,7 @@ namespace Core.ElasticSearch.Mapping
 		/// <typeparam name="T"></typeparam>
 		/// <typeparam name="TMapping"></typeparam>
 		/// <returns></returns>
-		public ElasticMapping<TSettings> AddProjection<T, TMapping>()
+		public IElasticMapping<TSettings> AddProjection<T, TMapping>()
 			where T : BaseEntity, IProjection<TMapping>, new()
 			where TMapping : class, IModel
 		{
@@ -83,7 +97,7 @@ namespace Core.ElasticSearch.Mapping
 		/// <typeparam name="TParent"></typeparam>
 		/// <typeparam name="TParentMapping"></typeparam>
 		/// <returns></returns>
-		public ElasticMapping<TSettings> AddProjection<T, TMapping, TParent>()
+		public IElasticMapping<TSettings> AddProjection<T, TMapping, TParent>()
 			where T : BaseEntity, IProjection<TMapping>, IWithParent<TParent>, new()
 			where TMapping : class, IModel, IWithParent<TParent>
 			where TParent : BaseEntity, IProjection, new()

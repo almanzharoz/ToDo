@@ -50,7 +50,7 @@ namespace Core.ElasticSearch.Mapping
 		}
 
 		public override JsonConverter GetJsonConverter(IRequestContainer container)
-			=> new ClassJsonConverter<T>(container);
+			=> new ClassJsonConverter<T>(this, container);
 	}
 
 	internal class ProjectionWithParentItem<T, TMapping, TParent, TSettings> : BaseProjectionItem<T, TMapping, TSettings>

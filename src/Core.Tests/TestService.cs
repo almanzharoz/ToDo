@@ -18,8 +18,8 @@ namespace Core.Tests
 {
     public class TestService : BaseService<ElasticSettings>
     {
-        public TestService(ILoggerFactory loggerFactory, ElasticSettings settings, ElasticMapping<ElasticSettings> mapping, RequestContainer<ElasticSettings> container, ElasticClient<ElasticSettings> client) : 
-			base(loggerFactory, settings, mapping, container, client)
+        public TestService(ILoggerFactory loggerFactory, ElasticSettings settings, ElasticScopeFactory<ElasticSettings> factory) : 
+			base(loggerFactory, settings, factory)
         {
         }
 
@@ -56,11 +56,11 @@ namespace Core.Tests
             where T : class, IProjection
             => base.GetAsync<T>(id, load);
 
-        public new int Count<T>(QueryContainer query) where T : class, IEntity
+        public new int Count<T>(QueryContainer query) where T : class, IProjection
             => base.Count<T>(query);
 
-        public new Task<int> CountAsync<T>(QueryContainer query) where T : class, IEntity
-            => base.CountAsync<T>(query);
+        public new Task<int> CountAsync<T>(QueryContainer query) where T : class, IProjection
+			=> base.CountAsync<T>(query);
 
         public new bool Insert<T>(T entity, bool refresh) where T : BaseEntity, IModel
             => base.Insert<T>(entity, refresh);

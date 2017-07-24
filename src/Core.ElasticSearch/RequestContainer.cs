@@ -14,13 +14,13 @@ namespace Core.ElasticSearch
 	{
 		T GetOrAdd<T>(string key, bool load) where T : BaseEntity, new();
 		IEntity Get(string key);
-		IEnumerable<(IEnumerable<string> types, IEnumerable<string> fields, IEnumerable<string> ids)> PopEntitiesForLoad();
+		IEnumerable<(string index, IEnumerable<string> types, IEnumerable<string> fields, IEnumerable<string> ids)> PopEntitiesForLoad();
 	}
 	/// <summary>
 	/// Контейнер загруженных объектов и объектов, готовых для загрузки.
 	/// </summary>
 	/// <typeparam name="TSettings"></typeparam>
-	public class RequestContainer<TSettings> : IRequestContainer 
+	internal class RequestContainer<TSettings> : IRequestContainer 
 		where TSettings : BaseElasticSettings
 	{
 		private readonly ConcurrentDictionary<string, IList<KeyValuePair<IEntity, bool>>> _cache =
@@ -81,7 +81,7 @@ namespace Core.ElasticSearch
 			return null;
 		}
 
-		public IEnumerable<(IEnumerable<string> types, IEnumerable<string> fields, IEnumerable<string> ids)> PopEntitiesForLoad()
+		public IEnumerable<(string index, IEnumerable<string> types, IEnumerable<string> fields, IEnumerable<string> ids)> PopEntitiesForLoad()
 		{
 			IEntity[] items;
 			lock (_locker)
@@ -90,17 +90,18 @@ namespace Core.ElasticSearch
 				_loadBag = new ConcurrentBag<IEntity>();
 			}
 			// группировать по MappingItem
-			var result = new List<(IEnumerable<string> types, IEnumerable<string> fields, IEnumerable<string> ids)>();
+			var result = new List<(string index, IEnumerable<string> types, IEnumerable<string> fields, IEnumerable<string> ids)>();
 			foreach (var item in items.GroupBy(x => x.GetType())
 				.Select(x => (projection: _mapping.GetProjectionItem(x.Key), ids: x.Select(y => y.Id).ToArray()))
 				.GroupBy(x => x.projection.MappingItem))
 			{
 				while (result.Count < item.Count())
-					result.Add((types: new string[0], fields: new string[0], ids: new string[0]));
+					result.Add((index: null, types: new string[0], fields: new string[0], ids: new string[0]));
 				var i = 0;
 				foreach (var inner in item)
 				{
 					result[i] = (
+						index: item.Key.IndexName,
 						types: result[i].types.Union(new[] {item.Key.TypeName}),
 						fields: result[i].fields.Union(inner.projection.Fields),
 						ids: result[i].ids.Union(inner.ids));

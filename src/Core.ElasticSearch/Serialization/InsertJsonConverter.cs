@@ -37,26 +37,4 @@ namespace Core.ElasticSearch.Serialization
 		}
 	}
 
-	internal class InsertResultJsonConverter : JsonConverter
-	{
-		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-		{
-			throw new NotImplementedException();
-		}
-
-		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-		{
-			var jsonObject = JObject.Load(reader);
-			var result = new IndexResponse();
-			using (var r = jsonObject.CreateReader())
-				serializer.Populate(r, result);
-
-			return result;
-		}
-
-		public override bool CanConvert(Type objectType)
-		{
-			throw new NotImplementedException();
-		}
-	}
 }

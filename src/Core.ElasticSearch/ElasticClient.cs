@@ -5,7 +5,7 @@ using Nest;
 
 namespace Core.ElasticSearch
 {
-	public class ElasticClient<TSettings>
+	internal class ElasticClient<TSettings>
 		where TSettings : BaseElasticSettings
 	{
 		public ElasticClient Client { get; }

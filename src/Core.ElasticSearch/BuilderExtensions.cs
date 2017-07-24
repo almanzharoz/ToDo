@@ -12,10 +12,10 @@ namespace Core.ElasticSearch
 		public static IServiceCollection AddElastic<TSettings>(this IServiceCollection services, TSettings settings)
 			where TSettings : BaseElasticSettings
 		{
-			services.AddSingleton<TSettings>(settings)
+			services
+				.AddSingleton<TSettings>(settings)
 				.AddSingleton<ElasticMapping<TSettings>>()
-				.AddScoped<RequestContainer<TSettings>>()
-				.AddScoped<ElasticClient<TSettings>>();
+				.AddScoped<ElasticScopeFactory<TSettings>>();
 			return services;
 		}
 
@@ -32,7 +32,7 @@ namespace Core.ElasticSearch
 			return services;
 		}
 
-		public static IApplicationBuilder UseElastic<TSettings, TService>(this IApplicationBuilder app, Action<ElasticMapping<TSettings>> mappingFactory, Action<TService> initFunc)
+		public static IApplicationBuilder UseElastic<TSettings, TService>(this IApplicationBuilder app, Action<IElasticMapping<TSettings>> mappingFactory, Action<TService> initFunc)
 			where TSettings : BaseElasticSettings
 			where TService : BaseService<TSettings>
 
@@ -43,7 +43,7 @@ namespace Core.ElasticSearch
 			return app;
 		}
 
-		public static void UseElasticForTests<TSettings>(this IServiceProvider services, Action<ElasticMapping<TSettings>> mappingFactory)
+		public static void UseElasticForTests<TSettings>(this IServiceProvider services, Action<IElasticMapping<TSettings>> mappingFactory)
 			where TSettings : BaseElasticSettings
 
 		{
@@ -53,7 +53,7 @@ namespace Core.ElasticSearch
 			mapping.Build(null);
 		}
 
-		public static void UseElastic<TSettings>(this IServiceProvider services, Action<ElasticMapping<TSettings>> mappingFactory)
+		public static void UseElastic<TSettings>(this IServiceProvider services, Action<IElasticMapping<TSettings>> mappingFactory)
 			where TSettings : BaseElasticSettings
 
 		{
@@ -62,7 +62,7 @@ namespace Core.ElasticSearch
 			mapping.Build(null);
 		}
 
-		public static void UseElastic<TSettings, TService>(this IServiceProvider services, Action<ElasticMapping<TSettings>> mappingFactory, Action<TService> initFunc)
+		public static void UseElastic<TSettings, TService>(this IServiceProvider services, Action<IElasticMapping<TSettings>> mappingFactory, Action<TService> initFunc)
 			where TSettings : BaseElasticSettings
 			where TService : BaseService<TSettings>
 

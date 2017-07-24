@@ -20,16 +20,16 @@ namespace Core.ElasticSearch
 	{
 		protected readonly ILogger _logger;
 		protected readonly ElasticClient _client;
-		protected readonly RequestContainer<TSettings> _container;
+		private readonly RequestContainer<TSettings> _container;
 		private readonly TSettings _settings;
 		private readonly ElasticMapping<TSettings> _mapping;
 
-		protected BaseService(ILoggerFactory loggerFactory, TSettings settings, ElasticMapping<TSettings> mapping, RequestContainer<TSettings> container, ElasticClient<TSettings> client)
+		protected BaseService(ILoggerFactory loggerFactory, TSettings settings, ElasticScopeFactory<TSettings> factory)
 		{
-			_container = container;
+			_container = factory.Container;
 			_settings = settings;
-			_mapping = mapping;
-			_client = client.Client;
+			_mapping = factory.Mapping;
+			_client = factory.Client.Client;
 			_logger = loggerFactory.CreateLogger<BaseService<TSettings>>();
 		}
 
@@ -44,11 +44,13 @@ namespace Core.ElasticSearch
 #if DEBUG
 					_logger.LogDebug($"Loading data: {Newtonsoft.Json.JsonConvert.SerializeObject(item)}");
 					_logger.LogDebug((await _client.SearchAsync<IProjection>(x => x
+						.Index(item.index)
 						.Type(Types.Type(item.types))
 						.Source(s => s.Includes(f => f.Fields(item.fields.ToArray())))
 						.Query(q => q.Ids(id => id.Values(item.ids))))).DebugInformation);
 #else
 				await _client.SearchAsync<IProjection>(x => x
+					.Index(item.index)
 					.Type(Types.Type(item.types))
 					.Source(s => s.Includes(f => f.Fields(item.fields.ToArray())))
 					.Query(q => q.Ids(id => id.Values(item.ids))));
@@ -70,11 +72,13 @@ namespace Core.ElasticSearch
 #if DEBUG
 					_logger.LogDebug($"Loading data: {Newtonsoft.Json.JsonConvert.SerializeObject(item)}");
 					_logger.LogDebug((_client.Search<IProjection>(x => x
+						.Index(item.index)
 						.Type(Types.Type(item.types))
 						.Source(s => s.Includes(f => f.Fields(item.fields.ToArray())))
 						.Query(q => q.Ids(id => id.Values(item.ids))))).DebugInformation);
 #else
 				_client.Search<IProjection>(x => x
+					.Index(item.index)
 					.Type(Types.Type(item.types))
 					.Source(s => s.Includes(f => f.Fields(item.fields.ToArray())))
 					.Query(q => q.Ids(id => id.Values(item.ids))));
