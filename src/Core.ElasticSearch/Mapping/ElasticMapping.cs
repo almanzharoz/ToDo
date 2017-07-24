@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
  using System.Linq;
+ using System.Reflection;
  using System.Threading;
  using BenchmarkDotNet.Extensions;
  using Core.ElasticSearch.Domain;
@@ -56,7 +57,7 @@ namespace Core.ElasticSearch.Mapping
 		{
 			_mapping.AddOrUpdate(typeof(T), x => new MappingItem<T, TSettings>(_settings, indexName),
 				(t, m) => throw new Exception($"Mapping for type \"{typeof(T).Name}\" already exists."));
-			_converters.TryAdd(typeof(T), new InsertJsonConverter<T>()); // объекты этого типа доступны только для вставки
+			//_converters.TryAdd(typeof(T), new InsertJsonConverter<T>()); // объекты этого типа доступны только для вставки
 			return this;
 		}
 
@@ -88,8 +89,12 @@ namespace Core.ElasticSearch.Mapping
 				{
 					var result = new ProjectionItem<T, TMapping, TSettings>((MappingItem<TMapping, TSettings>) _mapping.GetOrAdd(typeof(TMapping),
 						y => throw new Exception($"Not found mapping for type \"{y.Name}\"")));
-					_converters.TryAdd(typeof(GetResponse<T>), new GetJsonConverter<T>());
-					_converters.TryAdd(typeof(SearchResponse<T>), new SearchJsonConverter<T>());
+					if (typeof(IInsertProjection).IsAssignableFrom(x))
+						_converters.TryAdd(typeof(T), new InsertJsonConverter<T>(result));
+					if (typeof(IGetProjection).IsAssignableFrom(x))
+						_converters.TryAdd(typeof(GetResponse<T>), new GetJsonConverter<T>());
+					if (typeof(ISearchProjection).IsAssignableFrom(x))
+						_converters.TryAdd(typeof(SearchResponse<T>), new SearchJsonConverter<T>());
 					//_converters.TryAdd(typeof(UpdateResponse<T>), new UpdateResultJsonConverter<T>());
 					return result;
 				},
@@ -103,7 +108,6 @@ namespace Core.ElasticSearch.Mapping
 		/// <typeparam name="T"></typeparam>
 		/// <typeparam name="TMapping"></typeparam>
 		/// <typeparam name="TParent"></typeparam>
-		/// <typeparam name="TParentMapping"></typeparam>
 		/// <returns></returns>
 		public IElasticMapping<TSettings> AddProjection<T, TMapping, TParent>()
 			where T : BaseEntity, IProjection<TMapping>, IWithParent<TParent>, new()
@@ -114,8 +118,12 @@ namespace Core.ElasticSearch.Mapping
 				{
 					var result = new ProjectionWithParentItem<T, TMapping, TParent, TSettings>((MappingItem<TMapping, TSettings>)_mapping.GetOrAdd(typeof(TMapping),
 						y => throw new Exception($"Not found mapping for type \"{y.Name}\"")));
-					_converters.TryAdd(typeof(GetResponse<T>), new GetJsonConverter<T>());
-					_converters.TryAdd(typeof(SearchResponse<T>), new SearchJsonConverter<T>());
+					if (typeof(IInsertProjection).IsAssignableFrom(x))
+						_converters.TryAdd(typeof(T), new InsertJsonConverter<T>(result));
+					if (typeof(IGetProjection).IsAssignableFrom(x))
+						_converters.TryAdd(typeof(GetResponse<T>), new GetJsonConverter<T>());
+					if (typeof(ISearchProjection).IsAssignableFrom(x))
+						_converters.TryAdd(typeof(SearchResponse<T>), new SearchJsonConverter<T>());
 					return result;
 				},
 				(t, m) => throw new Exception($"Projection for type \"{typeof(T).Name}\" already exists."));

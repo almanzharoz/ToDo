@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace Core.Tests.Projections
 {
-	public class CategoryProjection : BaseEntity, IProjection<Models.Category>
+	public class CategoryProjection : BaseEntity, IProjection<Models.Category>, IGetProjection, ISearchProjection
 	{
         [JsonProperty]
 		[Keyword]

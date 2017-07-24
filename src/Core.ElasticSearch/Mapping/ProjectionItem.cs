@@ -65,6 +65,6 @@ namespace Core.ElasticSearch.Mapping
 		}
 
 		public override JsonConverter GetJsonConverter(IRequestContainer container)
-			=> new ParentJsonConverter<T, TParent>(container);
+			=> new ParentJsonConverter<T, TParent>(this, container);
 	}
 }

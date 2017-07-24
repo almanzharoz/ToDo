@@ -6,6 +6,37 @@ namespace Core.ElasticSearch.Domain
 		
 	}
 
+	/// <summary>
+	/// Использование проекции для вставки
+	/// </summary>
+	public interface IInsertProjection : IEntity
+	{
+
+	}
+	/// <summary>
+	/// Использование проекции для обновления
+	/// </summary>
+	public interface IUpdateProjection : IEntity
+	{
+
+	}
+	/// <summary>
+	/// Использование проекции для поиска по Id
+	/// </summary>
+	public interface IGetProjection : IEntity
+	{
+
+	}
+	/// <summary>
+	/// Использование проекции для поиска
+	/// </summary>
+	public interface ISearchProjection : IEntity
+	{
+
+	}
+
+
+
 	public interface IProjection<T> : IProjection where T : class, IModel
 	{
 		

@@ -9,7 +9,7 @@ namespace Core.ElasticSearch
 {
 	public abstract partial class BaseService<TSettings>
 	{
-		protected bool Insert<T>(T entity, bool refresh) where T : BaseEntity, IModel
+		protected bool Insert<T>(T entity, bool refresh) where T : BaseEntity, IInsertProjection
 			=> Try(
 				c => c.Index(entity, s => s.Index(_mapping.GetIndexName<T>()).If(refresh, x => x.Refresh(Refresh.True)))
 					.Fluent(x => entity
@@ -18,10 +18,10 @@ namespace Core.ElasticSearch
 				r => r.Created,
 				RepositoryLoggingEvents.ES_INSERT);
 
-		protected bool Insert<T>(T entity) where T : BaseEntity, IModel => Insert(entity, true);
+		protected bool Insert<T>(T entity) where T : BaseEntity, IInsertProjection => Insert(entity, true);
 
 		protected bool Insert<T, TParent>(T entity, bool refresh)
-			where T : BaseEntity, IModel, IWithParent<TParent>
+			where T : BaseEntity, IInsertProjection, IWithParent<TParent>
 			where TParent : IProjection
 			=> Try(
 				c => c.Index(entity, s => s.Index(_mapping.GetIndexName<T>()).If(refresh, a => a.Refresh(Refresh.True)).IfNotNull(entity.Parent, a => a.Parent(entity.Parent.Id)))
@@ -32,11 +32,11 @@ namespace Core.ElasticSearch
 				RepositoryLoggingEvents.ES_INSERT);
 
 		protected bool Insert<T, TParent>(T entity)
-			where T : BaseEntity, IModel, IWithParent<TParent>
+			where T : BaseEntity, IInsertProjection, IWithParent<TParent>
 			where TParent : IProjection 
 			=> Insert<T, TParent>(entity, true);
 
-		protected Task<bool> InsertAsync<T>(T entity, bool refresh = true) where T : BaseEntity, IModel
+		protected Task<bool> InsertAsync<T>(T entity, bool refresh = true) where T : BaseEntity, IInsertProjection
 			=> TryAsync(
 				c => c.IndexAsync(entity, s => s.Index(_mapping.GetIndexName<T>()).If(refresh, x => x.Refresh(Refresh.True)))
 					.Fluent(x => entity
@@ -45,7 +45,7 @@ namespace Core.ElasticSearch
 				r => r.Created,
 				RepositoryLoggingEvents.ES_INSERT);
 
-		protected bool Update<T>(T entity, bool refresh) where T : BaseEntityWithVersion, IProjection
+		protected bool Update<T>(T entity, bool refresh) where T : BaseEntityWithVersion, IUpdateProjection
 			=> Try(
 				c => c.Update(
 						DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, x => x.Version, nameof(entity))),
@@ -55,9 +55,9 @@ namespace Core.ElasticSearch
 				RepositoryLoggingEvents.ES_UPDATE,
 				$"Update (Id: {entity?.Id})");
 
-		protected bool Update<T>(T entity) where T : BaseEntityWithVersion, IProjection => Update(entity, true);
+		protected bool Update<T>(T entity) where T : BaseEntityWithVersion, IUpdateProjection => Update(entity, true);
 
-		protected Task<bool> UpdateAsync<T>(T entity, bool refresh = true) where T : BaseEntityWithVersion, IProjection, IWithVersion
+		protected Task<bool> UpdateAsync<T>(T entity, bool refresh = true) where T : BaseEntityWithVersion, IUpdateProjection, IWithVersion
 			=> TryAsync(
 				c => c.UpdateAsync(
 						DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, x => x.Version, nameof(entity))),
@@ -67,7 +67,7 @@ namespace Core.ElasticSearch
 				RepositoryLoggingEvents.ES_UPDATE,
 				$"Update (Id: {entity?.Id})");
 
-		protected int Update<T>(QueryContainer query, UpdateByQueryBuilder<T> update, bool refresh = true) where T : class, IEntity, IWithVersion
+		protected int Update<T>(QueryContainer query, UpdateByQueryBuilder<T> update, bool refresh = true) where T : class, IUpdateProjection, IWithVersion
 			=> Try(
 				c => c.UpdateByQuery<T>(x => x
 					.Index(_mapping.GetIndexName<T>())
@@ -79,7 +79,7 @@ namespace Core.ElasticSearch
 				RepositoryLoggingEvents.ES_UPDATEBYQUERY);
 
 		protected Task<(int updated, int total)> UpdateAsync<T>(QueryContainer query, UpdateByQueryBuilder<T> update, bool refresh = true)
-			where T : class, IEntity, IWithVersion
+			where T : class, IUpdateProjection, IWithVersion
 			=> TryAsync(
 				c => c.UpdateByQueryAsync<T>(x => x
 					.Index(_mapping.GetIndexName<T>())

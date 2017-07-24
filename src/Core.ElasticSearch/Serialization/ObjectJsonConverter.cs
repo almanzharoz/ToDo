@@ -7,10 +7,17 @@ namespace Core.ElasticSearch.Serialization
 {
 	internal class ObjectJsonConverter<T> : JsonConverter where T : struct
 	{
+		private readonly PropertyInfo[] _properties;
+
+		public ObjectJsonConverter()
+		{
+			_properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+		}
+
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
 		{
 			writer.WriteStartObject();
-			foreach (var property in value.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+			foreach (var property in _properties)
 			{
 				var v = property.GetValue(value);
 				if (v == null)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using Core.ElasticSearch.Domain;
+using Core.ElasticSearch.Mapping;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -11,18 +12,19 @@ namespace Core.ElasticSearch.Serialization
 		where TParent : BaseEntity, IProjection, new()
 	{
 		private readonly IRequestContainer _entityContainer;
-		public ParentJsonConverter(IRequestContainer entityContainer)
+		private readonly IProjectionItem _projection;
+
+		public ParentJsonConverter(IProjectionItem projection, IRequestContainer entityContainer)
 		{
 			_entityContainer = entityContainer;
+			_projection = projection;
 		}
 
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
 		{
 			writer.WriteStartObject();
-			foreach (var property in value.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)) // TODO: добавить выбор полей в маппинг
+			foreach (var property in _projection.Properties)
 			{
-				if (property.Name == "Id" || property.Name == "Version" || property.Name == "Parent")
-					continue;
 				var v = property.GetValue(value);
 				if (v == null)
 					continue;

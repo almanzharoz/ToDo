@@ -14,7 +14,7 @@ namespace Core.ElasticSearch
 	{
 		protected Task<IReadOnlyCollection<T>> SearchAsync<T>(QueryContainer query, int take = 0,
 			int skip = 0, bool load = true)
-			where T : class, IProjection
+			where T : class, IProjection, ISearchProjection
 			=> _mapping.GetProjectionItem<T>()
 				.Convert(
 					projection => TryAsync(
@@ -32,7 +32,7 @@ namespace Core.ElasticSearch
 
 		protected IReadOnlyCollection<TProjection> Search<T, TProjection>(QueryContainer query,
 			Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, int take = 0, int skip = 0, bool load = true)
-			where TProjection : class, IProjection<T>
+			where TProjection : class, IProjection<T>, ISearchProjection
 			where T : class, IModel
 			=> _mapping.GetProjectionItem<TProjection>()
 				.Convert(
@@ -44,7 +44,7 @@ namespace Core.ElasticSearch
 									.Source(s => s.Includes(f => f.Fields(projection.Fields)))
 									.Query(q => q.Bool(b => b.Filter(query)))
 									.IfNotNull(sort, y => y.Sort(sort))
-									.If(y => typeof(TProjection).GetInterfaces().Any(z => z == typeof(IWithVersion)), y => y.Version())
+									.If(y => typeof(IWithVersion).IsAssignableFrom(typeof(TProjection)), y => y.Version())
 									.IfNotNull(take, y => y.Take(take).Skip(skip)))
 							)
 							.Fluent(() => Debug.WriteLine("Search: " + sw2.ElapsedMilliseconds)),
@@ -54,7 +54,7 @@ namespace Core.ElasticSearch
 		protected IReadOnlyCollection<TProjection> Search<T, TProjection>(
 			Func<QueryContainerDescriptor<T>, QueryContainer> query,
 			Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, int page = 0, int take = 0, bool load = true)
-			where TProjection : class, IProjection<T>
+			where TProjection : class, IProjection<T>, ISearchProjection
 			where T : class, IModel
 			=> _mapping.GetProjectionItem<TProjection>()
 				.Convert(
@@ -66,13 +66,13 @@ namespace Core.ElasticSearch
 								.Source(s => s.Includes(f => f.Fields(projection.Fields)))
 								.Query(query)
 								.IfNotNull(sort, y => y.Sort(sort))
-								.If(y => typeof(TProjection).GetInterfaces().Any(z => z == typeof(IWithVersion)), y => y.Version())
+								.If(y => typeof(IWithVersion).IsAssignableFrom(typeof(TProjection)), y => y.Version())
 								.IfNotNull(take, y => y.Take(take).Skip(page * take))),
 						r => r.Documents.If(load, Load),
 						RepositoryLoggingEvents.ES_SEARCH));
 
 		protected T Get<T>(string id, bool load = true)
-			where T : class, IProjection
+			where T : class, IProjection, IGetProjection
 			=> _mapping.GetProjectionItem<T>()
 				.Convert(
 					projection => Try(
@@ -86,7 +86,7 @@ namespace Core.ElasticSearch
 						$"Get (Id: {id})"));
 
 		protected T Get<T, TParent>(string id, string parent, bool load = true)
-			where T : class, IProjection, IWithParent<TParent>
+			where T : class, IProjection, IGetProjection, IWithParent<TParent>
 			where TParent : class, IProjection
 			=> _mapping.GetProjectionItem<T>()
 				.Convert(
@@ -101,7 +101,7 @@ namespace Core.ElasticSearch
 						$"Get (Id: {id})"));
 
 		protected Task<T> GetAsync<T>(string id, bool load = true)
-			where T : class, IProjection
+			where T : class, IProjection, IGetProjection
 			=> _mapping.GetProjectionItem<T>()
 				.Convert(
 					projection => TryAsync(

@@ -13,7 +13,7 @@ namespace Core.ElasticSearch
 	{
 		protected Pager<TProjection> SearchPager<T, TProjection>(QueryContainer query, int page, int take,
 			Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, bool load = true)
-			where TProjection : class, IProjection<T>
+			where TProjection : class, IProjection<T>, ISearchProjection
 			where T : class, IModel // Нужно для SortDescriptor<T>, чтобы использовать любое поля для сортировки, а не только поля из проекции
 			=> _mapping.GetProjectionItem<TProjection>()
 				.Convert(
@@ -33,7 +33,7 @@ namespace Core.ElasticSearch
 		protected Pager<TProjection> SearchPager<T, TProjection>(Func<QueryContainerDescriptor<T>, QueryContainer> query,
 			int page, int take,
 			Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, bool load = true)
-			where TProjection : class, IProjection<T>
+			where TProjection : class, IProjection<T>, ISearchProjection
 			where T : class, IModel
 			=> _mapping.GetProjectionItem<TProjection>()
 				.Convert(

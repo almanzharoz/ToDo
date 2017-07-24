@@ -92,7 +92,6 @@ namespace Core.ElasticSearch
 			// группировать по MappingItem
 			var result =
 				new List<(string index, IEnumerable<string> types, IEnumerable<string> fields, IEnumerable<string> ids)>();
-			var i = 0;
 			foreach (var item in items.GroupBy(x => x.GetType())
 				.Select(x => (projection: _mapping.GetProjectionItem(x.Key), ids: x.Select(y => y.Id).ToArray())))
 			{
