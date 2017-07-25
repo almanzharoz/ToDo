@@ -11,23 +11,8 @@ namespace Core.ElasticSearch
 {
 	internal static class Extensions
 	{
-		public static bool HasBaseType<T>(this Type type)
-		{
-			return type.HasBaseType(typeof(T));
-		}
-		public static bool HasBaseType(this Type type, Type basetype)
-		{
-			if (basetype.GetTypeInfo().IsInterface)
-				return type.GetInterfaces().Any(x => x == basetype);
-			Type baseType = type.GetTypeInfo().BaseType;
-			while (baseType != null)
-			{
-				if (baseType == basetype)
-					return true;
-				baseType = baseType.GetTypeInfo().BaseType;
-			}
-			return false;
-		}
+		public static bool HasBaseType<T>(this Type type) => typeof(T).IsAssignableFrom(type);
+		public static bool HasBaseType(this Type type, Type basetype) => basetype.IsAssignableFrom(type);
 
 		public static string[] GetFields(this Type type, string lastName = null)
 		{

@@ -62,15 +62,15 @@ namespace Core.Tests
         public new Task<int> CountAsync<T>(QueryContainer query) where T : class, IProjection
 			=> base.CountAsync<T>(query);
 
-        public new bool Insert<T>(T entity, bool refresh) where T : BaseEntity, IInsertProjection
+        public new bool Insert<T>(T entity, bool refresh) where T : BaseEntity, IProjection, IInsertProjection
 			=> base.Insert<T>(entity, refresh);
 
         public new bool Insert<T, TParent>(T entity, bool refresh)
-            where T : BaseEntity, IWithParent<TParent>, IInsertProjection
+            where T : BaseEntity, IWithParent<TParent>, IProjection, IInsertProjection
 			where TParent : IProjection
             => base.Insert<T, TParent>(entity, refresh);
 
-        public new Task<bool> InsertAsync<T>(T entity, bool refresh = true) where T : BaseEntity, IInsertProjection
+        public new Task<bool> InsertAsync<T>(T entity, bool refresh = true) where T : BaseEntity, IProjection, IInsertProjection
             => base.InsertAsync<T>(entity, refresh);
 
         public new bool Update<T>(T entity, bool refresh) where T : BaseEntityWithVersion, IProjection, IWithVersion, IUpdateProjection
@@ -80,12 +80,12 @@ namespace Core.Tests
 			=> base.UpdateAsync<T>(entity, refresh);
 
         public new int Update<T>(QueryContainer query, UpdateByQueryBuilder<T> update, bool refresh = true)
-            where T : class, IEntity, IWithVersion, IUpdateProjection
+            where T : class, IEntity, IWithVersion, IProjection, IUpdateProjection
 			=> base.Update<T>(query, update, refresh);
 
         public new Task<(int updated, int total)> UpdateAsync<T>(QueryContainer query, UpdateByQueryBuilder<T> update,
             bool refresh = true)
-            where T : class, IEntity, IWithVersion, IUpdateProjection
+            where T : class, IEntity, IWithVersion, IProjection, IUpdateProjection
             => base.UpdateAsync<T>(query, update, refresh);
 
         public new bool Remove<T>(T entity) 
@@ -95,10 +95,10 @@ namespace Core.Tests
         public new Task<bool> RemoveAsync<T>(T entity) where T : class, IProjection, IWithVersion, IRemoveProjection
 			=> base.RemoveAsync<T>(entity);
 
-        public new int Remove<T>(QueryContainer query) where T : class, IEntity, IRemoveProjection
+        public new int Remove<T>(QueryContainer query) where T : class, IProjection, IRemoveProjection
 			=> base.Remove<T>(query);
 
-        public new Task<int> RemoveAsync<T>(QueryContainer query) where T : class, IEntity, IRemoveProjection
+        public new Task<int> RemoveAsync<T>(QueryContainer query) where T : class, IProjection, IRemoveProjection
 			=> base.RemoveAsync<T>(query);
 
         public new Pager<TProjection> SearchPager<T, TProjection>(QueryContainer query, int page, int take,

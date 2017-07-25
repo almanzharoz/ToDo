@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using Core.ElasticSearch;
+using Core.ElasticSearch.Domain;
 using Core.ElasticSearch.Exceptions;
 using Core.Tests.Models;
 using Core.Tests.Projections;
@@ -14,7 +16,7 @@ namespace Core.Tests
     [TestClass]
     public class BaseServiceTest : BaseTest
     {
-        [TestMethod]
+		[TestMethod]
         public void AddObjectWithoutParentAndRelated()
         {
             var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
