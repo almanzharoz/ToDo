@@ -4,7 +4,7 @@ using System.Linq;
 using Core.ElasticSearch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using ToDo.Dal.Repositories;
+using ToDo.Dal.Services;
 
 namespace ToDo.WebApp.Controllers
 {

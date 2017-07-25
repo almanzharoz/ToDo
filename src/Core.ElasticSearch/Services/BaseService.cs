@@ -15,22 +15,22 @@ using SharpFuncExt;
 
 namespace Core.ElasticSearch
 {
-	public abstract partial class BaseService<TSettings> 
-		where TSettings : BaseElasticSettings
+	public abstract partial class BaseService<TConnection> 
+		where TConnection : BaseElasticConnection
 	{
 		protected readonly ILogger _logger;
 		protected readonly ElasticClient _client;
-		private readonly RequestContainer<TSettings> _container;
-		private readonly TSettings _settings;
-		private readonly ElasticMapping<TSettings> _mapping;
+		private readonly RequestContainer<TConnection> _container;
+		private readonly TConnection _settings;
+		private readonly ElasticMapping<TConnection> _mapping;
 
-		protected BaseService(ILoggerFactory loggerFactory, TSettings settings, ElasticScopeFactory<TSettings> factory)
+		protected BaseService(ILoggerFactory loggerFactory, TConnection settings, ElasticScopeFactory<TConnection> factory)
 		{
 			_container = factory.Container;
 			_settings = settings;
 			_mapping = factory.Mapping;
 			_client = factory.Client.Client;
-			_logger = loggerFactory.CreateLogger<BaseService<TSettings>>();
+			_logger = loggerFactory.CreateLogger<BaseService<TConnection>>();
 		}
 
 		protected async Task LoadAsync()

@@ -9,13 +9,13 @@ using ToDo.Dal.Interfaces;
 using ToDo.Dal.Models;
 using ToDo.Dal.Projections;
 
-namespace ToDo.Dal.Repositories
+namespace ToDo.Dal.Services
 {
-	public abstract class BaseToDoService : BaseService<ElasticSettings>
+	public abstract class BaseToDoService : BaseService<ElasticConnection>
 	{
 		protected readonly UserName _user;
 
-		protected BaseToDoService(ILoggerFactory loggerFactory, ElasticSettings settings, ElasticScopeFactory<ElasticSettings> factory, UserName user) 
+		protected BaseToDoService(ILoggerFactory loggerFactory, ElasticConnection settings, ElasticScopeFactory<ElasticConnection> factory, UserName user) 
 			: base(loggerFactory, settings, factory)
 		{
 			_user = user;

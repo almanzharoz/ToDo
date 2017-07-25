@@ -16,9 +16,9 @@ using SharpFuncExt;
 
 namespace Core.Tests
 {
-    public class TestService : BaseService<ElasticSettings>
+    public class TestService : BaseService<ElasticConnection>
     {
-        public TestService(ILoggerFactory loggerFactory, ElasticSettings settings, ElasticScopeFactory<ElasticSettings> factory) : 
+        public TestService(ILoggerFactory loggerFactory, ElasticConnection settings, ElasticScopeFactory<ElasticConnection> factory) : 
 			base(loggerFactory, settings, factory)
         {
         }

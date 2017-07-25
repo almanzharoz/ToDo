@@ -19,7 +19,7 @@ namespace Core.ElasticSearch.Mapping
 
 	internal class MappingItem<T, TSettings> : IMappingItem 
 		where T : class, IModel
-		where TSettings : BaseElasticSettings
+		where TSettings : BaseElasticConnection
 	{
 		private readonly IEnumerable<string> _fields;
 		public MappingItem(TSettings settings, Func<TSettings, string> indexName)

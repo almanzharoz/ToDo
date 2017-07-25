@@ -9,7 +9,7 @@ using SharpFuncExt;
 
 namespace Core.ElasticSearch
 {
-	public abstract partial class BaseService<TSettings>
+	public abstract partial class BaseService<TConnection>
 	{
 		protected Pager<TProjection> SearchPager<T, TProjection>(QueryContainer query, int page, int take,
 			Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, bool load = true)

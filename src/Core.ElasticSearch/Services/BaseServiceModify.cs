@@ -7,7 +7,7 @@ using SharpFuncExt;
 
 namespace Core.ElasticSearch
 {
-	public abstract partial class BaseService<TSettings>
+	public abstract partial class BaseService<TConnection>
 	{
 		protected bool Insert<T>(T entity, bool refresh) where T : BaseEntity, IProjection, IInsertProjection
 			=> Try(

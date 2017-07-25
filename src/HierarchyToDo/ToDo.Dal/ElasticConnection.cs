@@ -6,9 +6,9 @@ using Nest;
 
 namespace ToDo.Dal
 {
-    public class ElasticSettings : BaseElasticSettings
+    public class ElasticConnection : BaseElasticConnection
     {
-	    public ElasticSettings(Uri url) : base(url)
+	    public ElasticConnection(Uri url) : base(url)
 	    {
 	    }
 

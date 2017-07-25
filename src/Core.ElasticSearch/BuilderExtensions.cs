@@ -9,65 +9,65 @@ namespace Core.ElasticSearch
 {
 	public static class BuilderExtensions
 	{
-		public static IServiceCollection AddElastic<TSettings>(this IServiceCollection services, TSettings settings)
-			where TSettings : BaseElasticSettings
+		public static IServiceCollection AddElastic<TConnection>(this IServiceCollection services, TConnection settings)
+			where TConnection : BaseElasticConnection
 		{
 			services
-				.AddSingleton<TSettings>(settings)
-				.AddSingleton<ElasticMapping<TSettings>>()
-				.AddScoped<ElasticScopeFactory<TSettings>>();
+				.AddSingleton<TConnection>(settings)
+				.AddSingleton<ElasticMapping<TConnection>>()
+				.AddScoped<ElasticScopeFactory<TConnection>>();
 			return services;
 		}
 
-		public static IServiceCollection AddElastic<TSettings>(this IServiceCollection services)
-			where TSettings : BaseElasticSettings, new()
-			=> AddElastic<TSettings>(services, new TSettings());
+		public static IServiceCollection AddElastic<TConnection>(this IServiceCollection services)
+			where TConnection : BaseElasticConnection, new()
+			=> AddElastic<TConnection>(services, new TConnection());
 		
 
-		public static IServiceCollection AddService<T, TSettings>(this IServiceCollection services)
-			where T : BaseService<TSettings>
-			where TSettings : BaseElasticSettings
+		public static IServiceCollection AddService<T, TConnection>(this IServiceCollection services)
+			where T : BaseService<TConnection>
+			where TConnection : BaseElasticConnection
 		{
 			services.AddScoped<T>();
 			return services;
 		}
 
-		public static IApplicationBuilder UseElastic<TSettings, TService>(this IApplicationBuilder app, Action<IElasticMapping<TSettings>> mappingFactory, Action<TService> initFunc)
-			where TSettings : BaseElasticSettings
-			where TService : BaseService<TSettings>
+		public static IApplicationBuilder UseElastic<TConnection, TService>(this IApplicationBuilder app, Action<IElasticMapping<TConnection>> mappingFactory, Action<TService> initFunc)
+			where TConnection : BaseElasticConnection
+			where TService : BaseService<TConnection>
 
 		{
-			var mapping = app.ApplicationServices.GetService<ElasticMapping<TSettings>>();
+			var mapping = app.ApplicationServices.GetService<ElasticMapping<TConnection>>();
 			mappingFactory(mapping);
 			mapping.Build(initFunc, app.ApplicationServices.GetService<TService>());
 			return app;
 		}
 
-		public static void UseElasticForTests<TSettings>(this IServiceProvider services, Action<IElasticMapping<TSettings>> mappingFactory)
-			where TSettings : BaseElasticSettings
+		public static void UseElasticForTests<TConnection>(this IServiceProvider services, Action<IElasticMapping<TConnection>> mappingFactory)
+			where TConnection : BaseElasticConnection
 
 		{
-			var mapping = services.GetService<ElasticMapping<TSettings>>();
+			var mapping = services.GetService<ElasticMapping<TConnection>>();
 			mappingFactory(mapping);
 			mapping.Drop();
 			mapping.Build(null);
 		}
 
-		public static void UseElastic<TSettings>(this IServiceProvider services, Action<IElasticMapping<TSettings>> mappingFactory)
-			where TSettings : BaseElasticSettings
+		public static void UseElastic<TConnection>(this IServiceProvider services, Action<IElasticMapping<TConnection>> mappingFactory)
+			where TConnection : BaseElasticConnection
 
 		{
-			var mapping = services.GetService<ElasticMapping<TSettings>>();
+			var mapping = services.GetService<ElasticMapping<TConnection>>();
 			mappingFactory(mapping);
 			mapping.Build(null);
 		}
 
-		public static void UseElastic<TSettings, TService>(this IServiceProvider services, Action<IElasticMapping<TSettings>> mappingFactory, Action<TService> initFunc)
-			where TSettings : BaseElasticSettings
-			where TService : BaseService<TSettings>
+		public static void UseElastic<TConnection, TService>(this IServiceProvider services, Action<IElasticMapping<TConnection>> mappingFactory, Action<TService> initFunc)
+			where TConnection : BaseElasticConnection
+			where TService : BaseService<TConnection>
 
 		{
-			var mapping = services.GetService<ElasticMapping<TSettings>>();
+			var mapping = services.GetService<ElasticMapping<TConnection>>();
 			mappingFactory(mapping);
 			mapping.Build(initFunc, services.GetService<TService>());
 		}

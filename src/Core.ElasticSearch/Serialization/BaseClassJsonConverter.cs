@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 namespace Core.ElasticSearch.Serialization
 {
 	internal class BaseClassJsonConverter<TSettings> : JsonConverter
-		where TSettings : BaseElasticSettings
+		where TSettings : BaseElasticConnection
 	{
 		private readonly RequestContainer<TSettings> _entityContainer;
 		public BaseClassJsonConverter(RequestContainer<TSettings> entityContainer)

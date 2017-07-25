@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SharpFuncExt;
 using ToDo.Dal;
 using ToDo.Dal.Projections;
-using ToDo.Dal.Repositories;
+using ToDo.Dal.Services;
 using ToDo.WebApp.Model;
 
 namespace ToDo.WebApp.Controllers

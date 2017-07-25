@@ -15,7 +15,7 @@ using SharpFuncExt;
 
 namespace Core.ElasticSearch.Mapping
 {
-	public interface IElasticMapping<TSettings> where TSettings : BaseElasticSettings
+	public interface IElasticMapping<TSettings> where TSettings : BaseElasticConnection
 	{
 		IElasticMapping<TSettings> AddMapping<T>(Func<TSettings, string> indexName) where T : class, IModel;
 		IElasticMapping<TSettings> AddStruct<T>() where T : struct;
@@ -33,7 +33,7 @@ namespace Core.ElasticSearch.Mapping
 		string GetTypeName<T>() where T : IProjection;
 	}
 
-	internal class ElasticMapping<TSettings> : IElasticMapping<TSettings> where TSettings : BaseElasticSettings
+	internal class ElasticMapping<TSettings> : IElasticMapping<TSettings> where TSettings : BaseElasticConnection
 	{
 		private readonly ConcurrentDictionary<Type, IMappingItem> _mapping = new ConcurrentDictionary<Type, IMappingItem>();
 		private readonly ConcurrentDictionary<Type, IProjectionItem> _projection = new ConcurrentDictionary<Type, IProjectionItem>();

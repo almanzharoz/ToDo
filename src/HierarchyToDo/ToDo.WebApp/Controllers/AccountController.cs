@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using ToDo.Dal;
 using ToDo.Dal.Models;
-using ToDo.Dal.Repositories;
+using ToDo.Dal.Services;
 using ToDo.WebApp.Model;
 
 namespace ToDo.WebApp.Controllers

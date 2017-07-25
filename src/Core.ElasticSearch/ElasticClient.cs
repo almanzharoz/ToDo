@@ -6,7 +6,7 @@ using Nest;
 namespace Core.ElasticSearch
 {
 	internal class ElasticClient<TSettings>
-		where TSettings : BaseElasticSettings
+		where TSettings : BaseElasticConnection
 	{
 		public ElasticClient Client { get; }
 

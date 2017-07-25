@@ -21,7 +21,7 @@ namespace Core.ElasticSearch
 	/// </summary>
 	/// <typeparam name="TSettings"></typeparam>
 	internal class RequestContainer<TSettings> : IRequestContainer 
-		where TSettings : BaseElasticSettings
+		where TSettings : BaseElasticConnection
 	{
 		private readonly ConcurrentDictionary<string, IList<KeyValuePair<IEntity, bool>>> _cache =
 			new ConcurrentDictionary<string, IList<KeyValuePair<IEntity, bool>>>();

@@ -10,7 +10,7 @@ using SharpFuncExt;
 
 namespace Core.ElasticSearch
 {
-	public abstract partial class BaseService<TSettings>
+	public abstract partial class BaseService<TConnection>
 	{
 		protected Task<IReadOnlyCollection<T>> SearchAsync<T>(QueryContainer query, int take = 0,
 			int skip = 0, bool load = true)
@@ -119,6 +119,40 @@ namespace Core.ElasticSearch
 						r => r.Source.If(load, Load),
 						RepositoryLoggingEvents.ES_GET,
 						$"Get (Id: {id})"));
+
+		protected T Get<T>(string id, QueryContainer query, bool load = true)
+			where T : class, IProjection, IGetProjection
+			=> _mapping.GetProjectionItem<T>()
+				.Convert(
+					projection => Try(
+						c => c.Search<T>(x => x
+							.Index(projection.MappingItem.IndexName)
+							.Type(projection.MappingItem.TypeName)
+							.Query(q => q.Bool(b => b.Filter(Query<T>.Ids(i => i.Values(id.HasNotNullArg("id"))) && query)))
+							.Take(1)
+							.If(y => typeof(IWithVersion).IsAssignableFrom(typeof(T)), y => y.Version())
+							.Source(s => s.Includes(f => f.Fields(projection.Fields)))),
+						r => r.Documents.FirstOrDefault().If(load, Load),
+						RepositoryLoggingEvents.ES_GET,
+						$"Get with query (Id: {id})"));
+
+		protected T Get<T, TParent>(string id, string parent, QueryContainer query, bool load = true)
+			where T : class, IProjection, IGetProjection, IWithParent<TParent>
+			where TParent : class, IProjection
+			=> _mapping.GetProjectionItem<T>()
+				.Convert(
+					projection => Try(
+						c => c.Search<T>(x => x
+							.Index(projection.MappingItem.IndexName)
+							.Type(projection.MappingItem.TypeName)
+							.Query(q => q.Bool(b => b.Filter(Query<T>.Ids(i => i.Values(id.HasNotNullArg("id"))) &&
+															Query<T>.ParentId(p => p.Id(parent.HasNotNullArg("parent"))) && query)))
+							.Take(1)
+							.If(y => typeof(IWithVersion).IsAssignableFrom(typeof(T)), y => y.Version())
+							.Source(s => s.Includes(f => f.Fields(projection.Fields)))),
+						r => r.Documents.FirstOrDefault().If(load, Load),
+						RepositoryLoggingEvents.ES_GET,
+						$"Get with query (Id: {id}, Parent: {parent})"));
 
 		protected Task<T> GetAsync<T>(string id, bool load = true)
 			where T : class, IProjection, IGetProjection

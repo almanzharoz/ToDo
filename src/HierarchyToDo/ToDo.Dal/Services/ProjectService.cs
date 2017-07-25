@@ -10,15 +10,19 @@ using Nest;
 using SharpFuncExt;
 using ToDo.Dal.Models;
 using ToDo.Dal.Projections;
+using ToDo.Dal.Services.Internal;
 
-namespace ToDo.Dal.Repositories
+namespace ToDo.Dal.Services
 {
 	public class ProjectService : BaseToDoService
 	{
-		public ProjectService(ILoggerFactory loggerFactory, ElasticSettings settings,
-			ElasticScopeFactory<ElasticSettings> factory, UserName user)
+		private readonly UsersService _usersService;
+
+		public ProjectService(ILoggerFactory loggerFactory, ElasticConnection settings,
+			ElasticScopeFactory<ElasticConnection> factory, UserName user)
 			: base(loggerFactory, settings, factory, user)
 		{
+			_usersService = factory.GetInternalService<UsersService>();
 		}
 
 		public IReadOnlyCollection<Project> GetMyProjects() =>
@@ -55,11 +59,12 @@ namespace ToDo.Dal.Repositories
 
 		public IEnumerable<Projections.User> GetUsersNames(string id, string s) =>
 			Search<Models.User, Projections.User>(q => q.Bool(b => b
-						.Must(Query<Models.User>.Match(m => m.Field(p => p.Nick).Query(s)))
-						.Filter(GetProject(id.HasNotNullArg("project"))
-							.Users.IfNotNull(u => !Query<Models.User>.Ids(f => f.Values(u.Select(x => x.Id))),
-								() => new QueryContainer()))),
-					sort => sort.Ascending(p => p.Nick), 0, 10);
+					.Must(Query<Models.User>.Match(m => m.Field(p => p.Nick).Query(s)))
+					.Filter(GetProject(id.HasNotNullArg("project"))
+						.Users.IfNotNull(u => !Query<Models.User>.Ids(f => f.Values(u.Select(x => x.Id))),
+							() => new QueryContainer()))),
+				sort => sort.Ascending(p => p.Nick), 0, 10);
+
 
 		public bool ProjectExists(string projectId, string name)
 			=> Count<Project>(!Query<Project>.Ids(x => x.Values(projectId)) && Query<Project>.Term(x => x.Field(f => f.Name).Value(name)))>0;

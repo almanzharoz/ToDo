@@ -5,18 +5,28 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Core.ElasticSearch
 {
-	public class ElasticScopeFactory<TSettings>
-		where TSettings : BaseElasticSettings
+	/// <summary>
+	/// Обертка для internal классов
+	/// </summary>
+	/// <typeparam name="TConnection"></typeparam>
+	public class ElasticScopeFactory<TConnection>
+		where TConnection : BaseElasticConnection
 	{
-		internal ElasticClient<TSettings> Client { get; }
-		internal RequestContainer<TSettings> Container { get; }
-		internal ElasticMapping<TSettings> Mapping { get; }
+		private readonly IServiceProvider _service;
 
-		public ElasticScopeFactory(IServiceProvider servise, TSettings settings)
+		internal ElasticClient<TConnection> Client { get; }
+		internal RequestContainer<TConnection> Container { get; }
+		internal ElasticMapping<TConnection> Mapping { get; }
+
+		public ElasticScopeFactory(IServiceProvider service, TConnection settings)
 		{
-			Mapping = servise.GetService<ElasticMapping<TSettings>>();
-			Container = new RequestContainer<TSettings>(Mapping);
-			Client = new ElasticClient<TSettings>(settings, Mapping, Container);
+			_service = service;
+			Mapping = service.GetService<ElasticMapping<TConnection>>();
+			Container = new RequestContainer<TConnection>(Mapping);
+			Client = new ElasticClient<TConnection>(settings, Mapping, Container);
 		}
+
+		public T GetInternalService<T>() where T : BaseService<TConnection>
+			=> _service.GetService<T>();
 	}
 }

@@ -10,21 +10,22 @@ using SharpFuncExt;
 using ToDo.Dal.Interfaces;
 using ToDo.Dal.Models;
 using ToDo.Dal.Projections;
+using ToDo.Dal.Services.Internal;
 using Task = ToDo.Dal.Projections.Task;
 
-namespace ToDo.Dal.Repositories
+namespace ToDo.Dal.Services
 {
 	public class TaskService : BaseToDoService
 	{
-		public TaskService(ILoggerFactory loggerFactory, ElasticSettings settings, ElasticScopeFactory<ElasticSettings> factory, UserName user) 
+		private readonly UsersService _usersService;
+
+		public TaskService(ILoggerFactory loggerFactory, ElasticConnection settings, ElasticScopeFactory<ElasticConnection> factory, UserName user) 
 			: base(loggerFactory, settings, factory, user)
 		{
+			_usersService = factory.GetInternalService<UsersService>();
 		}
 
-		public Project GetProject(string id, bool required = false) =>
-			Search<Project, Project>(
-					Query<Project>.Ids(x => x.Values(id.HasNotNullArg("projectId"))) && Query<Project>.Term(x => x.Users, _user.Id))
-				.FirstOrDefault().If(required, x => x.HasNotNullArg("project"));
+		public Project GetProject(string id, bool required = false) => _usersService.GetProject(id, required);
 
 		public Task GetTask(string id) =>
 			Search<Models.Task, Task>(TaskQuery(Query<Models.Task>.Ids(x => x.Values(id))))

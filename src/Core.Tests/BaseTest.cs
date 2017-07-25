@@ -17,11 +17,11 @@ namespace Core.Tests
         {
             var serviceProvider = new ServiceCollection()
                 .AddLogging()
-                .AddElastic<ElasticSettings>()
-                    .AddService<TestService, ElasticSettings>()
+                .AddElastic<ElasticConnection>()
+                    .AddService<TestService, ElasticConnection>()
                 .BuildServiceProvider();
 
-            serviceProvider.UseElasticForTests<ElasticSettings>(map => map
+            serviceProvider.UseElasticForTests<ElasticConnection>(map => map
 
                 .AddMapping<Producer>(x => x.SecondIndex)
                 .AddMapping<Category>(x => x.FirstIndex)

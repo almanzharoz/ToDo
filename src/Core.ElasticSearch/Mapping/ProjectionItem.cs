@@ -21,7 +21,7 @@ namespace Core.ElasticSearch.Mapping
 	internal abstract class BaseProjectionItem<T, TMapping, TSettings> : IProjectionItem
 		where T : BaseEntity, IProjection<TMapping>, new()
 		where TMapping : class, IModel
-		where TSettings : BaseElasticSettings
+		where TSettings : BaseElasticConnection
 	{
 		protected BaseProjectionItem(MappingItem<TMapping, TSettings> mappingItem)
 		{
@@ -43,7 +43,7 @@ namespace Core.ElasticSearch.Mapping
 	internal class ProjectionItem<T, TMapping, TSettings> : BaseProjectionItem<T, TMapping, TSettings>
 		where T : BaseEntity, IProjection<TMapping>, new() 
 		where TMapping : class, IModel
-		where TSettings : BaseElasticSettings
+		where TSettings : BaseElasticConnection
 	{
 		public ProjectionItem(MappingItem<TMapping, TSettings> mappingItem) : base(mappingItem)
 		{
@@ -57,7 +57,7 @@ namespace Core.ElasticSearch.Mapping
 		where T : BaseEntity, IProjection<TMapping>, IWithParent<TParent>, new()
 		where TMapping : class, IModel
 		where TParent : BaseEntity, IProjection, new()
-		where TSettings : BaseElasticSettings
+		where TSettings : BaseElasticConnection
 	{
 		public ProjectionWithParentItem(MappingItem<TMapping, TSettings> mappingItem) : base(mappingItem)
 		{

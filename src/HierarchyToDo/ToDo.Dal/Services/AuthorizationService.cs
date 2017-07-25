@@ -10,14 +10,14 @@ using Microsoft.Extensions.Logging;
 using Nest;
 using ToDo.Dal.Projections;
 
-namespace ToDo.Dal.Repositories
+namespace ToDo.Dal.Services
 {
 	public class AuthorizationService : BaseToDoService
 	{
 		private static readonly MD5 md5 = MD5.Create();
 
-		public AuthorizationService(ILoggerFactory loggerFactory, ElasticSettings settings,
-			ElasticScopeFactory<ElasticSettings> factory, UserName user)
+		public AuthorizationService(ILoggerFactory loggerFactory, ElasticConnection settings,
+			ElasticScopeFactory<ElasticConnection> factory, UserName user)
 			: base(loggerFactory, settings, factory, user)
 		{
 		}

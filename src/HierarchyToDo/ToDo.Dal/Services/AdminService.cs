@@ -10,13 +10,13 @@ using Nest;
 using SharpFuncExt;
 using ToDo.Dal.Models;
 
-namespace ToDo.Dal.Repositories
+namespace ToDo.Dal.Services
 {
 	public class AdminService : BaseToDoService
 	{
 		private static readonly MD5 md5 = MD5.Create();
 
-		public AdminService(ILoggerFactory loggerFactory, ElasticSettings settings, ElasticScopeFactory<ElasticSettings> factory, Projections.UserName user) 
+		public AdminService(ILoggerFactory loggerFactory, ElasticConnection settings, ElasticScopeFactory<ElasticConnection> factory, Projections.UserName user) 
 			: base(loggerFactory, settings, factory, user)
 		{
 		}

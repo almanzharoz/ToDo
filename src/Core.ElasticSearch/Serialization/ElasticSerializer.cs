@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 namespace Core.ElasticSearch.Serialization
 {
 	internal class ElasticSerializer<TSettings> : JsonNetSerializer 
-		where TSettings : BaseElasticSettings
+		where TSettings : BaseElasticConnection
 	{
 		private readonly ConcurrentDictionary<Type, JsonConverter> _converters = new ConcurrentDictionary<Type, JsonConverter>();
 

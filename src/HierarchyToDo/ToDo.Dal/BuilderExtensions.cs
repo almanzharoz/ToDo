@@ -4,7 +4,8 @@ using Core.ElasticSearch.Mapping;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using ToDo.Dal.Models;
-using ToDo.Dal.Repositories;
+using ToDo.Dal.Services;
+using ToDo.Dal.Services.Internal;
 
 namespace ToDo.Dal
 {
@@ -12,17 +13,19 @@ namespace ToDo.Dal
     {
 	    public static IServiceCollection AddToDo(this IServiceCollection services, string url)
 	    {
-		    services.AddElastic(new ElasticSettings(new Uri(url)))
-				// репозитории
-				.AddService<AuthorizationService, ElasticSettings>()
-			    .AddService<AdminService, ElasticSettings>()
-			    .AddService<ProjectService, ElasticSettings>()
-			    .AddService<TaskService, ElasticSettings>();
+		    services.AddElastic(new ElasticConnection(new Uri(url)))
+				// внутренние сервисы
+				.AddService<UsersService, ElasticConnection>()
+				// публичные сервисы
+				.AddService<AuthorizationService, ElasticConnection>()
+			    .AddService<AdminService, ElasticConnection>()
+			    .AddService<ProjectService, ElasticConnection>()
+			    .AddService<TaskService, ElasticConnection>();
 		    return services;
 	    }
 
 	    public static IApplicationBuilder UseToDo(this IApplicationBuilder app) =>
-		    app.UseElastic<ElasticSettings, AdminService>(
+		    app.UseElastic<ElasticConnection, AdminService>(
 			    m => m
 				    // маппинг
 				    .AddMapping<User>(x => x.IndexName)
