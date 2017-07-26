@@ -17,8 +17,8 @@ namespace ToDo.Dal.Services.Internal
 		}
 
 		public Project GetProject(string id, bool required = false) =>
-			Search<Project, Project>(
-					Query<Project>.Ids(x => x.Values(id.HasNotNullArg("projectId"))) && (Query<Project>.Term(p => p.User, _user.HasNotNullArg("user").Id) || Query<Project>.Term(x => x.Users, _user.Id)))
+			Filter<Project, Project>(q =>
+					q.Ids(x => x.Values(id.HasNotNullArg("projectId"))) && (q.Term(p => p.User, _user.HasNotNullArg("user").Id) || q.Term(x => x.Users, _user.Id)))
 				.FirstOrDefault().If(required, x => x.HasNotNullArg("project"));
 	}
 }

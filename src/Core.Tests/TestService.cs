@@ -25,16 +25,16 @@ namespace Core.Tests
 
         public void Clean() => _client.DeleteIndex("*");
         
-        public new Task<IReadOnlyCollection<T>> SearchAsync<T>(QueryContainer query, int take = 0,
+        public new Task<IReadOnlyCollection<T>> FilterAsync<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query, int take = 0,
             int skip = 0, bool load = true)
             where T : class, IProjection, ISearchProjection
-            => base.SearchAsync<T>(query, take, skip, load);
+            => base.FilterAsync<T>(query, take, skip, load);
 
-	    public new IReadOnlyCollection<TProjection> Search<T, TProjection>(QueryContainer query,
+	    public new IReadOnlyCollection<TProjection> Filter<T, TProjection>(Func<QueryContainerDescriptor<T>, QueryContainer> query,
 		    Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, int take = 0, int skip = 0, bool load = true)
 		    where TProjection : class, IProjection<T>, ISearchProjection
 			where T : class, IModel
-		    => base.Search<T, TProjection>(query, sort, take, skip, load);
+		    => base.Filter<T, TProjection>(query, sort, take, skip, load);
     
         public new IReadOnlyCollection<TProjection> Search<T, TProjection>(
             Func<QueryContainerDescriptor<T>, QueryContainer> query,
@@ -56,11 +56,11 @@ namespace Core.Tests
             where T : class, IProjection, IGetProjection
 			=> base.GetAsync<T>(id, load);
 
-        public new int Count<T>(QueryContainer query) where T : class, IProjection
-            => base.Count<T>(query);
+        public new int FilterCount<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query) where T : class, IProjection
+            => base.FilterCount<T>(query);
 
-        public new Task<int> CountAsync<T>(QueryContainer query) where T : class, IProjection
-			=> base.CountAsync<T>(query);
+        public new Task<int> FilterCountAsync<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query) where T : class, IProjection
+			=> base.FilterCountAsync<T>(query);
 
         public new bool Insert<T>(T entity, bool refresh) where T : BaseEntity, IProjection, IInsertProjection
 			=> base.Insert<T>(entity, refresh);
@@ -101,11 +101,11 @@ namespace Core.Tests
         public new Task<int> RemoveAsync<T>(QueryContainer query) where T : class, IProjection, IRemoveProjection
 			=> base.RemoveAsync<T>(query);
 
-        public new Pager<TProjection> SearchPager<T, TProjection>(QueryContainer query, int page, int take,
+        public new Pager<TProjection> FilterPager<T, TProjection>(Func<QueryContainerDescriptor<T>, QueryContainer> query, int page, int take,
             Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, bool load = true)
             where TProjection : class, IProjection<T>, ISearchProjection
 			where T : class, IModel
-            => base.SearchPager<T, TProjection>(query, page, take, sort, load);
+            => base.FilterPager<T, TProjection>(query, page, take, sort, load);
 
         public new Pager<TProjection> SearchPager<T, TProjection>(
             Func<QueryContainerDescriptor<T>, QueryContainer> query, int page, int take,

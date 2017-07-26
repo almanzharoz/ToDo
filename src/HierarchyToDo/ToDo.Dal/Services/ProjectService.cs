@@ -26,7 +26,7 @@ namespace ToDo.Dal.Services
 		}
 
 		public IReadOnlyCollection<Project> GetMyProjects() =>
-			Search<Project, Project>(UserQuery<Project>(null));
+			Filter<Project, Project>(q => UserQuery<Project>(null));
 
 		public IReadOnlyCollection<KeyValuePair<Project, int>> GetMyProjectsWithCount() =>
 			SearchWithScore<Project, Project>(
@@ -34,7 +34,7 @@ namespace ToDo.Dal.Services
 					q.Bool(b => b.Filter(UserQuery<Project>(null))));
 
 		public Project GetProject(string id) =>
-			Search<Project, Project>(UserQuery<Project>(Query<Project>.Ids(x => x.Values(id))))
+			Search<Project, Project>(q => UserQuery<Project>(q.Ids(x => x.Values(id))))
 				.FirstOrDefault();
 
 		public bool SaveProject(string id, Func<Project, Project> update) =>
@@ -67,8 +67,8 @@ namespace ToDo.Dal.Services
 
 
 		public bool ProjectExists(string projectId, string name)
-			=> Count<Project>(!Query<Project>.Ids(x => x.Values(projectId)) && Query<Project>.Term(x => x.Field(f => f.Name).Value(name)))>0;
+			=> FilterCount<Project>(q => !q.Ids(x => x.Values(projectId)) && q.Term(x => x.Field(f => f.Name).Value(name)))>0;
 		public bool ProjectExists(string name)
-			=> Count<Project>(Query<Project>.Term(x => x.Name, name)) > 0;
+			=> FilterCount<Project>(q => q.Term(x => x.Name, name)) > 0;
 	}
 }

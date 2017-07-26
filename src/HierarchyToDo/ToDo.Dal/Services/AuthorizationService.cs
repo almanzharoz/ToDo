@@ -23,10 +23,10 @@ namespace ToDo.Dal.Services
 		}
 
 		public UserWithRoles TryLogin(string email, string password)
-			=> Search<Models.User, UserWithRoles>(
-					Query<Models.User>.Term(x => x.Email, email) &&
-					!Query<Models.User>.Term(x => x.Deny, true) &&
-					Query<Models.User>.Term(x => x.Password, Base64UrlTextEncoder.Encode(md5.ComputeHash(Encoding.UTF8.GetBytes(password)))), null, 1)
+			=> Filter<Models.User, UserWithRoles>(q =>
+					q.Term(x => x.Email, email) &&
+					!q.Term(x => x.Deny, true) &&
+					q.Term(x => x.Password, Base64UrlTextEncoder.Encode(md5.ComputeHash(Encoding.UTF8.GetBytes(password)))), null, 1)
 				.FirstOrDefault();
 	}
 }

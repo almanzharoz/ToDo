@@ -28,17 +28,17 @@ namespace ToDo.Dal.Services
 		public Project GetProject(string id, bool required = false) => _usersService.GetProject(id, required);
 
 		public Task GetTask(string id) =>
-			Search<Models.Task, Task>(TaskQuery(Query<Models.Task>.Ids(x => x.Values(id))))
+			Filter<Models.Task, Task>(q => TaskQuery(q.Ids(x => x.Values(id))))
 				.FirstOrDefault();
 
 		public IReadOnlyCollection<Project> GetProjects() =>
-			Search<Project, Project>(Query<Project>.Term(x => x.Users, _user.Id));
+			Filter<Project, Project>(q => q.Term(x => x.Users, _user.Id));
 
 		public IReadOnlyCollection<Task> GetTasks(string id, string parentTaskId) =>
-			Search<Models.Task, Task>(TaskQuery(
+			Filter<Models.Task, Task>(q => TaskQuery(
 				parentTaskId.IfNotNull(
-					x => Query<Models.Task>.Term(p => p.ParentTask, GetTask(parentTaskId).Id),
-					() => !Query<Models.Task>.Exists(e => e.Field(p => p.ParentTask))), id));
+					x => q.Term(p => p.ParentTask, GetTask(parentTaskId).Id),
+					() => !q.Exists(e => e.Field(p => p.ParentTask))), id));
 
 		public bool AddTask(string projectId, string parentTask, string name, string note, DateTime deadline,
 			int estimatedTime, UserName assign) =>
@@ -57,7 +57,7 @@ namespace ToDo.Dal.Services
 			});
 
 		public IReadOnlyCollection<Task> GetMyTasks(string id) =>
-			Search<Models.Task, Task>(UserQuery<Task>(null), s => s.Descending(p => p.Created));
+			Filter<Models.Task, Task>(q => UserQuery<Task>(null), s => s.Descending(p => p.Created));
 
 		public IEnumerable<Projections.User> GetUsersNames(string id, string s) =>
 			Search<Models.User, Projections.User>(q => q.Bool(b => b
@@ -68,7 +68,7 @@ namespace ToDo.Dal.Services
 				sort => sort.Ascending(p => p.Nick), 0, 10);
 
 		public int GetChildrenCount(Task task) =>
-			Count<Task>(TaskQuery(Query<Models.Task>.Term(p => p.ParentTask, task.Id), task.Parent.Id));
+			FilterCount<Task>(q => TaskQuery(q.Term(p => p.ParentTask, task.Id), task.Parent.Id));
 
 		private IEnumerable<Task> GetParents(Task task)
 		{

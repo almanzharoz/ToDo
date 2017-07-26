@@ -22,7 +22,7 @@ namespace ToDo.Dal.Services
 		}
 
 		public bool AddUser(string email, string name, string password, EUserRole[] roles)
-			=> Count<Projections.UserWithRoles>(Query<Projections.UserWithRoles>.Term(p => p.Email, email.ToLower()))
+			=> FilterCount<Projections.UserWithRoles>(q => q.Term(p => p.Email, email.ToLower()))
 				.If(p => p == 0, x =>
 					Insert(new Projections.NewUser()
 					{
@@ -32,7 +32,7 @@ namespace ToDo.Dal.Services
 						Roles = roles
 					}), x => false);
 
-		public IReadOnlyCollection<Projections.UserWithRoles> GetUsers() => Search<Models.User, Projections.UserWithRoles>(new QueryContainer());
+		public IReadOnlyCollection<Projections.UserWithRoles> GetUsers() => Filter<Models.User, Projections.UserWithRoles>(q => null);
 
 		public bool DeleteRole(string id, EUserRole role)
 			=> Update(Query<Projections.UserWithRoles>.Ids(x => x.Values(id)),

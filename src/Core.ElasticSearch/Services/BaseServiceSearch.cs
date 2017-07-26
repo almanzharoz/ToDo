@@ -12,7 +12,7 @@ namespace Core.ElasticSearch
 {
 	public abstract partial class BaseService<TConnection>
 	{
-		protected Task<IReadOnlyCollection<T>> SearchAsync<T>(QueryContainer query, int take = 0,
+		protected Task<IReadOnlyCollection<T>> FilterAsync<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query, int take = 0,
 			int skip = 0, bool load = true)
 			where T : class, IProjection, ISearchProjection
 			=> _mapping.GetProjectionItem<T>()
@@ -23,14 +23,14 @@ namespace Core.ElasticSearch
 								.Index(projection.MappingItem.IndexName)
 								.Type(projection.MappingItem.TypeName)
 								.Source(s => s.Includes(f => f.Fields(projection.Fields)))
-								.Query(q => q.Bool(b => b.Filter(query)))
+								.Query(q => q.Bool(b => b.Filter(query(new QueryContainerDescriptor<T>()))))
 								.IfNotNull(take, y => y.Take(take).Skip(skip))),
 						r => r.Documents.IfAsync(load, LoadAsync),
 						RepositoryLoggingEvents.ES_SEARCH));
 
 		private Stopwatch sw2 = new Stopwatch();
 
-		protected IReadOnlyCollection<TProjection> Search<T, TProjection>(QueryContainer query,
+		protected IReadOnlyCollection<TProjection> Filter<T, TProjection>(Func<QueryContainerDescriptor<T>, QueryContainer> query,
 			Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, int take = 0, int skip = 0, bool load = true)
 			where TProjection : class, IProjection<T>, ISearchProjection
 			where T : class, IModel
@@ -42,7 +42,7 @@ namespace Core.ElasticSearch
 									.Index(projection.MappingItem.IndexName)
 									.Type(projection.MappingItem.TypeName)
 									.Source(s => s.Includes(f => f.Fields(projection.Fields)))
-									.Query(q => q.Bool(b => b.Filter(query)))
+									.Query(q => q.Bool(b => b.Filter(query(new QueryContainerDescriptor<T>()))))
 									.IfNotNull(sort, y => y.Sort(sort))
 									.If(y => typeof(IWithVersion).IsAssignableFrom(typeof(TProjection)), y => y.Version())
 									.IfNotNull(take, y => y.Take(take).Skip(skip)))
@@ -120,7 +120,7 @@ namespace Core.ElasticSearch
 						RepositoryLoggingEvents.ES_GET,
 						$"Get (Id: {id})"));
 
-		protected T Get<T>(string id, QueryContainer query, bool load = true)
+		protected T Get<T>(string id, Func<QueryContainerDescriptor<T>, QueryContainer> query, bool load = true)
 			where T : class, IProjection, IGetProjection
 			=> _mapping.GetProjectionItem<T>()
 				.Convert(
@@ -128,7 +128,7 @@ namespace Core.ElasticSearch
 						c => c.Search<T>(x => x
 							.Index(projection.MappingItem.IndexName)
 							.Type(projection.MappingItem.TypeName)
-							.Query(q => q.Bool(b => b.Filter(Query<T>.Ids(i => i.Values(id.HasNotNullArg("id"))) && query)))
+							.Query(q => q.Bool(b => b.Filter(Query<T>.Ids(i => i.Values(id.HasNotNullArg("id"))) && query(new QueryContainerDescriptor<T>()))))
 							.Take(1)
 							.If(y => typeof(IWithVersion).IsAssignableFrom(typeof(T)), y => y.Version())
 							.Source(s => s.Includes(f => f.Fields(projection.Fields)))),
@@ -136,7 +136,7 @@ namespace Core.ElasticSearch
 						RepositoryLoggingEvents.ES_GET,
 						$"Get with query (Id: {id})"));
 
-		protected T Get<T, TParent>(string id, string parent, QueryContainer query, bool load = true)
+		protected T Get<T, TParent>(string id, string parent, Func<QueryContainerDescriptor<T>, QueryContainer> query, bool load = true)
 			where T : class, IProjection, IGetProjection, IWithParent<TParent>
 			where TParent : class, IProjection
 			=> _mapping.GetProjectionItem<T>()
@@ -146,7 +146,7 @@ namespace Core.ElasticSearch
 							.Index(projection.MappingItem.IndexName)
 							.Type(projection.MappingItem.TypeName)
 							.Query(q => q.Bool(b => b.Filter(Query<T>.Ids(i => i.Values(id.HasNotNullArg("id"))) &&
-															Query<T>.ParentId(p => p.Id(parent.HasNotNullArg("parent"))) && query)))
+															Query<T>.ParentId(p => p.Id(parent.HasNotNullArg("parent"))) && query(new QueryContainerDescriptor<T>()))))
 							.Take(1)
 							.If(y => typeof(IWithVersion).IsAssignableFrom(typeof(T)), y => y.Version())
 							.Source(s => s.Includes(f => f.Fields(projection.Fields)))),
@@ -169,25 +169,45 @@ namespace Core.ElasticSearch
 						RepositoryLoggingEvents.ES_GET,
 						$"Get (Id: {id})"));
 
-		protected int Count<T>(QueryContainer query) where T : class, IProjection
+		protected int FilterCount<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query) where T : class, IProjection
 			=> _mapping.GetProjectionItem<T>()
 				.Convert(
 					projection => Try(
-						c => c.Count<T>(d => d.Query(q => q.Bool(b => b.Filter(query)))
+						c => c.Count<T>(d => d.Query(q => q.Bool(b => b.Filter(query(new QueryContainerDescriptor<T>()))))
 							.Index(projection.MappingItem.IndexName)
 							.Type(projection.MappingItem.TypeName)),
 						r => (int) r.Count,
 						RepositoryLoggingEvents.ES_COUNT));
 
-		protected Task<int> CountAsync<T>(QueryContainer query) where T : class, IProjection
+		protected Task<int> FilterCountAsync<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query) where T : class, IProjection
 			=> _mapping.GetProjectionItem<T>()
 				.Convert(
 					projection => TryAsync(
-						c => c.CountAsync<T>(d => d.Query(q => q.Bool(b => b.Filter(query)))
+						c => c.CountAsync<T>(d => d.Query(q => q.Bool(b => b.Filter(query(new QueryContainerDescriptor<T>()))))
 							.Index(projection.MappingItem.IndexName)
 							.Type(projection.MappingItem.TypeName)),
 						r => (int) r.Count,
 						RepositoryLoggingEvents.ES_COUNT));
 
+		protected int SearchCount<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query) where T : class, IProjection
+			=> _mapping.GetProjectionItem<T>()
+				.Convert(
+					projection => Try(
+						c => c.Count<T>(d => d.Query(query)
+							.Index(projection.MappingItem.IndexName)
+							.Type(projection.MappingItem.TypeName)),
+						r => (int)r.Count,
+						RepositoryLoggingEvents.ES_COUNT));
+
+		protected Task<int> SearchCountAsync<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query)
+			where T : class, IProjection
+			=> _mapping.GetProjectionItem<T>()
+				.Convert(
+					projection => TryAsync(
+						c => c.CountAsync<T>(d => d.Query(query)
+							.Index(projection.MappingItem.IndexName)
+							.Type(projection.MappingItem.TypeName)),
+						r => (int) r.Count,
+						RepositoryLoggingEvents.ES_COUNT));
 	}
 }
