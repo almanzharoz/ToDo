@@ -556,5 +556,16 @@ namespace Core.Tests
 		    Assert.AreEqual(loaded.Parent.Id, product.Parent.Id);
 		    Assert.AreEqual(loaded.Parent.Name, product.Parent.Name);
 		}
+
+	    [TestMethod]
+	    public void UpdateProjection()
+	    {
+		    // TODO: реализовать обновление одного документа используя IUpdateProjection. 
+			// 1. Добавить новую проекцию с 1 private set полем и несколькими с public set
+			// 2. Вставить в базу полную проекцию включая поля, которые не указаны в новой проекции
+			// 3. Достать по Id новую проекцию (у проекции для этого должен быть IGetProjection)
+			// 4. Обновить
+			// 5. Достать полную проекцию и проверить, что обновляемые поля обновлены, а другие остались нетронутыми
+	    }
 	}
 }
