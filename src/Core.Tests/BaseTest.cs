@@ -26,12 +26,15 @@ namespace Core.Tests
                 .AddMapping<Producer>(x => x.SecondIndex)
                 .AddMapping<Category>(x => x.FirstIndex)
                 .AddMapping<Product>(x => x.FirstIndex)
+                .AddMapping<User>(x => x.FirstIndex)
 
                 .AddProjection<Producer, Producer>()
                 .AddProjection<Category, Category>()
                 .AddProjection<CategoryProjection, Category>()
                 .AddProjection<ProductProjection, Product, Category>()
-                .AddProjection<Product, Product, Category>());
+                .AddProjection<Product, Product, Category>()
+                .AddProjection<User, User>()
+                .AddProjection<UserUpdateProjection, User>());
 
             _repository = serviceProvider.GetService<TestService>();
         }

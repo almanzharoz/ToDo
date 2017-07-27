@@ -236,7 +236,7 @@ namespace Core.Tests
 		//    Assert.ThrowsException<QueryException>(() => _repository.Update(category, true));
 		//}
 
-		// Тест больше не актуален, т.к. нельзя никак получить проекции и управлять номером версии в ней. А так же нельзя никак обновить проекцию в базе созданную из вне движка.
+		// РўРµСЃС‚ Р±РѕР»СЊС€Рµ РЅРµ Р°РєС‚СѓР°Р»РµРЅ, С‚.Рє. РЅРµР»СЊР·СЏ РЅРёРєР°Рє РїРѕР»СѓС‡РёС‚СЊ РїСЂРѕРµРєС†РёРё Рё СѓРїСЂР°РІР»СЏС‚СЊ РЅРѕРјРµСЂРѕРј РІРµСЂСЃРёРё РІ РЅРµР№. Рђ С‚Р°Рє Р¶Рµ РЅРµР»СЊР·СЏ РЅРёРєР°Рє РѕР±РЅРѕРІРёС‚СЊ РїСЂРѕРµРєС†РёСЋ РІ Р±Р°Р·Рµ СЃРѕР·РґР°РЅРЅСѓСЋ РёР· РІРЅРµ РґРІРёР¶РєР°.
 		//[TestMethod]
   //      public void UpdateObjectSimplyWithAnotherVersion()
   //      {
@@ -290,7 +290,7 @@ namespace Core.Tests
             Assert.IsNull(loadCategory);
         }
 
-		// Ограничил такое поведение на уровне компиляции (Id - internal set)
+		// РћРіСЂР°РЅРёС‡РёР» С‚Р°РєРѕРµ РїРѕРІРµРґРµРЅРёРµ РЅР° СѓСЂРѕРІРЅРµ РєРѕРјРїРёР»СЏС†РёРё (Id - internal set)
         //[TestMethod]
         //public void RemoveObjectByInvalidId()
         //{
@@ -560,12 +560,28 @@ namespace Core.Tests
 	    [TestMethod]
 	    public void UpdateProjection()
 	    {
-		    // TODO: реализовать обновление одного документа используя IUpdateProjection. 
-			// 1. Добавить новую проекцию с 1 private set полем и несколькими с public set
-			// 2. Вставить в базу полную проекцию включая поля, которые не указаны в новой проекции
-			// 3. Достать по Id новую проекцию (у проекции для этого должен быть IGetProjection)
-			// 4. Обновить
-			// 5. Достать полную проекцию и проверить, что обновляемые поля обновлены, а другие остались нетронутыми
+		    // TODO: СЂРµР°Р»РёР·РѕРІР°С‚СЊ РѕР±РЅРѕРІР»РµРЅРёРµ РѕРґРЅРѕРіРѕ РґРѕРєСѓРјРµРЅС‚Р° РёСЃРїРѕР»СЊР·СѓСЏ IUpdateProjection. 
+			// 1. Р”РѕР±Р°РІРёС‚СЊ РЅРѕРІСѓСЋ РїСЂРѕРµРєС†РёСЋ СЃ 1 private set РїРѕР»РµРј Рё РЅРµСЃРєРѕР»СЊРєРёРјРё СЃ public set
+			// 2. Р’СЃС‚Р°РІРёС‚СЊ РІ Р±Р°Р·Сѓ РїРѕР»РЅСѓСЋ РїСЂРѕРµРєС†РёСЋ РІРєР»СЋС‡Р°СЏ РїРѕР»СЏ, РєРѕС‚РѕСЂС‹Рµ РЅРµ СѓРєР°Р·Р°РЅС‹ РІ РЅРѕРІРѕР№ РїСЂРѕРµРєС†РёРё
+			// 3. Р”РѕСЃС‚Р°С‚СЊ РїРѕ Id РЅРѕРІСѓСЋ РїСЂРѕРµРєС†РёСЋ (Сѓ РїСЂРѕРµРєС†РёРё РґР»СЏ СЌС‚РѕРіРѕ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ IGetProjection)
+			// 4. РћР±РЅРѕРІРёС‚СЊ
+			// 5. Р”РѕСЃС‚Р°С‚СЊ РїРѕР»РЅСѓСЋ РїСЂРѕРµРєС†РёСЋ Рё РїСЂРѕРІРµСЂРёС‚СЊ, С‡С‚Рѕ РѕР±РЅРѕРІР»СЏРµРјС‹Рµ РїРѕР»СЏ РѕР±РЅРѕРІР»РµРЅС‹, Р° РґСЂСѓРіРёРµ РѕСЃС‚Р°Р»РёСЃСЊ РЅРµС‚СЂРѕРЅСѓС‚С‹РјРё
+
+	        var user = new User {Login = "user1", Email = "user1@user1.ru", Password = "123", Salt = "111"};
+	         _repository.Insert(user, true);
+
+	        var loaded = _repository.Get<UserUpdateProjection>(user.Id, true);
+	        loaded.Email = "new@user1.ru";
+	        loaded.Password = "newPass";
+
+	        _repository.Update(loaded, true);
+
+	        var loadedFullUser = _repository.Get<User>(user.Id, true);
+
+            Assert.AreEqual("user1", loadedFullUser.Login);
+            Assert.AreEqual("new@user1.ru", loadedFullUser.Email);
+            Assert.AreEqual("newPass", loadedFullUser.Password);
+            Assert.AreEqual("111", loadedFullUser.Salt);
 	    }
 	}
 }
