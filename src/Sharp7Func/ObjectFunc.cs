@@ -94,6 +94,10 @@ namespace SharpFuncExt
 		public static ValueTuple<TResult1, TResult2, TResult3, TResult4> Convert<T, TResult1, TResult2, TResult3, TResult4>(this T arg, TResult1 value1, TResult2 value2, TResult3 value3, TResult4 value4)
 			=> new ValueTuple<TResult1, TResult2, TResult3, TResult4>(value1, value2, value3, value4);
 
+		public static TExec Inject<TArg, T, TResult, TExec>(this TArg arg, T farg, Func<T, TResult> func, Func<TArg, TResult, TExec> exec)
+		{
+			return exec(arg, func(farg));
+		}
 
 		//public static TResult Is<TArg, T, TResult>(this TArg arg, Func<T, TResult> func, Func<TArg, TResult> funcNot) where T : TArg
 		//{
