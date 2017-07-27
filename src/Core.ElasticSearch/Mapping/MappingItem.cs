@@ -30,7 +30,7 @@ namespace Core.ElasticSearch.Mapping
 		}
 
 		public IEnumerable<string> CheckFields(IEnumerable<string> fields)
-			=> fields.Except(_fields).ToImmutableArray();
+			=> fields.Except(_fields).ToImmutableArray(); // TODO: Сделать проверку типов
 
 		public string IndexName { get; }
 		public string TypeName { get; }
