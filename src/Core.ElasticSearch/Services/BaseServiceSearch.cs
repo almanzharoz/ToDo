@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Core.ElasticSearch.Domain;
+using Elasticsearch.Net;
 using Nest;
 using SharpFuncExt;
 
@@ -23,7 +24,7 @@ namespace Core.ElasticSearch
 								.Index(projection.MappingItem.IndexName)
 								.Type(projection.MappingItem.TypeName)
 								.Source(s => s.Includes(f => f.Fields(projection.Fields)))
-								.Query(q => q.Bool(b => b.Filter(query(new QueryContainerDescriptor<T>()))))
+								.Query(q => q.Bool(b => b.Filter(query)))
 								.IfNotNull(take, y => y.Take(take).Skip(skip))),
 						r => r.Documents.IfAsync(load, LoadAsync),
 						RepositoryLoggingEvents.ES_SEARCH));
@@ -42,7 +43,7 @@ namespace Core.ElasticSearch
 									.Index(projection.MappingItem.IndexName)
 									.Type(projection.MappingItem.TypeName)
 									.Source(s => s.Includes(f => f.Fields(projection.Fields)))
-									.Query(q => q.Bool(b => b.Filter(query(new QueryContainerDescriptor<T>()))))
+									.Query(q => q.Bool(b => b.Filter(query)))
 									.IfNotNull(sort, y => y.Sort(sort))
 									.If(y => typeof(IWithVersion).IsAssignableFrom(typeof(TProjection)), y => y.Version())
 									.IfNotNull(take, y => y.Take(take).Skip(skip)))
@@ -173,7 +174,7 @@ namespace Core.ElasticSearch
 			=> _mapping.GetProjectionItem<T>()
 				.Convert(
 					projection => Try(
-						c => c.Count<T>(d => d.Query(q => q.Bool(b => b.Filter(query(new QueryContainerDescriptor<T>()))))
+						c => c.Count<T>(d => d.Query(q => q.Bool(b => b.Filter(query)))
 							.Index(projection.MappingItem.IndexName)
 							.Type(projection.MappingItem.TypeName)),
 						r => (int) r.Count,
@@ -183,7 +184,7 @@ namespace Core.ElasticSearch
 			=> _mapping.GetProjectionItem<T>()
 				.Convert(
 					projection => TryAsync(
-						c => c.CountAsync<T>(d => d.Query(q => q.Bool(b => b.Filter(query(new QueryContainerDescriptor<T>()))))
+						c => c.CountAsync<T>(d => d.Query(q => q.Bool(b => b.Filter(query)))
 							.Index(projection.MappingItem.IndexName)
 							.Type(projection.MappingItem.TypeName)),
 						r => (int) r.Count,

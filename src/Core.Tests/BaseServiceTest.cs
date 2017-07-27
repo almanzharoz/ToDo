@@ -259,7 +259,7 @@ namespace Core.Tests
         {
             var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
             _repository.Insert(category, true);
-            _repository.Update(Query<Category>.Ids(x => x.Values(category.Id)), new UpdateByQueryBuilder<Category>().Set(x => x.Name, "New Category"), true);
+            _repository.Update<Category>(q => q.Ids(x => x.Values(category.Id)), u => u.Set(x => x.Name, "New Category"), true);
 
             var loadCategory = _repository.Get<Category>(category.Id, true);
 
@@ -272,7 +272,7 @@ namespace Core.Tests
         {
             var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
             _repository.Insert(category, true);
-            _repository.Update(Query<Category>.Ids(x => x.Values(category.Id)), new UpdateByQueryBuilder<Category>().Unset(x => x.Name), true);
+            _repository.Update<Category>(q => q.Ids(x => x.Values(category.Id)), u => u.Unset(x => x.Name), true);
 
             var loadCategory = _repository.Get<Category>(category.Id, true);
 
@@ -305,7 +305,7 @@ namespace Core.Tests
         {
             var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
             _repository.Insert(category, true);
-            _repository.Remove<Category>(Query<Category>.Ids(x => x.Values(category.Id)));
+            _repository.Remove<Category>(q => q.Ids(x => x.Values(category.Id)));
             var loadCategory = _repository.Get<Category>(category.Id, true);
             Assert.IsNull(loadCategory);
         }

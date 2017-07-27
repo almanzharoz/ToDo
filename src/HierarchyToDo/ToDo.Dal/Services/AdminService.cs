@@ -35,16 +35,16 @@ namespace ToDo.Dal.Services
 		public IReadOnlyCollection<Projections.UserWithRoles> GetUsers() => Filter<Models.User, Projections.UserWithRoles>(q => null);
 
 		public bool DeleteRole(string id, EUserRole role)
-			=> Update(Query<Projections.UserWithRoles>.Ids(x => x.Values(id)),
-					new UpdateByQueryBuilder<Projections.UserWithRoles>().Remove(x => x.Roles, role)) > 0;
+			=> Update<Projections.UserWithRoles>(q => q.Ids(x => x.Values(id)),
+					u => u.Remove(x => x.Roles, role)) > 0;
 
 		public bool AddRole(string id, EUserRole role)
-			=> Update(Query<Projections.UserWithRoles>.Ids(x => x.Values(id)),
-					new UpdateByQueryBuilder<Projections.UserWithRoles>().Add(x => x.Roles, role)) > 0;
+			=> Update<Projections.UserWithRoles>(q => q.Ids(x => x.Values(id)),
+					u => u.Add(x => x.Roles, role)) > 0;
 
 		public bool DenyUser(string id, bool deny)
-			=> Update(Query<Projections.UserWithRoles>.Ids(x => x.Values(id)),
-					new UpdateByQueryBuilder<Projections.UserWithRoles>().Set(x => x.Deny, deny)) > 0;
+			=> Update<Projections.UserWithRoles>(q => q.Ids(x => x.Values(id)),
+					u => u.Set(x => x.Deny, deny)) > 0;
 
 		public bool DeleteUser(string id) => Remove<Projections.User>(GetUser(id));
 		public Projections.UserWithRoles GetUser(string id) => Get<Projections.UserWithRoles>(id.HasNotNullArg("userId"));
