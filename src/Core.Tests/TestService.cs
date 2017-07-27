@@ -79,11 +79,11 @@ namespace Core.Tests
         public new Task<bool> UpdateAsync<T>(T entity, bool refresh = true) where T : BaseEntityWithVersion, IProjection, IWithVersion, IUpdateProjection
 			=> base.UpdateAsync<T>(entity, refresh);
 
-        public new int Update<T>(QueryContainer query, UpdateByQueryBuilder<T> update, bool refresh = true)
+        public new int Update<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query, Func<UpdateByQueryBuilder<T>, UpdateByQueryBuilder<T>> update, bool refresh = true)
             where T : class, IEntity, IWithVersion, IProjection, IUpdateProjection
 			=> base.Update<T>(query, update, refresh);
 
-        public new Task<(int updated, int total)> UpdateAsync<T>(QueryContainer query, UpdateByQueryBuilder<T> update,
+        public new Task<(int updated, int total)> UpdateAsync<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query, Func<UpdateByQueryBuilder<T>, UpdateByQueryBuilder<T>> update,
             bool refresh = true)
             where T : class, IEntity, IWithVersion, IProjection, IUpdateProjection
             => base.UpdateAsync<T>(query, update, refresh);
@@ -95,10 +95,10 @@ namespace Core.Tests
         public new Task<bool> RemoveAsync<T>(T entity) where T : class, IProjection, IWithVersion, IRemoveProjection
 			=> base.RemoveAsync<T>(entity);
 
-        public new int Remove<T>(QueryContainer query) where T : class, IProjection, IRemoveProjection
+        public new int Remove<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query) where T : class, IProjection, IRemoveProjection
 			=> base.Remove<T>(query);
 
-        public new Task<int> RemoveAsync<T>(QueryContainer query) where T : class, IProjection, IRemoveProjection
+        public new Task<int> RemoveAsync<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query) where T : class, IProjection, IRemoveProjection
 			=> base.RemoveAsync<T>(query);
 
         public new Pager<TProjection> FilterPager<T, TProjection>(Func<QueryContainerDescriptor<T>, QueryContainer> query, int page, int take,

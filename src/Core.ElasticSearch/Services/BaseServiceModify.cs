@@ -87,7 +87,7 @@ namespace Core.ElasticSearch
 				RepositoryLoggingEvents.ES_UPDATE,
 				$"Update (Id: {entity?.Id})");
 
-		protected int Update<T>(QueryContainer query, UpdateByQueryBuilder<T> update, bool refresh = true)
+		protected int Update<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query, Func<UpdateByQueryBuilder<T>, UpdateByQueryBuilder<T>> update, bool refresh = true)
 			where T : class, IProjection, IUpdateProjection, IWithVersion
 			=> Try(
 				c => c.UpdateByQuery<T>(x => x
@@ -96,11 +96,11 @@ namespace Core.ElasticSearch
 					.Query(q => q.Bool(b => b.Filter(query)))
 					.Version()
 					.If(refresh, y => y.Refresh())
-					.Script(s => s.Inline(update).Params(update.GetParams))),
+					.Script(s => s.Inject(new UpdateByQueryBuilder<T>(), update, (s1, u) => s1.Inline(u).Params(u.GetParams)))),
 				r => (int) r.Updated,
 				RepositoryLoggingEvents.ES_UPDATEBYQUERY);
 
-		protected Task<(int updated, int total)> UpdateAsync<T>(QueryContainer query, UpdateByQueryBuilder<T> update,
+		protected Task<(int updated, int total)> UpdateAsync<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query, Func<UpdateByQueryBuilder<T>, UpdateByQueryBuilder<T>> update,
 			bool refresh = true)
 			where T : class, IProjection, IUpdateProjection, IWithVersion
 			=> TryAsync(
@@ -110,7 +110,7 @@ namespace Core.ElasticSearch
 					.Query(q => q.Bool(b => b.Filter(query)))
 					.Version()
 					.If(refresh, y => y.Refresh())
-					.Script(s => s.Inline(update).Params(update.GetParams))),
+					.Script(s => s.Inject(new UpdateByQueryBuilder<T>(), update, (s1, u) => s1.Inline(u).Params(u.GetParams)))),
 				r => ((int) r.Updated, (int) r.Total),
 				RepositoryLoggingEvents.ES_UPDATEBYQUERY);
 
@@ -137,7 +137,7 @@ namespace Core.ElasticSearch
 				RepositoryLoggingEvents.ES_REMOVE,
 				$"Remove (Id: {entity.Id})");
 
-		protected int Remove<T>(QueryContainer query) where T : class, IProjection, IRemoveProjection
+		protected int Remove<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query) where T : class, IProjection, IRemoveProjection
 			=> Try(
 				c => c.DeleteByQuery<T>(d => d.Query(q => q.Bool(b => b.Filter(query)))
 					.Index(_mapping.GetIndexName<T>())
@@ -146,7 +146,7 @@ namespace Core.ElasticSearch
 				r => (int) r.Deleted,
 				RepositoryLoggingEvents.ES_REMOVEBYQUERY);
 
-		protected Task<int> RemoveAsync<T>(QueryContainer query) where T : class, IProjection, IRemoveProjection
+		protected Task<int> RemoveAsync<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query) where T : class, IProjection, IRemoveProjection
 			=> TryAsync(
 				c => c.DeleteByQueryAsync<T>(d => d.Query(q => q.Bool(b => b.Filter(query)))
 					.Index(_mapping.GetIndexName<T>())

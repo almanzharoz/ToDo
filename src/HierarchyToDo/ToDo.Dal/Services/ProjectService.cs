@@ -50,12 +50,12 @@ namespace ToDo.Dal.Services
 					.ThrowIf(x => x.Version != version, x => new Exception("version not equals")));
 
 		public bool AddUser(string id, string userId) =>
-			Update(UserQuery<Project>(Query<Project>.Ids(x => x.Values(id.HasNotNullArg("project")))),
-				new UpdateByQueryBuilder<Project>().Add(p => p.Users, userId.HasNotNullArg("user"))) > 0;
+			Update<Project>(q => UserQuery<Project>(q.Ids(x => x.Values(id.HasNotNullArg("project")))),
+				u => u.Add(p => p.Users, userId.HasNotNullArg("user"))) > 0;
 
 		public bool DeleteUser(string id, string userId) =>
-			Update(UserQuery<Project>(Query<Project>.Ids(x => x.Values(id.HasNotNullArg("project")))),
-				new UpdateByQueryBuilder<Project>().Remove(p => p.Users, userId.HasNotNullArg("user"))) > 0;
+			Update<Project>(q => UserQuery<Project>(q.Ids(x => x.Values(id.HasNotNullArg("project")))),
+				u => u.Remove(p => p.Users, userId.HasNotNullArg("user"))) > 0;
 
 		public IEnumerable<Projections.User> GetUsersNames(string id, string s) =>
 			Search<Models.User, Projections.User>(q => q.Bool(b => b
