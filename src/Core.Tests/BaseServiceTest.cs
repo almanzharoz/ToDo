@@ -583,5 +583,17 @@ namespace Core.Tests
             Assert.AreEqual("newPass", loadedFullUser.Password);
             Assert.AreEqual("111", loadedFullUser.Salt);
 	    }
+
+	    [TestMethod]
+	    public void HtmlStripTest()
+	    {
+		    
+	    }
+
+	    [TestMethod]
+	    public void AutocompleteTest()
+	    {
+			// Есть уже анализатор, но лучше покурить это: https://www.red-gate.com/simple-talk/dotnet/net-development/how-to-build-a-search-page-with-elasticsearch-and-net/
+		}
 	}
 }
