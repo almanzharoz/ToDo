@@ -4,4 +4,9 @@
     <TargetFramework>netcoreapp1.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core.ElasticSearch\Core.ElasticSearch.csproj" />
+    <ProjectReference Include="..\ToDo.Dal\ToDo.Dal.csproj" />
+  </ItemGroup>
+
 </Project>
