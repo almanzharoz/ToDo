@@ -1,6 +1,6 @@
 ﻿namespace Expo3.Model
 {
-    public class Price
+    public struct Price
     {
         public int Rubles { get; set; }
         public int Pennies { get; set; }

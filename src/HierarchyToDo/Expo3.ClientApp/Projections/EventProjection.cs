@@ -20,7 +20,5 @@ namespace Expo3.ClientApp.Projections
         public DateTime FinishDateTime { get; private set; }
         [JsonProperty]
         public Address Address { get; private set; }
-        [JsonProperty]
-        public string Description { get; private set; }
     }
 }
