@@ -4,7 +4,7 @@ using Nest;
 
 namespace Expo3.Model
 {
-    public class User : BaseEntityWithVersion, IModel, IProjection
+    public class User : BaseEntityWithVersion, IModel, IProjection, IGetProjection
     {
         public string Email { get; set; }
         [Keyword]

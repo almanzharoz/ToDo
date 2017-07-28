@@ -6,7 +6,7 @@ using Nest;
 
 namespace Expo3.Model
 {
-    public class Event : BaseEntityWithVersion, IModel, IProjection, IWithName, IWithCreated, IWithUser
+    public class Event : BaseEntityWithVersion, IModel, IProjection, IInsertProjection, IWithName, IWithCreated, IWithUser
     {
         [Keyword]
         public string Name { get; set; }

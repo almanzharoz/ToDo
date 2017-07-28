@@ -17,4 +17,19 @@ namespace Expo3.AdminApp.Projections
         [JsonProperty]
         public EUserRole Role { get; private set; }
     }
+
+    public class UserName
+    {
+        public string Id { get; }
+
+        public UserName(string id)
+        {
+            Id = id;
+        }
+
+        public UserName(User user)
+        {
+            Id = user.Id;
+        }
+    }
 }
