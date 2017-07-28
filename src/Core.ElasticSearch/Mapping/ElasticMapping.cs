@@ -157,7 +157,8 @@ namespace Core.ElasticSearch.Mapping
 					client.CreateIndex(mapping.Key, x => x
 							.Settings(s => s
 								.Analysis(a => a
-									.Analyzers(an => an.Custom("autocomplete", t => t.Tokenizer("autocomplete_token").Filters("lowercase")))
+									.Analyzers(an => an.Custom("autocomplete", t => t.Tokenizer("autocomplete_token").Filters("lowercase"))
+										.Custom("html_strip", t => t.CharFilters("html_strip").Tokenizer("standard")))
 									.Tokenizers(t => t.EdgeNGram("autocomplete_token",
 										e => e.MinGram(1).MaxGram(10).TokenChars(TokenChar.Letter, TokenChar.Digit)))))
 							.Mappings(z => z.Each(mapping, m => m.Value.Map(z, _mapping.GetValueOrDefault))))
