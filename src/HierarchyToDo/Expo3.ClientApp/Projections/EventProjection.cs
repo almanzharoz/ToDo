@@ -1,6 +1,7 @@
 ﻿using System;
 using Core.ElasticSearch.Domain;
 using Expo3.Model;
+using Expo3.Model.Helpers;
 using Nest;
 using Newtonsoft.Json;
 

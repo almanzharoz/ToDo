@@ -1,5 +1,6 @@
 ﻿using System;
 using Core.ElasticSearch.Domain;
+using Expo3.Model.Helpers;
 using Expo3.Model.Interfaces;
 using Nest;
 
