@@ -1,7 +1,14 @@
-﻿namespace Expo3.Model
+﻿using System.Runtime.Serialization;
+
+namespace Expo3.Model.Helpers
 {
     public enum EEventType
     {
-        //TODO
+        [EnumMember(Value = "concert")]
+        Concert,
+        [EnumMember(Value = "exhibition")]
+        Exhibition,
+        [EnumMember(Value = "excursion")]
+        Excursion
     }
 }
