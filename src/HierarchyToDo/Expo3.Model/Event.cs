@@ -10,6 +10,8 @@ namespace Expo3.Model
     {
         [Keyword]
         public string Name { get; set; }
+        [Keyword]
+        public string Caption { get; set; }
         public DateTime Created { get; set; }
         public User User { get; set; }
         public Price Price { get; set; }

@@ -9,4 +9,9 @@
     <Folder Include="Services\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core.ElasticSearch\Core.ElasticSearch.csproj" />
+    <ProjectReference Include="..\Expo3.Model\Expo3.Model.csproj" />
+  </ItemGroup>
+
 </Project>
