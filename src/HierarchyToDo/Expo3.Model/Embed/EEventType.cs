@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Expo3.Model.Helpers
+namespace Expo3.Model.Embed
 {
     public enum EEventType
     {
