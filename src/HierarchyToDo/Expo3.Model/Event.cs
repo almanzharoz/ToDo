@@ -1,6 +1,6 @@
 ﻿using System;
 using Core.ElasticSearch.Domain;
-using Expo3.Model.Helpers;
+using Expo3.Model.Embed;
 using Expo3.Model.Interfaces;
 using Nest;
 
@@ -14,8 +14,7 @@ namespace Expo3.Model
         public string Caption { get; set; }
         public DateTime Created { get; set; }
         public User User { get; set; }
-        public Price StartPrice { get; set; }
-        public Price FinishPrice { get; set; }
+        public Price[] Prices { get; set; }
         [Keyword]
         public DateTime StartDateTime { get; set; }
         [Keyword]
@@ -25,5 +24,6 @@ namespace Expo3.Model
         public EventPage EventPage { get; set; }
         public EEventType Type { get; set; }
         public string Email { get; set; }
+        public Visitor[] Visitors { get; set; }
     }
 }

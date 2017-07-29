@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Expo3.Model
+namespace Expo3.Model.Embed
 {
     public enum EUserRole
     {

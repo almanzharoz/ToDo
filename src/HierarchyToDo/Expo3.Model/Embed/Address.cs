@@ -1,6 +1,6 @@
 ﻿using Nest;
 
-namespace Expo3.Model.Helpers
+namespace Expo3.Model.Embed
 {
     public struct Address
     {

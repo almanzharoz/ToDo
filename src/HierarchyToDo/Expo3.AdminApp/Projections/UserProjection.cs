@@ -1,10 +1,11 @@
 ﻿using Core.ElasticSearch.Domain;
 using Expo3.Model;
+using Expo3.Model.Embed;
 using Newtonsoft.Json;
 
 namespace Expo3.AdminApp.Projections
 {
-    public class UserProjection : BaseEntityWithVersion, IProjection<User>, IGetProjection
+    public class UserProjection : BaseEntityWithVersion, IProjection<User>, IGetProjection, ISearchProjection
     {
         [JsonProperty]
         public string Email { get; private set; }
