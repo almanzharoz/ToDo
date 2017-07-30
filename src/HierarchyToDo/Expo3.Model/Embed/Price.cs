@@ -26,5 +26,13 @@ namespace Expo3.Model.Embed
                 _pennies = value;
             }
         }
+
+        public Price(int rubles, byte pennies)
+        {
+            _rubles = 0;
+            _pennies = 0;
+            Rubles = rubles;
+            Pennies = pennies;
+        }
     }
 }
