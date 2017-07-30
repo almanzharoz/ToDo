@@ -1,10 +1,12 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Core.ElasticSearch;
 using Expo3.AdminApp.Projections;
 using Expo3.Model;
-using Microsoft.AspNetCore.WebUtilities;
+using Expo3.Model.Embed;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.Extensions.Logging;
 
 namespace Expo3.AdminApp.Services
@@ -19,15 +21,51 @@ namespace Expo3.AdminApp.Services
 
         public UserProjection TryLogin(string email, string password)
         {
-            using (var sha512 = SHA512.Create())
+            var user = Filter<User, UserProjection>(q =>
+                q.Term(x => x.Email, email)).FirstOrDefault();
+            var hash = GetHash(password, Encoding.UTF8.GetBytes(user.Salt));
+            return hash == user.Password ? user : null;
+        }
+
+        public User Register(string email, string nickname, string password)
+        {
+            //TODO: проверка на существующего пользователя
+            var user = new User
             {
-                var user = Filter<User, UserProjection>(q =>
-                    q.Term(x => x.Email, email)).FirstOrDefault();
-                var hash = sha512.ComputeHash(Encoding.UTF8.GetBytes(password + Base64UrlTextEncoder.Decode(user.Salt)));
-                if (hash == Base64UrlTextEncoder.Decode(user.Password))
-                    return user;
+                Email = email,
+                Nickname = nickname,
+                Password = GetHash(password, GenerateSalt())
+            };
+            Insert(user);
+
+            return user;
+        }
+
+        /// <summary>
+        /// Return base64 of hash password with a base64Salt
+        /// </summary>
+        /// <param name="password">Password as a string</param>
+        /// <param name="salt">Salt as a byte array</param>
+        /// <returns></returns>
+        private static string GetHash(string password, byte[] salt)
+        {
+            var hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password,
+                salt,
+                KeyDerivationPrf.HMACSHA512,
+                10000,
+                64));
+            return hashed;
+        }
+
+        private static byte[] GenerateSalt()
+        {
+            var salt = new byte[128 / 8];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(salt);
             }
-            return null;
+            return salt;
         }
     }
 }
