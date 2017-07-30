@@ -5,6 +5,7 @@ using Expo3.Model;
 using Expo3.Model.Embed;
 using Expo3.Model.Exceptions;
 using Microsoft.Extensions.Logging;
+using SharpFuncExt;
 
 namespace Expo3.AdminApp.Services
 {
@@ -34,7 +35,8 @@ namespace Expo3.AdminApp.Services
                 EventPage = eventPage,
                 Type = type,
                 Email = email
-            }, false);
+            }, false)
+            .HasNotNullArg("event");
 
             if(!result) throw new AddEntityException();
         }
@@ -42,7 +44,7 @@ namespace Expo3.AdminApp.Services
         ///<exception cref="RemoveEntityException"></exception>
         public void RemoveEvent(EventRemoveProjection eventRemoveProjection)
         {
-            var result = Remove(eventRemoveProjection);
+            var result = Remove(eventRemoveProjection.HasNotNullArg("event"));
             if(!result) throw new RemoveEntityException();
         }
 
@@ -67,7 +69,7 @@ namespace Expo3.AdminApp.Services
             eventUpdateProjection.Type = type;
             eventUpdateProjection.Email = email;
 
-            var result = Update(eventUpdateProjection, false);
+            var result = Update(eventUpdateProjection, false).HasNotNullArg("event");
             if (!result) throw new UpdateEntityException();
         }
 

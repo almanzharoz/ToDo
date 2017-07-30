@@ -5,7 +5,7 @@ namespace Expo3.Model.Embed
     public struct Price
     {
         private int _rubles;
-        private int _pennies;
+        private byte _pennies;
 
         public int Rubles
         {
@@ -17,12 +17,12 @@ namespace Expo3.Model.Embed
             }
         }
 
-        public int Pennies
+        public byte Pennies
         {
             get => _pennies;
             set
             {
-                if(value < 0 || value > 99) throw new ArgumentException("Pennies should be in range between 0 and 99");
+                if(value > 99) throw new ArgumentException("Pennies should be in range between 0 and 99");
                 _pennies = value;
             }
         }
