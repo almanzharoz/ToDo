@@ -43,7 +43,7 @@ namespace Core.ElasticSearch
 			return app;
 		}
 
-		public static void UseElasticForTests<TConnection>(this IServiceProvider services, Action<IElasticMapping<TConnection>> mappingFactory)
+		public static IServiceProvider UseElasticForTests<TConnection>(this IServiceProvider services, Action<IElasticMapping<TConnection>> mappingFactory)
 			where TConnection : BaseElasticConnection
 
 		{
@@ -51,25 +51,25 @@ namespace Core.ElasticSearch
 			mappingFactory(mapping);
 			mapping.Drop();
 			mapping.Build(null);
+			return services;
 		}
 
-		public static void UseElastic<TConnection>(this IServiceProvider services, Action<IElasticMapping<TConnection>> mappingFactory)
+		public static IApplicationBuilder UseElastic<TConnection>(this IApplicationBuilder app, Action<IElasticMapping<TConnection>> mappingFactory)
 			where TConnection : BaseElasticConnection
-
 		{
-			var mapping = services.GetService<ElasticMapping<TConnection>>();
+			var mapping = app.ApplicationServices.GetService<ElasticMapping<TConnection>>();
 			mappingFactory(mapping);
 			mapping.Build(null);
+			return app;
 		}
 
-		public static void UseElastic<TConnection, TService>(this IServiceProvider services, Action<IElasticMapping<TConnection>> mappingFactory, Action<TService> initFunc)
+		public static IApplicationBuilder UseElasticProjections<TConnection>(this IApplicationBuilder app, Action<IElasticProjections<TConnection>> projectionsFactory)
 			where TConnection : BaseElasticConnection
-			where TService : BaseService<TConnection>
 
 		{
-			var mapping = services.GetService<ElasticMapping<TConnection>>();
-			mappingFactory(mapping);
-			mapping.Build(initFunc, services.GetService<TService>());
+			var mapping = app.ApplicationServices.GetService<ElasticMapping<TConnection>>();
+			projectionsFactory(mapping);
+			return app;
 		}
 	}
 }

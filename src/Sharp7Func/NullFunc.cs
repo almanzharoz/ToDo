@@ -113,6 +113,13 @@ namespace SharpFuncExt
 			return arg;
 		}
 
+		public static T ThrowIfNull<T, TException>(this T arg) where TException : Exception, new()
+		{
+			if (arg.IsNull())
+				throw new TException();
+			return arg;
+		}
+
 		public static T ThrowIfNull<T, TValue, TException>(this T arg, Expression<Func<T, TValue>> expression, Func<TException> func) where TException : Exception
 		{
 			if (arg.IsNull(expression))

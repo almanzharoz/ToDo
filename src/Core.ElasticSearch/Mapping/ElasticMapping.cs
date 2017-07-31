@@ -33,7 +33,21 @@ namespace Core.ElasticSearch.Mapping
 		string GetTypeName<T>() where T : IProjection;
 	}
 
-	internal class ElasticMapping<TSettings> : IElasticMapping<TSettings> where TSettings : BaseElasticConnection
+	public interface IElasticProjections<TSettings> where TSettings : BaseElasticConnection
+	{
+		IElasticMapping<TSettings> AddStruct<T>() where T : struct;
+
+		IElasticMapping<TSettings> AddProjection<T, TMapping>()
+			where T : BaseEntity, IProjection<TMapping>, new()
+			where TMapping : class, IModel;
+
+		IElasticMapping<TSettings> AddProjection<T, TMapping, TParent>()
+			where T : BaseEntity, IProjection<TMapping>, IWithParent<TParent>, new()
+			where TMapping : class, IModel, IWithParent<TParent>
+			where TParent : BaseEntity, IProjection, new();
+	}
+
+	internal class ElasticMapping<TSettings> : IElasticMapping<TSettings>, IElasticProjections<TSettings> where TSettings : BaseElasticConnection
 	{
 		private readonly ConcurrentDictionary<Type, IMappingItem> _mapping = new ConcurrentDictionary<Type, IMappingItem>();
 		private readonly ConcurrentDictionary<Type, IProjectionItem> _projection = new ConcurrentDictionary<Type, IProjectionItem>();

@@ -13,7 +13,8 @@ namespace Expo3.Model
         [Keyword]
         public string Caption { get; set; }
         public DateTime Created { get; set; }
-        public User User { get; set; }
+        [Keyword]
+        public BaseUserProjection User { get; set; }
         public Price[] Prices { get; set; }
         [Keyword]
         public DateTime StartDateTime { get; set; }

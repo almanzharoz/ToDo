@@ -251,6 +251,19 @@ namespace SharpFuncExt
 			return arg;
 		}
 
+		public static bool ThrowIf<TException>(this bool arg) where TException : Exception, new()
+		{
+			if (arg)
+				throw new TException();
+			return arg;
+		}
+		public static bool ThrowIfNot<TException>(this bool arg) where TException : Exception, new()
+		{
+			if (!arg)
+				throw new TException();
+			return arg;
+		}
+
 		public static T Throw<T, TException>(this T arg, Func<T, TException> func) where TException : Exception
 		{
 			throw func(arg);

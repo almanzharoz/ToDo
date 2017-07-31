@@ -72,6 +72,22 @@ namespace Core.ElasticSearch
 
 		protected bool Update<T>(T entity) where T : BaseEntityWithVersion, IProjection, IUpdateProjection => Update(entity, true);
 
+		protected bool Update<T>(T entity, Func<T, T> setter, bool refresh) where T : BaseEntityWithVersion, IProjection, IUpdateProjection
+			=> Try(
+				c => c.Update(
+						DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, x => x.Version, nameof(entity))), d => d
+							.Index(_mapping.GetIndexName<T>())
+							.Type(_mapping.GetTypeName<T>())
+							.Version(entity.Version)
+							.Doc(setter(entity))
+							.If(refresh, x => x.Refresh(Refresh.True)))
+					.Fluent(r => entity.Version = (int)r.Version),
+				r => r.Result == Result.Updated,
+				RepositoryLoggingEvents.ES_UPDATE,
+				$"Update (Id: {entity?.Id})");
+
+		protected bool Update<T>(T entity, Func<T, T> setter) where T : BaseEntityWithVersion, IProjection, IUpdateProjection => Update(entity, setter, true);
+
 		protected Task<bool> UpdateAsync<T>(T entity, bool refresh = true)
 			where T : BaseEntityWithVersion, IProjection, IUpdateProjection, IWithVersion
 			=> TryAsync(

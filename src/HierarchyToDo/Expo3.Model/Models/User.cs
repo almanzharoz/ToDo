@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace Expo3.Model
 {
-	public class BaseUserProjection : BaseEntity, IProjection, IGetProjection
+	public class BaseUserProjection : BaseEntity, IProjection<User>, IGetProjection
 	{
 		[JsonProperty]
 		public string Nickname { get; }
@@ -26,4 +26,19 @@ namespace Expo3.Model
         [Keyword]
         public EUserRole[] Roles { get; set; }
     }
+
+	public class UserName
+	{
+		public string Id { get; }
+
+		public UserName(string id)
+		{
+			Id = id;
+		}
+
+		public UserName(BaseUserProjection user)
+		{
+			Id = user.Id;
+		}
+	}
 }
