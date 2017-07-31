@@ -137,6 +137,7 @@ namespace SharpFuncExt
 		public static bool IsNull<T>(this T arg) => EqualityComparer<T>.Default.Equals(arg, default(T));
 		public static bool NotNull<T>(this T arg) => !EqualityComparer<T>.Default.Equals(arg, default(T));
 
+		// TODO: кешировать Expression
 		public static bool IsNull<T, TValue>(this T arg, Expression<Func<T, TValue>> expression)
 			=> EqualityComparer<T>.Default.Equals(arg, default(T))
 				|| EqualityComparer<TValue>.Default.Equals(expression.Compile()(arg), default(TValue)); // TODO: Добавить кеширование
