@@ -17,6 +17,7 @@ namespace Expo3.AdminApp
 
 		public static IApplicationBuilder UseExpo3AdminApp(this IApplicationBuilder app)
 			=> app.UseExpo3Projections(p => p
-				.AddProjection<EventProjection, Event>());
+				.AddProjection<EventProjection, Event>()
+				.AddProjection<EventRemoveProjection, Event>());
 	}
 }

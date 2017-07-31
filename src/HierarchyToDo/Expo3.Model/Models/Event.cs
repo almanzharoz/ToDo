@@ -6,25 +6,21 @@ using Nest;
 
 namespace Expo3.Model
 {
-    public class Event : BaseEntityWithVersion, IModel, IProjection, IInsertProjection, IWithName, IWithCreated, IWithUser
+	/// <summary>
+	/// Модель мероприятия для фильтрации и отображения ячеек
+	/// </summary>
+    public class Event : BaseEntityWithVersion, IModel, IProjection, IWithName
     {
-        [Keyword]
         public string Name { get; set; }
-        [Keyword]
         public string Caption { get; set; }
-        public DateTime Created { get; set; }
         [Keyword]
-        public BaseUserProjection User { get; set; }
-        public Price[] Prices { get; set; }
-        [Keyword]
+        public User Owner { get; set; }
+		[Keyword(Index = false)]
+	    public string Cover { get; set; }
         public DateTime StartDateTime { get; set; }
-        [Keyword]
         public DateTime FinishDateTime { get; set; }
-        [Keyword]
-        public Address Address { get; set; }
-        public EventPage EventPage { get; set; }
+		public Address Address { get; set; }
         public EEventType Type { get; set; }
-        public string Email { get; set; }
-        public Visitor[] Visitors { get; set; }
+        public TicketPrice[] Prices { get; set; }
     }
 }

@@ -142,6 +142,18 @@ namespace Core.ElasticSearch
 				RepositoryLoggingEvents.ES_REMOVE,
 				$"Remove (Id: {entity.Id})");
 
+		protected bool Remove<T>(T entity, int version)
+			where T : class, IWithVersion, IProjection, IRemoveProjection
+			=> Try(
+				c => c.Delete(DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, nameof(entity))), x => x
+					.Index(_mapping.GetIndexName<T>())
+					.Type(_mapping.GetTypeName<T>())
+					.Version(version.HasNotNullArg("version"))
+					.Refresh(Refresh.True)),
+				r => r.Found,
+				RepositoryLoggingEvents.ES_REMOVE,
+				$"Remove (Id: {entity.Id})");
+
 		protected Task<bool> RemoveAsync<T>(T entity) where T : class, IProjection, IRemoveProjection, IWithVersion
 			=> TryAsync(
 				c => c.DeleteAsync(DocumentPath<T>.Id(entity.HasNotNullArg(x => x.Id, nameof(entity))), x => x

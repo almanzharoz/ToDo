@@ -18,7 +18,7 @@ namespace Expo3.Model
             User = user;
         }
 
-        protected QueryContainer UserQuery<T>(QueryContainer query) where T : class, IWithUser, ISearchProjection
-            => Query<T>.Term(p => p.User, User.HasNotNullArg("user").Id) && query;
+        protected QueryContainer UserQuery<T>(QueryContainer query) where T : class, IWithOwner, ISearchProjection
+            => Query<T>.Term(p => p.Owner, User.HasNotNullArg(x => x.Id, "user").Id) && query;
     }
 }
