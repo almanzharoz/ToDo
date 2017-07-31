@@ -8,9 +8,9 @@ namespace Expo3.Model
 	public class BaseUserProjection : BaseEntity, IProjection<User>, IGetProjection
 	{
 		[JsonProperty]
-		public string Nickname { get; }
+		public string Nickname { get; private set; }
 		[JsonProperty]
-		public EUserRole[] Roles { get; }
+		public EUserRole[] Roles { get; private set; }
 	}
 
 	public class User : BaseEntityWithVersion, IModel

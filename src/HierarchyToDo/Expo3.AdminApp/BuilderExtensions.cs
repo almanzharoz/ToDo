@@ -12,8 +12,8 @@ namespace Expo3.AdminApp
 	{
 		public static IServiceCollection AddExpo3AdminApp(this IServiceCollection services, Uri connectionString)
 			=> services
-			.AddService<EventService, Expo3ElasticConnection>()
-			.AddService<UsersService, Expo3ElasticConnection>();
+				.AddService<EventService, Expo3ElasticConnection>()
+				.AddService<UsersService, Expo3ElasticConnection>();
 
 		public static IApplicationBuilder UseExpo3AdminApp(this IApplicationBuilder app)
 			=> app.UseExpo3Projections(p => p

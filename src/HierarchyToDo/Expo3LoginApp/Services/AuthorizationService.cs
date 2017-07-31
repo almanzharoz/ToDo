@@ -34,13 +34,12 @@ namespace Expo3.LoginApp.Services
 			if (FilterCount<UserProjection>(q => q.Term(x => x.Email, email)) > 0)
 				throw new EntityAlreadyExistsException();
 
-			var user = new RegisterUserProjection
+			return Insert(new RegisterUserProjection
 			{
 				Email = email,
 				Nickname = nickname,
 				Password = GetHash(password, GenerateSalt())
-			};
-			return Insert(user);
+			});
 		}
 
 		/// <summary>

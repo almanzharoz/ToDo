@@ -9,7 +9,7 @@ namespace Expo3.Model
 	/// <summary>
 	/// Модель мероприятия для фильтрации и отображения ячеек
 	/// </summary>
-    public class Event : BaseEntityWithVersion, IModel, IProjection, IWithName
+    public abstract class Event : BaseEntityWithVersion, IModel, IProjection, IWithName
     {
         public string Name { get; set; }
         public string Caption { get; set; }
