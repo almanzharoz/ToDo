@@ -2,10 +2,10 @@
 
 namespace Expo3.Model.Embed
 {
-    public enum EUserRole
+    public enum EUserRole : byte
     {
         [EnumMember(Value="admin")]
-        Admin,
+        Admin = 1,
         [EnumMember(Value = "organizer")]
         Organizer,
         [EnumMember(Value = "user")]
