@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Core.ElasticSearch;
 using Expo3.AdminApp.Projections;
 using Expo3.Model;
@@ -15,7 +16,6 @@ namespace Expo3.AdminApp.Services
             ElasticScopeFactory<ElasticConnection> factory, UserName user) : base(loggerFactory, settings, factory,
             user)
         {
-            
         }
 
         /// <exception cref="AddEntityException"></exception>
@@ -80,5 +80,11 @@ namespace Expo3.AdminApp.Services
         {
             UpdateEvent(Get<EventProjection>(id), name, caption, prices, startDateTime, finishDateTime, address, eventPage, type, email);
         }
+
+        public IReadOnlyCollection<EventProjection> SearchByName(string query) => 
+            Search<Event, EventProjection>(q => q
+                .Match(m => m
+                    .Field(x => x.Name)
+                    .Query(query)));
     }
 }

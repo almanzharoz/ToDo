@@ -6,6 +6,7 @@ using Core.ElasticSearch;
 using Expo3.AdminApp.Projections;
 using Expo3.Model;
 using Expo3.Model.Embed;
+using Expo3.Model.Exceptions;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.Extensions.Logging;
 
@@ -27,9 +28,11 @@ namespace Expo3.AdminApp.Services
             return hash == user.Password ? user : null;
         }
 
+        /// <exception cref="EntityAlreadyExistsException"></exception>
         public User Register(string email, string nickname, string password)
         {
-            //TODO: проверка на существующего пользователя
+            if(Filter<User, UserProjection>(q => q.Term(x => x.Email, email)).FirstOrDefault() != null) throw new EntityAlreadyExistsException();
+
             var user = new User
             {
                 Email = email,
@@ -42,7 +45,7 @@ namespace Expo3.AdminApp.Services
         }
 
         /// <summary>
-        /// Return base64 of hash password with a base64Salt
+        /// Return base64 of hash password with a salt
         /// </summary>
         /// <param name="password">Password as a string</param>
         /// <param name="salt">Salt as a byte array</param>
