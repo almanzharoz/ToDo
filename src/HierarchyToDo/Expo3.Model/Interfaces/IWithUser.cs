@@ -2,6 +2,6 @@
 {
 	public interface IWithUser
 	{
-		User User { get; set; }
+		BaseUserProjection User { get; }
 	}
 }

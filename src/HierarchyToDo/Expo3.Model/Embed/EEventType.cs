@@ -2,13 +2,11 @@
 
 namespace Expo3.Model.Embed
 {
-    public enum EEventType
+    public enum EEventType : byte
     {
-        [EnumMember(Value = "concert")]
-        Concert,
-        [EnumMember(Value = "exhibition")]
-        Exhibition,
-        [EnumMember(Value = "excursion")]
+		None=0,
+        Concert = 1,
+        Exhibition = 2,
         Excursion
     }
 }
