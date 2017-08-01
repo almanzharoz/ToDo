@@ -4,7 +4,7 @@ using Expo3.Model.Embed;
 using Expo3.Model.Interfaces;
 using Nest;
 
-namespace Expo3.Model
+namespace Expo3.Model.Models
 {
 	/// <summary>
 	/// Модель мероприятия для фильтрации и отображения ячеек
@@ -22,5 +22,6 @@ namespace Expo3.Model
 		public Address Address { get; set; }
         public EEventType Type { get; set; }
         public TicketPrice[] Prices { get; set; }
+		public Visitor[] Visitors { get; set; }
     }
 }

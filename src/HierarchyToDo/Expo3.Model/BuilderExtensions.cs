@@ -4,6 +4,7 @@ using System.Text;
 using Core.ElasticSearch;
 using Core.ElasticSearch.Mapping;
 using Expo3.Model.Embed;
+using Expo3.Model.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 

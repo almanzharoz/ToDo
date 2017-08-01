@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <Folder Include="Projections\Interfaces\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,6 +2,7 @@
 using Core.ElasticSearch.Domain;
 using Expo3.Model.Embed;
 using Expo3.Model.Interfaces;
+using Expo3.Model.Models;
 using Nest;
 
 namespace Expo3.Model
