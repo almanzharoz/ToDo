@@ -29,7 +29,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Expo3.AdminApp", "Expo3.Adm
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Expo3.LoginApp", "Expo3LoginApp\Expo3.LoginApp.csproj", "{9A80683A-2612-415B-82DC-B92E95990B4D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Expo3.LoginApp.Tests", "Expo3.LoginApp.Tests\Expo3.LoginApp.Tests.csproj", "{90B02F23-D9C5-43D0-AF8A-9DDC22CE1B5B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Expo3.LoginApp.Tests", "Expo3.LoginApp.Tests\Expo3.LoginApp.Tests.csproj", "{90B02F23-D9C5-43D0-AF8A-9DDC22CE1B5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Expo3.AdminApp.Tests", "Expo3.AdminApp.Tests\Expo3.AdminApp.Tests.csproj", "{28BD7F3F-D40E-4C09-8DCF-059D38209DBE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -77,6 +79,10 @@ Global
 		{90B02F23-D9C5-43D0-AF8A-9DDC22CE1B5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{90B02F23-D9C5-43D0-AF8A-9DDC22CE1B5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{90B02F23-D9C5-43D0-AF8A-9DDC22CE1B5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28BD7F3F-D40E-4C09-8DCF-059D38209DBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28BD7F3F-D40E-4C09-8DCF-059D38209DBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28BD7F3F-D40E-4C09-8DCF-059D38209DBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28BD7F3F-D40E-4C09-8DCF-059D38209DBE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -92,5 +98,6 @@ Global
 		{B3EF91FE-514A-447F-AED9-D8D2E150F3AF} = {30EC2731-1DD2-4A78-A659-6517C1F6E18F}
 		{9A80683A-2612-415B-82DC-B92E95990B4D} = {30EC2731-1DD2-4A78-A659-6517C1F6E18F}
 		{90B02F23-D9C5-43D0-AF8A-9DDC22CE1B5B} = {63DF5459-E264-4D01-90AA-AC58E4CABBCA}
+		{28BD7F3F-D40E-4C09-8DCF-059D38209DBE} = {63DF5459-E264-4D01-90AA-AC58E4CABBCA}
 	EndGlobalSection
 EndGlobal

@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace Expo3.LoginApp.Projections
 {
-    internal class UserProjection : BaseEntity, IProjection<User>, IGetProjection, ISearchProjection
+    public class UserProjection : BaseEntity, IProjection<User>, IGetProjection, ISearchProjection
     {
         [JsonProperty]
         public string Email { get; private set; }
@@ -19,7 +19,7 @@ namespace Expo3.LoginApp.Projections
         public EUserRole[] Roles { get; private set; }
     }
 
-	internal class RegisterUserProjection : BaseEntity, IProjection<User>, IInsertProjection
+	public class RegisterUserProjection : BaseEntity, IProjection<User>, IInsertProjection
 	{
 		public string Email { get; set; }
 		public string Nickname { get; set; }

@@ -11,7 +11,7 @@ using SharpFuncExt;
 
 namespace Expo3.AdminApp.Services
 {
-	public class EventService : BaseService
+	public class EventService : BaseExpo3Service
 	{
 		public EventService(ILoggerFactory loggerFactory, Expo3ElasticConnection settings,
 			ElasticScopeFactory<Expo3ElasticConnection> factory, UserName user) : base(loggerFactory, settings, factory,
