@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core.ElasticSearch\Core.ElasticSearch.csproj" />
+    <ProjectReference Include="..\HierarchyToDo\Core.ElasticQueryBuilder\Core.ElasticQueryBuilder.csproj" />
     <ProjectReference Include="..\HierarchyToDo\Expo3.Model\Expo3.Model.csproj" />
     <ProjectReference Include="..\Sharp7Func\Sharp7Func.csproj" />
   </ItemGroup>

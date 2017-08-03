@@ -107,11 +107,20 @@ namespace Core.Tests
 			where T : class, IModel
             => base.FilterPager<T, TProjection>(query, page, take, sort, load);
 
-        public new Pager<TProjection> SearchPager<T, TProjection>(
+	    public new Pager<TProjection> FilterPager<T, TProjection>(string query, int page, int take,
+		    Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, bool load = true)
+		    where TProjection : class, IProjection<T>, ISearchProjection
+		    where T : class, IModel
+		    => base.FilterPager<T, TProjection>(query, page, take, sort, load);
+
+		public new Pager<TProjection> SearchPager<T, TProjection>(
             Func<QueryContainerDescriptor<T>, QueryContainer> query, int page, int take,
             Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, bool load = true)
             where TProjection : class, IProjection<T>, ISearchProjection
 			where T : class, IModel
             => base.SearchPager<T, TProjection>(query, page, take, sort, load);
+
+	    public IElasticLowLevelClient GetClient()
+		    => base._client.LowLevel;
     }
 }

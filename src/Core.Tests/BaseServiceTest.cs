@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Core.ElasticSearch;
@@ -9,6 +11,7 @@ using Core.Tests.Projections;
 using Elasticsearch.Net;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Nest;
+using PlainElastic.Net.Queries;
 using SharpFuncExt;
 
 namespace Core.Tests
@@ -514,9 +517,14 @@ namespace Core.Tests
             var category2 = new Category() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
             _repository.Insert(category2, true);
 
-			var childCategories = _repository.FilterPager<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 1, 2, sort => sort.Descending(c => c.CreatedOnUtc), true);
+			//var childCategories = _repository.FilterPager<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 1, 2, sort => sort.Descending(c => c.CreatedOnUtc), true);
+	        var sw = new Stopwatch();
+	        sw.Start();
+	        var childCategories = _repository.FilterPager<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 1, 2, sort => sort.Descending(c => c.CreatedOnUtc), true);
+	        sw.Stop();
+	        Console.WriteLine(sw.ElapsedMilliseconds);
 
-            Assert.AreEqual(childCategories.Total, 3);
+			Assert.AreEqual(childCategories.Total, 3);
             Assert.AreEqual(childCategories.Limit, 2);
             Assert.AreEqual(childCategories.Page, 1);
             Assert.AreEqual(childCategories.Count, 2);
@@ -594,5 +602,48 @@ namespace Core.Tests
 	    {
 			// Есть уже анализатор, но лучше покурить это: https://www.red-gate.com/simple-talk/dotnet/net-development/how-to-build-a-search-page-with-elasticsearch-and-net/
 		}
+
+	    [TestMethod]
+	    public void Test()
+	    {
+		    var parentCategory = new Category() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
+		    _repository.Insert(parentCategory, true);
+		    var childCategory1 = new Category() { Name = "Child Category1", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
+		    _repository.Insert(childCategory1, true);
+		    var childCategory2 = new Category() { Name = "Child Category2", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
+		    _repository.Insert(childCategory2, true);
+		    var childCategory3 = new Category() { Name = "Child Category3", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
+		    _repository.Insert(childCategory3, true);
+		    var category1 = new Category() { Name = "Category1", CreatedOnUtc = DateTime.UtcNow };
+		    _repository.Insert(category1, true);
+		    var category2 = new Category() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
+		    _repository.Insert(category2, true);
+
+			var sw = new Stopwatch();
+		    sw.Restart();
+			var q = new QueryBuilder<Category>()
+				.Query(f => f.Bool(b => b.Must(m => m.Match(a => a.Field(p => p.Top).Query(parentCategory.Id)))));
+			var query = q.Build().Replace("\"must\"", "\"filter\"");
+		    //query = query.Substring(query.IndexOf("{", 1));
+		    //query = query.Substring(0, query.Length - 1);
+
+		    //var childCategories = _repository.FilterPager<Category, Category>(query, 1, 2, sort => sort.Descending(c => c.CreatedOnUtc), true);
+		    sw.Stop();
+			Console.WriteLine(query);
+		    Console.WriteLine(sw.ElapsedMilliseconds);
+
+			//Assert.AreEqual(childCategories.Total, 3);
+		 //   Assert.AreEqual(childCategories.Limit, 2);
+		 //   Assert.AreEqual(childCategories.Page, 1);
+		 //   Assert.AreEqual(childCategories.Count, 2);
+		 //   Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category3")));
+		 //   Assert.IsNotNull(childCategories.FirstOrDefault().Top);
+		 //   Assert.IsNotNull(childCategories.FirstOrDefault().Top.Name);
+
+		    var client = _repository.GetClient();
+		    sw.Restart();
+		    var r = client.Search<SearchResponse<Category>>(new PostData<object>(query));
+		    sw.Stop();
+	    }
 	}
 }
