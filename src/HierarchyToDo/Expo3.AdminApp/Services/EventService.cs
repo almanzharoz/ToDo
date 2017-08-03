@@ -56,7 +56,6 @@ namespace Expo3.AdminApp.Services
 					return x;
 				}, false)
 				.ThrowIfNot<UpdateEntityException>();
-		// TODO: удалил UpdateEvent(event...), т.к. нарушение безопасности доступа к данным происходит - неясно откуда взялась обновляемая проекция
 
 		public IReadOnlyCollection<EventProjection> SearchByName(string query)
 			=> Search<Event, EventProjection>(q => q

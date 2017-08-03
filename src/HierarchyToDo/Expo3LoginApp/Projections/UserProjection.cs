@@ -1,6 +1,7 @@
 ﻿using Core.ElasticSearch.Domain;
 using Expo3.Model;
 using Expo3.Model.Embed;
+using Expo3.Model.Models;
 using Newtonsoft.Json;
 
 namespace Expo3.LoginApp.Projections

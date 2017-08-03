@@ -2,6 +2,7 @@
 using Core.ElasticSearch.Domain;
 using Expo3.Model;
 using Expo3.Model.Interfaces;
+using Expo3.Model.Models;
 using Microsoft.Extensions.Logging;
 using Nest;
 using SharpFuncExt;

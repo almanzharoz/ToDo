@@ -3,7 +3,8 @@ using Expo3.Model.Embed;
 using Nest;
 using Newtonsoft.Json;
 
-namespace Expo3.Model
+namespace Expo3.Model.Models
+
 {
 	public class BaseUserProjection : BaseEntity, IProjection<User>, IGetProjection
 	{

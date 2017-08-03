@@ -4,7 +4,6 @@ using Expo3.AdminApp.Projections;
 using Expo3.AdminApp.Services;
 using Expo3.Model;
 using Expo3.Model.Models;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Expo3.AdminApp

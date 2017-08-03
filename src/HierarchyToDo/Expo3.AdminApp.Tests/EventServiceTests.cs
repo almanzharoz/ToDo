@@ -21,19 +21,16 @@ namespace Expo3.AdminApp.Tests
 
 		[TestInitialize]
 		public void Setup()
-	    {
+		{
 			_serviceProvider = new ServiceCollection()
-			    .AddElastic(new Expo3ElasticConnection(new Uri("http://localhost:9200/")))
-			    .AddService<EventService, Expo3ElasticConnection>()
-			    .AddSingleton<ILoggerFactory, LoggerFactory>()
-			    .BuildServiceProvider();
+				.AddExpo3Model(new Uri("http://localhost:9200/"))
+				.AddExpo3AdminApp(new Uri("http://localhost:9200/"))
+				.AddLogging()
+				.BuildServiceProvider();
 
-		    _serviceProvider.UseElasticForTests<Expo3ElasticConnection>(map => map
-			    .AddMapping<User>(x => x.UserIndexName)
-			    .AddMapping<Event>(x => x.EventIndexName)
-
-			    .AddProjection<EventProjection, Event>()
-				.AddProjection<EventRemoveProjection, Event>());
+			_serviceProvider
+				.UseExpo3Model()
+				.UseExpo3AdminApp();
 		}
 
         [TestMethod]
