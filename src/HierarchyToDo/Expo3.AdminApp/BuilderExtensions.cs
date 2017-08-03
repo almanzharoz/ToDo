@@ -18,9 +18,9 @@ namespace Expo3.AdminApp
 				.AddService<UsersService, Expo3ElasticConnection>();
 		}
 
-		public static IApplicationBuilder UseExpo3AdminApp(this IApplicationBuilder app)
+		public static IServiceProvider UseExpo3AdminApp(this IServiceProvider services)
 		{
-			return app.UseExpo3Projections(p => p
+			return services.UseExpo3Projections(p => p
 				.AddProjection<EventProjection, Event>()
 				.AddProjection<EventRemoveProjection, Event>());
 		}

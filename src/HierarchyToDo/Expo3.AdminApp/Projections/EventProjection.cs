@@ -4,6 +4,7 @@ using Expo3.Model;
 using Expo3.Model.Embed;
 using Expo3.Model.Interfaces;
 using Expo3.Model.Models;
+using Nest;
 using Newtonsoft.Json;
 
 namespace Expo3.AdminApp.Projections
@@ -27,6 +28,7 @@ namespace Expo3.AdminApp.Projections
 		public EEventType Type { get; set; }
 		public string Name { get; set; }
 
+		[Keyword]
 		[JsonProperty]
 		public BaseUserProjection Owner { get; private set; }
 	}

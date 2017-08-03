@@ -20,14 +20,11 @@ namespace Expo3.AdminApp.Services
 		}
 
 		public EventProjection GetEvent(string id)
-		{
-			return Get<EventProjection>(id.HasNotNullArg("event id"), f => UserQuery<EventProjection>(null));
-		}
+			=> Get<EventProjection>(id.HasNotNullArg("event id"), f => UserQuery<EventProjection>(null));
 
 		/// <exception cref="AddEntityException"></exception>
 		public void AddEvent(string name, string caption, DateTime start, DateTime finish, Address address, EEventType type)
-		{
-			Insert(new EventProjection(Get<BaseUserProjection>(User.Id).HasNotNullArg("owner"))
+			=> Insert(new EventProjection(Get<BaseUserProjection>(User.Id).HasNotNullArg("owner"))
 				{
 					Name = name,
 					Caption = caption,
@@ -37,22 +34,18 @@ namespace Expo3.AdminApp.Services
 					Type = type
 				}, false)
 				.ThrowIfNot<AddEntityException>();
-		}
 
 		///<exception cref="RemoveEntityException"></exception>
 		public void RemoveEvent(string id, int version)
-		{
-			Remove(
+			=> Remove(
 					Get<EventRemoveProjection>(id.HasNotNullArg("event id"), f => UserQuery<EventProjection>(null))
 						.HasNotNullArg("event"), version)
 				.ThrowIfNot<RemoveEntityException>();
-		}
 
 		///<exception cref="UpdateEntityException"></exception>
 		public void UpdateEvent(string id, string name, string caption,
 			DateTime startDateTime, DateTime finishDateTime, Address address, EEventType type)
-		{
-			Update(GetEvent(id).HasNotNullArg("event"), x =>
+			=> Update(GetEvent(id).HasNotNullArg("event"), x =>
 				{
 					x.Name = name;
 					x.Caption = caption;
@@ -63,15 +56,12 @@ namespace Expo3.AdminApp.Services
 					return x;
 				}, false)
 				.ThrowIfNot<UpdateEntityException>();
-		}
 		// TODO: удалил UpdateEvent(event...), т.к. нарушение безопасности доступа к данным происходит - неясно откуда взялась обновляемая проекция
 
 		public IReadOnlyCollection<EventProjection> SearchByName(string query)
-		{
-			return Search<Event, EventProjection>(q => q
+			=> Search<Event, EventProjection>(q => q
 				.Match(m => m
 					.Field(x => x.Name)
 					.Query(query)));
-		}
 	}
 }

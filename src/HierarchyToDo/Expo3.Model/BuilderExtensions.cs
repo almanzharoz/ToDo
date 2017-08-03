@@ -15,8 +15,8 @@ namespace Expo3.Model
 	    public static IServiceCollection AddExpo3Model(this IServiceCollection services, Uri connectionString)
 			=> services.AddElastic(new Expo3ElasticConnection(connectionString));
 
-	    public static IApplicationBuilder UseExpo3Model(this IApplicationBuilder app)
-		    => app.UseElastic<Expo3ElasticConnection>(
+	    public static IServiceProvider UseExpo3Model(this IServiceProvider services)
+		    => services.UseElastic<Expo3ElasticConnection>(
 			    m => m
 				    // маппинг
 				    .AddMapping<User>(x => x.UserIndexName)
@@ -30,8 +30,8 @@ namespace Expo3.Model
 				    // проекции
 				    .AddProjection<BaseUserProjection, User>());
 
-	    public static IApplicationBuilder UseExpo3Projections(this IApplicationBuilder app,
+	    public static IServiceProvider UseExpo3Projections(this IServiceProvider services,
 		    Action<IElasticProjections<Expo3ElasticConnection>> projectionsFactory)
-		    => app.UseElasticProjections(projectionsFactory);
+		    => services.UseElasticProjections(projectionsFactory);
     }
 }

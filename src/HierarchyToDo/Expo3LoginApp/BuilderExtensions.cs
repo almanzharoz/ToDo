@@ -10,12 +10,12 @@ namespace Expo3.LoginApp
 {
     public static class BuilderExtensions
 	{
-		public static IServiceCollection AddExpo3LoginApp(this IServiceCollection services, Uri connectionString)
+		public static IServiceCollection AddExpo3LoginApp(this IServiceCollection services)
 			=> services
 				.AddService<AuthorizationService, Expo3ElasticConnection>();
 
-		public static IApplicationBuilder UseExpo3LoginApp(this IApplicationBuilder app)
-			=> app.UseExpo3Projections(p => p
+		public static IServiceProvider UseExpo3LoginApp(this IServiceProvider services)
+			=> services.UseExpo3Projections(p => p
 				.AddProjection<UserProjection, User>()
 				.AddProjection<RegisterUserProjection, User>());
 	}

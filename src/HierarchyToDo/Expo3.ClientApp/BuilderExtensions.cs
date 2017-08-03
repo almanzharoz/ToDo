@@ -17,11 +17,12 @@ namespace Expo3.ClientApp
 				.AddService<EventService, Expo3ElasticConnection>();
 		}
 
-		public static IApplicationBuilder UseExpo3ClientApp(this IApplicationBuilder app)
+		public static IServiceProvider UseExpo3ClientApp(this IServiceProvider services)
 		{
-			return app.UseExpo3Projections(x => x
+			return services.UseExpo3Projections(x => x
 				.AddProjection<EventProjection, Event>()
 				.AddProjection<EventProjectionWithVisitors, Event>()
 				.AddProjection<EventSearchProjection, Event>());
 		}
+	}
 }

@@ -24,8 +24,8 @@ namespace ToDo.Dal
 		    return services;
 	    }
 
-	    public static IApplicationBuilder UseToDo(this IApplicationBuilder app) =>
-		    app.UseElastic<ElasticConnection, AdminService>(
+	    public static IServiceProvider UseToDo(this IServiceProvider services) =>
+		    services.UseElastic<ElasticConnection, AdminService>(
 			    m => m
 				    // маппинг
 				    .AddMapping<User>(x => x.IndexName)

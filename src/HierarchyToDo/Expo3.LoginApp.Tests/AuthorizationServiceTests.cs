@@ -6,6 +6,7 @@ using Expo3.Model;
 using Expo3.Model.Embed;
 using Expo3.Model.Exceptions;
 using Expo3.Model.Models;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -21,20 +22,15 @@ namespace Expo3.LoginApp.Tests
         public void Setup()
         {
 	        var serviceProvider = new ServiceCollection()
-		        .AddElastic(new Expo3ElasticConnection(new Uri("http://localhost:9200/")))
-					.AddService<AuthorizationService, Expo3ElasticConnection>()
-					.AddSingleton<ILoggerFactory, LoggerFactory>()
-					.AddSingleton(new UserName("1"))
+				.AddExpo3Model(new Uri("http://localhost:9200/"))
+		        .AddExpo3LoginApp()
+		        .AddSingleton(new UserName("1"))
+				.AddLogging()
 		        .BuildServiceProvider();
 
-	        serviceProvider.UseElasticForTests<Expo3ElasticConnection>(map => map
-		        .AddMapping<User>(x => x.UserIndexName)
-		        .AddMapping<Event>(x => x.EventIndexName)
-
-		        .AddProjection<LoginUserProjection, User>()
-		        .AddProjection<RegisterUserProjection, User>()
-		        .AddProjection<UserProjection, User>()
-				.AddProjection<BaseUserProjection, User>());
+	        serviceProvider
+				.UseExpo3Model()
+		        .UseExpo3LoginApp();
 
 	        _service = serviceProvider.GetService<AuthorizationService>();
         }

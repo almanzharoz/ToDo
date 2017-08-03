@@ -97,7 +97,7 @@ namespace ToDo.WebApp
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-	        app.UseToDo();
+	        app.ApplicationServices.UseToDo();
         }
     }
 }
