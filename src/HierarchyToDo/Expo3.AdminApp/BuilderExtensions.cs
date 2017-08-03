@@ -21,7 +21,11 @@ namespace Expo3.AdminApp
 		{
 			return services.UseExpo3Projections(p => p
 				.AddProjection<EventProjection, Event>()
-				.AddProjection<EventRemoveProjection, Event>());
+				.AddProjection<EventRemoveProjection, Event>()
+				
+				.AddProjection<UserInsertProjection, User>()
+				.AddProjection<UserUpdateProjection, User>()
+				.AddProjection<UserSearchProjection, User>());
 		}
 	}
 }

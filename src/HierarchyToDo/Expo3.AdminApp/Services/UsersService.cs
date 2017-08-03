@@ -1,4 +1,5 @@
-﻿using Core.ElasticSearch;
+﻿using System.Collections.Generic;
+using Core.ElasticSearch;
 using Expo3.AdminApp.Projections;
 using Expo3.Model;
 using Expo3.Model.Embed;
@@ -10,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Expo3.AdminApp.Services
 {
-	internal class UsersService : BaseExpo3Service
+	public class UsersService : BaseExpo3Service
 	{
 		public UsersService(ILoggerFactory loggerFactory, Expo3ElasticConnection settings,
 			ElasticScopeFactory<Expo3ElasticConnection> factory, UserName user) : base(loggerFactory, settings, factory,
@@ -48,5 +49,11 @@ namespace Expo3.AdminApp.Services
 
 		public UserUpdateProjection GetUser(string id)
 			=> Get<UserUpdateProjection>(id);
+
+		public IReadOnlyCollection<UserSearchProjection> SearchUserByName(string query)
+			=> Search<User, UserSearchProjection>(q => q
+				.Match(m => m
+					.Field(x => x.Email)
+					.Query(query)));
 	}
 }

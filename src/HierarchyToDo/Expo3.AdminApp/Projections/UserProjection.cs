@@ -1,6 +1,7 @@
 ﻿using Core.ElasticSearch.Domain;
 using Expo3.Model.Embed;
 using Expo3.Model.Models;
+using Nest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -23,5 +24,15 @@ namespace Expo3.AdminApp.Projections
 		public EUserRole[] Roles { get; set; }
 		[JsonProperty]
 		public string Salt { get; private set; }
+	}
+
+	public class UserSearchProjection : BaseEntityWithVersion, IProjection<User>, IGetProjection, ISearchProjection
+	{
+		[JsonProperty]
+		public string Email { get; private set; }
+		[JsonProperty]
+		public string Nickname { get; private set; }
+		[JsonProperty]
+		public EUserRole[] Roles { get; private set; }
 	}
 }
