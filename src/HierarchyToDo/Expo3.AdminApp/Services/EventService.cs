@@ -32,7 +32,7 @@ namespace Expo3.AdminApp.Services
 					FinishDateTime = finish,
 					Address = address,
 					Type = type
-				}, false)
+				}, true)
 				.ThrowIfNot<AddEntityException>();
 
 		///<exception cref="RemoveEntityException"></exception>
@@ -54,7 +54,7 @@ namespace Expo3.AdminApp.Services
 					x.Address = address;
 					x.Type = type;
 					return x;
-				}, false)
+				}, true)
 				.ThrowIfNot<UpdateEntityException>();
 		// TODO: удалил UpdateEvent(event...), т.к. нарушение безопасности доступа к данным происходит - неясно откуда взялась обновляемая проекция
 

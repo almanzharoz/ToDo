@@ -54,11 +54,13 @@ namespace Core.ElasticSearch
 			return services;
 		}
 
-		public static IServiceProvider UseElastic<TConnection>(this IServiceProvider services, Action<IElasticMapping<TConnection>> mappingFactory)
+		public static IServiceProvider UseElastic<TConnection>(this IServiceProvider services, Action<IElasticMapping<TConnection>> mappingFactory, bool forTest)
 			where TConnection : BaseElasticConnection
 		{
 			var mapping = services.GetService<ElasticMapping<TConnection>>();
 			mappingFactory(mapping);
+			if (forTest)
+				mapping.Drop();
 			mapping.Build(null);
 			return services;
 		}

@@ -10,7 +10,7 @@ namespace Expo3.Model
 {
 	public abstract class BaseExpo3Service : BaseService<Expo3ElasticConnection>
 	{
-		protected readonly UserName User;
+		protected UserName User;
 
 		protected BaseExpo3Service(ILoggerFactory loggerFactory, Expo3ElasticConnection settings,
 			ElasticScopeFactory<Expo3ElasticConnection> factory, UserName user) : base(loggerFactory, settings, factory)
@@ -20,5 +20,8 @@ namespace Expo3.Model
 
 		protected QueryContainer UserQuery<T>(QueryContainer query) where T : class, IWithOwner, ISearchProjection
 			=> Query<T>.Term(p => p.Owner, User.HasNotNullArg(x => x.Id, "user").Id) && query;
+
+		public UserName UseUserName(string userId)
+			=> User = new UserName(userId);
 	}
 }

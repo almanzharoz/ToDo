@@ -15,7 +15,7 @@ namespace Expo3.Model
 	    public static IServiceCollection AddExpo3Model(this IServiceCollection services, Uri connectionString)
 			=> services.AddElastic(new Expo3ElasticConnection(connectionString));
 
-	    public static IServiceProvider UseExpo3Model(this IServiceProvider services)
+	    public static IServiceProvider UseExpo3Model(this IServiceProvider services, bool forTest)
 		    => services.UseElastic<Expo3ElasticConnection>(
 			    m => m
 				    // маппинг
@@ -28,7 +28,7 @@ namespace Expo3.Model
 				    .AddStruct<TicketPrice>()
 				    .AddStruct<Address>()
 				    // проекции
-				    .AddProjection<BaseUserProjection, User>());
+				    .AddProjection<BaseUserProjection, User>(), forTest);
 
 	    public static IServiceProvider UseExpo3Projections(this IServiceProvider services,
 		    Action<IElasticProjections<Expo3ElasticConnection>> projectionsFactory)

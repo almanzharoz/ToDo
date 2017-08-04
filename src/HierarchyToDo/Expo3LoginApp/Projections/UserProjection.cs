@@ -38,7 +38,8 @@ namespace Expo3.LoginApp.Projections
 		public LoginUserProjection(){} // for serializer
 
 		internal LoginUserProjection(UserProjection user) // for auth service (without RequestContainer)
-		{
+		{			
+			SetId(user.Id);
 			Nickname = user.Nickname;
 			Roles = user.Roles;
 		}

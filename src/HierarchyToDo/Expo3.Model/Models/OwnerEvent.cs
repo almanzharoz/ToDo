@@ -10,7 +10,7 @@ namespace Expo3.Model
 	/// <summary>
 	/// Настройки мероприятия, доступные только создателю
 	/// </summary>
-	public class OwnerEvent : BaseEntityWithParentAndVersion<Event>, IModel, IWithCreated
+	public class OwnerEvent : BaseEntityWithVersion, IModel, IWithCreated
 	{
         public string Email { get; set; }
         public DateTime Created { get; set; }

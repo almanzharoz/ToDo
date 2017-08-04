@@ -8,7 +8,7 @@ namespace Expo3.Model
 	/// <summary>
 	/// Настройки мероприятия, отображаемые посетителю
 	/// </summary>
-	public class EventPage : BaseEntityWithParentAndVersion<Event>, IModel, IProjection
+	public class EventPage : BaseEntityWithVersion, IModel, IProjection
 	{
 		[Keyword]
 		public string UrlName { get; set; }

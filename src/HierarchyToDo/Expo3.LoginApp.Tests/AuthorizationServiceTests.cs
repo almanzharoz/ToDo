@@ -24,12 +24,12 @@ namespace Expo3.LoginApp.Tests
 	        var serviceProvider = new ServiceCollection()
 				.AddExpo3Model(new Uri("http://localhost:9200/"))
 		        .AddExpo3LoginApp()
-		        .AddSingleton(new UserName("1"))
+			    .AddSingleton(new UserName("1"))
 				.AddLogging()
 		        .BuildServiceProvider();
 
 	        serviceProvider
-				.UseExpo3Model()
+				.UseExpo3Model(true)
 		        .UseExpo3LoginApp();
 
 	        _service = serviceProvider.GetService<AuthorizationService>();

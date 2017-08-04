@@ -11,7 +11,7 @@ namespace Expo3.AdminApp
 {
 	public static class BuilderExtensions
 	{
-		public static IServiceCollection AddExpo3AdminApp(this IServiceCollection services, Uri connectionString)
+		public static IServiceCollection AddExpo3AdminApp(this IServiceCollection services)
 		{
 			return services
 				.AddService<EventService, Expo3ElasticConnection>()
