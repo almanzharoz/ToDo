@@ -44,4 +44,10 @@ namespace Expo3.LoginApp.Projections
 			Roles = user.Roles;
 		}
 	}
+
+	public class UpdatePasswordProjection : BaseEntityWithVersion, IProjection<User>, IUpdateProjection, IGetProjection
+	{
+		public string Password { get; set; }
+		public string Salt { get; set; }
+	}
 }

@@ -35,4 +35,8 @@ namespace Expo3.AdminApp.Projections
 		[JsonProperty]
 		public EUserRole[] Roles { get; private set; }
 	}
+
+	public class UserRemoveProjection : BaseEntityWithVersion, IProjection<User>, IGetProjection, IRemoveProjection
+	{
+	}
 }

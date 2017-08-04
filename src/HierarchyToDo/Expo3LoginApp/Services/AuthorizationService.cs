@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Core.ElasticSearch;
 using Expo3.LoginApp.Projections;
 using Expo3.Model;
@@ -33,15 +34,34 @@ namespace Expo3.LoginApp.Services
 				throw new EntityAlreadyExistsException();
 
 			var salt = HashPasswordHelper.GenerateSalt();
+			var hashedPassword = HashPasswordHelper.GetHash(password, salt);
+			password = null;
 
 			return Insert(new RegisterUserProjection
 			{
 				Email = email,
 				Nickname = nickname,
-				Password = HashPasswordHelper.GetHash(password, salt),
+				Password = hashedPassword,
 				Salt =  Base64UrlTextEncoder.Encode(salt),
 				Roles = roles
 			});
+		}
+
+		public bool ChangePassword(string email, string oldPassword, string newPassword)
+		{
+			var user = TryLogin(email, oldPassword);
+			oldPassword = null;
+			if (user == null) return false;
+
+			var salt = HashPasswordHelper.GenerateSalt();
+			var hashedPassword = HashPasswordHelper.GetHash(newPassword, salt);
+			newPassword = null;
+
+			var userUpdate = Get<UpdatePasswordProjection>(user.Id);
+			userUpdate.Password = hashedPassword;
+			userUpdate.Salt = Base64UrlTextEncoder.Encode(salt);
+
+			return Update(userUpdate);
 		}
 	}
 }

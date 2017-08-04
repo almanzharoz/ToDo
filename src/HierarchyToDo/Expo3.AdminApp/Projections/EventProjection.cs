@@ -36,4 +36,9 @@ namespace Expo3.AdminApp.Projections
 	public class EventRemoveProjection : BaseEntityWithVersion, IProjection<Event>, IRemoveProjection, IGetProjection
 	{
 	}
+
+	public class EventAddVisitorProjection : BaseEntityWithVersion, IProjection<Event>, IGetProjection, IUpdateProjection
+	{
+		public Visitor[] Visitors { get; set; }
+	}
 }

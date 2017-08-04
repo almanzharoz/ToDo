@@ -45,5 +45,23 @@ namespace Expo3.AdminApp.Tests
 			Assert.AreEqual("123", userById.Nickname);
 			Assert.AreEqual(2, userById.Roles.Length);
 		}
+
+		[TestMethod]
+		public void DeleteUserTest()
+		{
+			var added = _service.AddUser("test@test", "123", "123", new[] {EUserRole.Admin, EUserRole.User});
+			Assert.AreEqual(true, added);
+
+			var userId = _service.SearchUserByName("test").ToList()[0].Id;
+
+			var userById = _service.GetUser(userId);
+			Assert.IsNotNull(userById);
+
+			var deleted = _service.DeleteUser(userId);
+			Assert.AreEqual(true, deleted);
+
+			var userById2 = _service.GetUser(userId);
+			Assert.IsNull(userById2);
+		}
 	}
 }

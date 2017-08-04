@@ -51,13 +51,13 @@ namespace Expo3.LoginApp.Tests
 	    }
 
 	    [TestMethod]
-		[ExpectedException(typeof(EntityAlreadyExistsException))]
 	    public void TryToRegisterExistingUser()
 	    {
 		    var registered = _service.Register("test@test", "123", "123", new[] {EUserRole.User});
 		    Assert.AreEqual(true, registered);
 
-		    _service.Register("test@test", "234", "234", new[] {EUserRole.User});
+		    Assert.ThrowsException<EntityAlreadyExistsException>(() =>
+			    _service.Register("test@test", "234", "234", new[] {EUserRole.User}));
 	    }
     }
 }

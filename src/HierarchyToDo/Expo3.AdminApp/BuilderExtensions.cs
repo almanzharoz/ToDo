@@ -25,7 +25,8 @@ namespace Expo3.AdminApp
 				
 				.AddProjection<UserInsertProjection, User>()
 				.AddProjection<UserUpdateProjection, User>()
-				.AddProjection<UserSearchProjection, User>());
+				.AddProjection<UserSearchProjection, User>()
+				.AddProjection<UserRemoveProjection, User>());
 		}
 	}
 }
