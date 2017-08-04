@@ -3,6 +3,7 @@ using Core.ElasticSearch;
 using Expo3.LoginApp.Projections;
 using Expo3.LoginApp.Services;
 using Expo3.Model;
+using Expo3.Model.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 

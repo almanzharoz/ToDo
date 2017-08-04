@@ -56,12 +56,22 @@ namespace Expo3.AdminApp.Services
 					return x;
 				}, true)
 				.ThrowIfNot<UpdateEntityException>();
-		// TODO: удалил UpdateEvent(event...), т.к. нарушение безопасности доступа к данным происходит - неясно откуда взялась обновляемая проекция
 
 		public IReadOnlyCollection<EventProjection> SearchByName(string query)
 			=> Search<Event, EventProjection>(q => q
 				.Match(m => m
 					.Field(x => x.Name)
 					.Query(query)));
+
+		public bool RegisterNewVisitorToEvent(string id, string email, string phoneNumber, string name) 
+			=> RegisterNewVisitorToEvent(id, new Visitor {Email = email, Name = name, PhoneNumber = phoneNumber});
+
+		public bool RegisterNewVisitorToEvent(string id, Visitor visitor)
+			=> Update(Get<EventAddVisitorProjection>(id), x =>
+			{
+				x.Visitors.Add(visitor);
+				return x;
+			});
+
 	}
 }

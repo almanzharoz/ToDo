@@ -4,7 +4,6 @@ using Expo3.AdminApp.Projections;
 using Expo3.AdminApp.Services;
 using Expo3.Model;
 using Expo3.Model.Models;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Expo3.AdminApp
@@ -22,7 +21,12 @@ namespace Expo3.AdminApp
 		{
 			return services.UseExpo3Projections(p => p
 				.AddProjection<EventProjection, Event>()
-				.AddProjection<EventRemoveProjection, Event>());
+				.AddProjection<EventRemoveProjection, Event>()
+				
+				.AddProjection<UserInsertProjection, User>()
+				.AddProjection<UserUpdateProjection, User>()
+				.AddProjection<UserSearchProjection, User>()
+				.AddProjection<UserRemoveProjection, User>());
 		}
 	}
 }

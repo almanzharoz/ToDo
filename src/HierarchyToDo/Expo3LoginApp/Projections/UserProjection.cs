@@ -1,6 +1,7 @@
 ﻿using Core.ElasticSearch.Domain;
 using Expo3.Model;
 using Expo3.Model.Embed;
+using Expo3.Model.Models;
 using Newtonsoft.Json;
 
 namespace Expo3.LoginApp.Projections
@@ -43,5 +44,11 @@ namespace Expo3.LoginApp.Projections
 			Nickname = user.Nickname;
 			Roles = user.Roles;
 		}
+	}
+
+	public class UpdatePasswordProjection : BaseEntityWithVersion, IProjection<User>, IUpdateProjection, IGetProjection
+	{
+		public string Password { get; set; }
+		public string Salt { get; set; }
 	}
 }

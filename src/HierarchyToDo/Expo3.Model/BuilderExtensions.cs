@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Core.ElasticSearch;
 using Core.ElasticSearch.Mapping;
 using Expo3.Model.Embed;
 using Expo3.Model.Models;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Expo3.Model
@@ -23,6 +20,7 @@ namespace Expo3.Model
 				    .AddMapping<Event>(x => x.EventIndexName)
 				    .AddMapping<EventPage>(x => x.EventIndexName)
 				    .AddMapping<OwnerEvent>(x => x.EventIndexName)
+					.AddMapping<Visitor>(x => x.EventIndexName)
 				    // внутренние документы
 				    .AddStruct<Price>()
 				    .AddStruct<TicketPrice>()
