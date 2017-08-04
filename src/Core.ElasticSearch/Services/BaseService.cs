@@ -33,6 +33,8 @@ namespace Core.ElasticSearch
 			_logger = loggerFactory.CreateLogger<BaseService<TConnection>>();
 		}
 
+		protected void Clear() => _container.Clear();
+
 		protected async Task LoadAsync()
 		{
 			// TODO: Проблема: могут запрашиваться поля не входящие в проекцию, т.к. одинаково имя поля из другой проекции

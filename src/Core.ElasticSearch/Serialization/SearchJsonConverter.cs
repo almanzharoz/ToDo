@@ -18,7 +18,6 @@ namespace Core.ElasticSearch.Serialization
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 		{
 			var sw = new Stopwatch();
-			sw.Start();
 			var jsonObject = JObject.Load(reader);
 			foreach (var j in jsonObject["hits"]["hits"].AsEnumerable())
 			{
@@ -31,10 +30,11 @@ namespace Core.ElasticSearch.Serialization
 					j["_source"]["parent"] = j["_parent"];
 			}
 			var target = new SearchResponse<T>();
+			sw.Start();
 			using (var r = jsonObject.CreateReader())
 				serializer.Populate(r, target);
 			sw.Stop();
-			Debug.WriteLine("Deserialize: " + sw.ElapsedMilliseconds);
+			Debug.WriteLine($"DeserializeSearch<{typeof(T).Name}>: " + sw.ElapsedMilliseconds);
 			return target;
 		}
 

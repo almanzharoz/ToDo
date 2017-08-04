@@ -23,7 +23,7 @@ namespace Core.ElasticSearch
 	internal class RequestContainer<TSettings> : IRequestContainer 
 		where TSettings : BaseElasticConnection
 	{
-		private readonly ConcurrentDictionary<string, IList<KeyValuePair<IEntity, bool>>> _cache =
+		private /*readonly*/ ConcurrentDictionary<string, IList<KeyValuePair<IEntity, bool>>> _cache =
 			new ConcurrentDictionary<string, IList<KeyValuePair<IEntity, bool>>>();
 
 		private ConcurrentBag<IEntity> _loadBag = new ConcurrentBag<IEntity>();
@@ -102,6 +102,12 @@ namespace Core.ElasticSearch
 					ids: item.ids));
 			}
 			return result;
+		}
+
+		public void Clear()
+		{
+			_cache = new ConcurrentDictionary<string, IList<KeyValuePair<IEntity, bool>>>();
+			_loadBag = new ConcurrentBag<IEntity>();
 		}
 	}
 }

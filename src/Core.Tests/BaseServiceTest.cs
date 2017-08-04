@@ -641,9 +641,12 @@ namespace Core.Tests
 		 //   Assert.IsNotNull(childCategories.FirstOrDefault().Top.Name);
 
 		    var client = _repository.GetClient();
-		    sw.Restart();
 		    var r = client.Search<SearchResponse<Category>>(new PostData<object>(query));
+			_repository.Clear();
+		    sw.Restart();
+		    r = client.Search<SearchResponse<Category>>(new PostData<object>(query));
 		    sw.Stop();
+		    Console.WriteLine(sw.ElapsedMilliseconds);
 	    }
 	}
 }

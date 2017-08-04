@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Core.ElasticSearch.Domain;
@@ -49,8 +50,15 @@ namespace Core.ElasticSearch.Serialization
 
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 		{
+			var sw = new Stopwatch();
+			sw.Start();
 			if (reader.Value is string)
-				return _entityContainer.GetOrAdd<T>(reader.Value as string, true);
+			{
+				sw.Stop();
+				var r = _entityContainer.GetOrAdd<T>(reader.Value as string, true);
+				Debug.WriteLine($"DeserializeId<{typeof(T).Name}>: " + sw.ElapsedMilliseconds);
+				return r;
+			}
 			var jsonObject = JObject.Load(reader);
 			jsonObject.Remove("_type");
 			var target = existingValue ?? _entityContainer.GetOrAdd<T>(jsonObject["id"].ToString(), false);
@@ -60,6 +68,8 @@ namespace Core.ElasticSearch.Serialization
 				_entityContainer.GetOrAdd<T>(parent.Value<string>(), true);
 			if (target is IWithVersion && jsonObject.TryGetValue("version", out var v))
 				((BaseEntityWithVersion) target).Version = (int)v;
+			sw.Stop();
+			Debug.WriteLine($"Deserialize<{typeof(T).Name}>: " + sw.ElapsedMilliseconds);
 			return target;
 		}
 
