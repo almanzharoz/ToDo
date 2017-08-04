@@ -1,17 +1,12 @@
 using System;
 using System.Linq;
-using Core.ElasticSearch;
-using Expo3.AdminApp.Projections;
 using Expo3.AdminApp.Services;
 using Expo3.LoginApp;
 using Expo3.Model;
 using Expo3.Model.Embed;
 using Expo3.Model.Models;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Nest;
-using ToDo.Dal.Services;
 using AuthorizationService = Expo3.LoginApp.Services.AuthorizationService;
 
 namespace Expo3.AdminApp.Tests
