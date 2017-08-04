@@ -33,6 +33,7 @@ namespace Expo3.LoginApp.Services
 			if (FilterCount<UserProjection>(q => q.Term(x => x.Email.ToLowerInvariant(), email.ToLowerInvariant())) > 0)
 				throw new EntityAlreadyExistsException();
 
+			email = email.ToLowerInvariant();
 			var salt = HashPasswordHelper.GenerateSalt();
 			var hashedPassword = HashPasswordHelper.GetHash(password, salt);
 			password = null;

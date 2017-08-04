@@ -30,6 +30,7 @@ namespace Expo3.AdminApp.Services
 			var hashedPassword = HashPasswordHelper.GetHash(password, salt);
 			password = null;
 
+			email = email.ToLowerInvariant();
 			return Insert(new UserInsertProjection
 			{
 				Email = email,
@@ -43,7 +44,7 @@ namespace Expo3.AdminApp.Services
 		public bool EditUser(string id, string email, string password, string nickname, EUserRole[] roles)
 		=> Update(Get<UserUpdateProjection>(id), u =>
 			{
-				u.Email = email;
+				u.Email = email.ToLowerInvariant();
 				u.Nickname = nickname;
 				u.Password = HashPasswordHelper.GetHash(password, Base64UrlTextEncoder.Decode(u.Salt));
 				u.Roles = roles;
@@ -54,13 +55,10 @@ namespace Expo3.AdminApp.Services
 			=> Get<UserUpdateProjection>(id);
 
 		public IReadOnlyCollection<UserSearchProjection> SearchUserByEmail(string query)
-			//=> Search<User, UserSearchProjection>(q => q
-			//	.Match(m => m
-			//		.Field(x => x.Email)
-			//		.Query(query)));
 			=> Search<User, UserSearchProjection>(q => q
-				.Match(m => m
-					.Query(query)));
+				.Wildcard(w => w
+					.Field(x => x.Email)
+					.Value($"*{query.ToLowerInvariant()}*")));
 
 		public bool DeleteUser(string id)
 			=> Remove(Get<UserRemoveProjection>(id));
