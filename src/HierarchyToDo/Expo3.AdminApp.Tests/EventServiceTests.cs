@@ -70,6 +70,50 @@ namespace Expo3.AdminApp.Tests
 	        //Assert.AreEqual(new GeoCoordinate(12, 14), gotEvent.Address.Coordinates);
 	        Assert.AreEqual(EEventType.Concert, gotEvent.Type);
 		}
+
+	    [TestMethod]
+	    public void TestRegisterVisitorsToEvent()
+	    {
+		    _authService.Register("test@test", "test", "123", new[] {EUserRole.User});
+		    var userId = _authService.TryLogin("test@test", "123").Id;
+
+		    _service.UseUserName(userId);
+
+		    _service.AddEvent("Test Event", "New", DateTime.MinValue, DateTime.MaxValue,
+			    new Address {AddressString = "asd", City = "Ekaterinburg"},
+			    EEventType.Concert, true);
+
+		    var searchedEvent = _service.SearchByName("Test").ToArray();
+
+		    _service.RegisterNewVisitorToEvent(searchedEvent[0].Id, "test@test.test", "123", "Groot");
+
+		    var eventById = _service.GetEvent(searchedEvent[0].Id);
+			Assert.AreEqual(1, eventById.Visitors.Length);
+			Assert.AreEqual("test@test.test", eventById.Visitors[0].Email);
+			Assert.AreEqual("123", eventById.Visitors[0].PhoneNumber);
+			Assert.AreEqual("Groot", eventById.Visitors[0].Name);
+	    }
+
+	    [TestMethod]
+	    public void RemoveTest()
+	    {
+			_authService.Register("test@test", "test", "123", new[] { EUserRole.User });
+		    var userId = _authService.TryLogin("test@test", "123").Id;
+
+		    _service.UseUserName(userId);
+
+		    _service.AddEvent("Test Event", "New", DateTime.MinValue, DateTime.MaxValue,
+			    new Address { AddressString = "asd", City = "Ekaterinburg" },
+			    EEventType.Concert, true);
+
+		    var searchedEvent = _service.SearchByName("Test").ToArray();
+			Assert.AreEqual(1, searchedEvent.Length);
+
+			_service.RemoveEvent(searchedEvent[0].Id, searchedEvent[0].Version);
+
+		    var searched2 = _service.SearchByName("Test").ToArray();
+			Assert.AreEqual(0, searched2.Length);
+	    }
     }
 }
 

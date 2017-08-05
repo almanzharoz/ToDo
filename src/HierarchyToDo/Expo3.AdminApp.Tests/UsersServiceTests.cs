@@ -40,7 +40,7 @@ namespace Expo3.AdminApp.Tests
 			var added = _service.AddUser("test@test", "123", "123", new[] {EUserRole.Admin, EUserRole.Organizer}, true);
 			Assert.AreEqual(true, added);
 
-			var user = _service.SearchUserByEmail("test").ToList();
+			var user = _service.SearchUsersByEmail("test").ToList();
 			Assert.AreEqual(1, user.Count);
 			Assert.AreEqual("test@test", user[0].Email);
 			Assert.AreEqual("123", user[0].Nickname);
@@ -58,7 +58,7 @@ namespace Expo3.AdminApp.Tests
 			var added = _service.AddUser("test@test", "123", "123", new[] {EUserRole.Admin, EUserRole.User}, true);
 			Assert.AreEqual(true, added);
 
-			var userId = _service.SearchUserByEmail("test").ToList()[0].Id;
+			var userId = _service.SearchUsersByEmail("test").ToList()[0].Id;
 
 			var userById = _service.GetUser(userId);
 			Assert.IsNotNull(userById);
@@ -68,6 +68,48 @@ namespace Expo3.AdminApp.Tests
 
 			var userById2 = _service.GetUser(userId);
 			Assert.IsNull(userById2);
+		}
+
+		[TestMethod]
+		public void SearchUserTest()
+		{
+			var added = _service.AddUser("TeST@mail.RU", "132", "123", new[] {EUserRole.User}, true);
+			Assert.AreEqual(true, added);
+
+			var searched1 = _service.SearchUsersByEmail("test");
+			Assert.AreEqual(1, searched1.Count);
+
+			var searched2 = _service.SearchUsersByEmail("TEST@MAIL.RU");
+			Assert.AreEqual(1, searched2.Count);
+
+			var searched3 = _service.SearchUsersByEmail("@");
+			Assert.AreEqual(1, searched3.Count);
+
+			var searched4 = _service.SearchUsersByEmail("132");
+			Assert.AreEqual(0, searched4.Count);
+		}
+
+		[TestMethod]
+		public void EditUserText()
+		{
+			var added = _service.AddUser("test@test.test", "", "", new[] {EUserRole.User}, true);
+			Assert.AreEqual(true, added);
+
+			var searched = _service.SearchUsersByEmail("test").ToArray();
+			Assert.AreEqual(1, searched.Length);
+
+			var edited = _service.EditUser(searched[0].Id, searched[0].Email, "", "123", searched[0].Roles);
+			Assert.AreEqual(true, edited);
+
+			var searched2 = _service.SearchUsersByEmail("test").ToArray();
+			Assert.AreEqual(1, searched2.Length);
+
+			Assert.AreEqual(searched[0].Id, searched2[0].Id);
+			Assert.AreEqual("test@test.test", searched2[0].Email);
+			Assert.AreEqual(searched[0].Email, searched2[0].Email);
+			Assert.AreEqual("123", searched2[0].Nickname);
+			Assert.AreEqual(1, searched2[0].Roles.Length);
+			Assert.AreEqual(EUserRole.User, searched2[0].Roles[0]);
 		}
 	}
 }

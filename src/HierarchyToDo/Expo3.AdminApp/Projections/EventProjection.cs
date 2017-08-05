@@ -27,6 +27,7 @@ namespace Expo3.AdminApp.Projections
 		public Address Address { get; set; }
 		public EEventType Type { get; set; }
 		public string Name { get; set; }
+		public Visitor[] Visitors { get; set; }
 
 		[Keyword]
 		[JsonProperty]

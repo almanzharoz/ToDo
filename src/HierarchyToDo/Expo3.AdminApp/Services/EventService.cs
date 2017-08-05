@@ -23,7 +23,7 @@ namespace Expo3.AdminApp.Services
 			=> Get<EventProjection>(id.HasNotNullArg("event id"), f => UserQuery<EventProjection>(null));
 
 		/// <exception cref="AddEntityException"></exception>
-		public void AddEvent(string name, string caption, DateTime start, DateTime finish, Address address, EEventType type)
+		public void AddEvent(string name, string caption, DateTime start, DateTime finish, Address address, EEventType type, bool refresh = false)
 			=> Insert(new EventProjection(Get<BaseUserProjection>(User.Id).HasNotNullArg("owner"))
 				{
 					Name = name,
@@ -32,7 +32,7 @@ namespace Expo3.AdminApp.Services
 					FinishDateTime = finish,
 					Address = address,
 					Type = type
-				}, true)
+				}, refresh)
 				.ThrowIfNot<AddEntityException>();
 
 		///<exception cref="RemoveEntityException"></exception>
@@ -44,7 +44,7 @@ namespace Expo3.AdminApp.Services
 
 		///<exception cref="UpdateEntityException"></exception>
 		public void UpdateEvent(string id, string name, string caption,
-			DateTime startDateTime, DateTime finishDateTime, Address address, EEventType type)
+			DateTime startDateTime, DateTime finishDateTime, Address address, EEventType type, bool refresh = false)
 			=> Update(GetEvent(id).HasNotNullArg("event"), x =>
 				{
 					x.Name = name;
@@ -54,7 +54,7 @@ namespace Expo3.AdminApp.Services
 					x.Address = address;
 					x.Type = type;
 					return x;
-				}, true)
+				}, false)
 				.ThrowIfNot<UpdateEntityException>();
 
 		public IReadOnlyCollection<EventProjection> SearchByName(string query)
@@ -63,6 +63,8 @@ namespace Expo3.AdminApp.Services
 					.Field(x => x.Name)
 					.Query(query)));
 
+
+		//TODO: сделать, чтобы работало
 		public bool RegisterNewVisitorToEvent(string id, string email, string phoneNumber, string name) 
 			=> RegisterNewVisitorToEvent(id, new Visitor {Email = email, Name = name, PhoneNumber = phoneNumber});
 

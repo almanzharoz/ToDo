@@ -54,7 +54,7 @@ namespace Expo3.AdminApp.Services
 		public UserUpdateProjection GetUser(string id)
 			=> Get<UserUpdateProjection>(id);
 
-		public IReadOnlyCollection<UserSearchProjection> SearchUserByEmail(string query)
+		public IReadOnlyCollection<UserSearchProjection> SearchUsersByEmail(string query)
 			=> Search<User, UserSearchProjection>(q => q
 				.Wildcard(w => w
 					.Field(x => x.Email)
