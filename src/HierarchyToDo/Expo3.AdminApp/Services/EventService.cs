@@ -65,8 +65,8 @@ namespace Expo3.AdminApp.Services
 
 
 		//TODO: сделать, чтобы работало
-		public bool RegisterNewVisitorToEvent(string id, string email, string phoneNumber, string name) 
-			=> RegisterNewVisitorToEvent(id, new Visitor {Email = email, Name = name, PhoneNumber = phoneNumber});
+		public bool RegisterNewVisitorToEvent(string eventId, string email, string phoneNumber, string name) 
+			=> RegisterNewVisitorToEvent(eventId, new Visitor {Email = email, Name = name, PhoneNumber = phoneNumber});
 
 		public bool RegisterNewVisitorToEvent(string id, Visitor visitor)
 			=> Update(Get<EventAddVisitorProjection>(id), x =>

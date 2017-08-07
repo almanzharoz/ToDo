@@ -5,7 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Projections\Interfaces\" />
+    <Compile Remove="Projections\Interfaces\**" />
+    <EmbeddedResource Remove="Projections\Interfaces\**" />
+    <None Remove="Projections\Interfaces\**" />
   </ItemGroup>
 
   <ItemGroup>
