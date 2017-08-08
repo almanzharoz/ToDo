@@ -20,7 +20,6 @@ namespace Expo3.Model
 				    .AddMapping<Event>(x => x.EventIndexName)
 				    .AddMapping<EventPage>(x => x.EventIndexName)
 				    .AddMapping<OwnerEvent>(x => x.EventIndexName)
-					.AddMapping<Visitor>(x => x.EventIndexName)
 				    // внутренние документы
 				    .AddStruct<Price>()
 				    .AddStruct<TicketPrice>()
