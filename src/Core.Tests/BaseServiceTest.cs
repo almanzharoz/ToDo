@@ -642,11 +642,14 @@ namespace Core.Tests
 
 		    var client = _repository.GetClient();
 		    var r = client.Search<SearchResponse<Category>>(new PostData<object>(query));
-			_repository.Clear();
-		    sw.Restart();
-		    r = client.Search<SearchResponse<Category>>(new PostData<object>(query));
-		    sw.Stop();
-		    Console.WriteLine(sw.ElapsedMilliseconds);
+		    for (var i = 0; i < 10; i++)
+		    {
+			    _repository.Clear();
+			    sw.Restart();
+			    r = client.Search<SearchResponse<Category>>(new PostData<object>(query));
+			    sw.Stop();
+			    Console.WriteLine(sw.ElapsedMilliseconds);
+		    }
 	    }
 	}
 }
