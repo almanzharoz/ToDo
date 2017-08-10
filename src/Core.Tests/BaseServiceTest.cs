@@ -651,5 +651,14 @@ namespace Core.Tests
 			    Console.WriteLine(sw.ElapsedMilliseconds);
 		    }
 	    }
+
+	    [TestMethod]
+	    public void QueryTest()
+	    {
+		    var q = new Query<Product>();
+		    q.Bool(x => x.Must("Name", 1));
+			q.Build();
+			Console.WriteLine(q.GetJson());
+	    }
 	}
 }
