@@ -12,12 +12,14 @@ namespace Core.Tests.Projections
 		public string Producer { get; set; }
 	}
 
-	public class ProductProjection : BaseEntity, IWithParent<Models.Category>, IProjection<Models.Product>, IGetProjection
-	{
+	public class ProductProjection : BaseEntity, IWithParent<Models.Category>, IProjection<Models.Product>, IGetProjection, ISearchProjection
+    {
         public string Name { get; set; }
         [JsonProperty]
 		public FullName FullName { get; private set; }
         [JsonIgnore]
         public Category Parent { get; set; }
+
+        public string Description { get; set; }
     }
 }
