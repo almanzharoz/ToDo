@@ -20,6 +20,7 @@ namespace Expo3.OrganizersApp.Projections
 			Owner = owner;
 		}
 
+		public Category Category { get; set; }
 		public string Caption { get; set; }
 		public DateTime StartDateTime { get; set; }
 		public DateTime FinishDateTime { get; set; }

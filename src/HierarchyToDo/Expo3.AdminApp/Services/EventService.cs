@@ -23,7 +23,7 @@ namespace Expo3.AdminApp.Services
 			=> Get<EventProjection>(id.HasNotNullArg("event id"), f => UserQuery<EventProjection>(null));
 
 		/// <exception cref="AddEntityException"></exception>
-		public void AddEvent(string name, string caption, DateTime start, DateTime finish, Address address, EEventType type, bool refresh = false)
+		public void AddEvent(string name, string caption, DateTime start, DateTime finish, Address address, EEventType type, Category category, bool refresh = false)
 			=> Insert(new EventProjection(Get<BaseUserProjection>(User.Id).HasNotNullArg("owner"))
 				{
 					Name = name,
@@ -31,7 +31,8 @@ namespace Expo3.AdminApp.Services
 					StartDateTime = start,
 					FinishDateTime = finish,
 					Address = address,
-					Type = type
+					Type = type,
+					Category = category
 				}, refresh)
 				.ThrowIfNot<AddEntityException>();
 
@@ -62,6 +63,13 @@ namespace Expo3.AdminApp.Services
 				.Match(m => m
 					.Field(x => x.Name)
 					.Query(query)));
+
+		public bool SetCategoryToEvent(string eventId, string categoryId)
+			=> Update(GetEvent(eventId).HasNotNullArg("event"), x =>
+			{
+				x.Category = new Category {Name = Get<CategoryProjection>(categoryId).Name};
+				return x;
+			});
 
 
 		//TODO: сделать, чтобы работало

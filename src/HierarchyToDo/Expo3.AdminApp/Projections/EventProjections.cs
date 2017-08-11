@@ -21,6 +21,7 @@ namespace Expo3.AdminApp.Projections
 			Owner = owner;
 		}
 
+		public Category Category { get; set; }
 		public string Caption { get; set; }
 		public DateTime StartDateTime { get; set; }
 		public DateTime FinishDateTime { get; set; }
