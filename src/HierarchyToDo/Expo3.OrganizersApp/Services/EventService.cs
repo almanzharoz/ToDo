@@ -22,7 +22,8 @@ namespace Expo3.OrganizersApp.Services
 
 		/// <exception cref="AddEntityException"></exception>
 		// TODO: добавить проверку пользователя
-		public void AddEvent(string name, string caption, DateTime start, DateTime finish, Address address, EEventType type, Category category, bool refresh = false)
+		public void AddEvent(string name, string caption, DateTime start, DateTime finish, Address address, EEventType type,
+			Category category, bool refresh = false)
 			=> Insert(new EventProjection(Get<BaseUserProjection>(User.Id).HasNotNullArg("owner"))
 				{
 					Name = name,

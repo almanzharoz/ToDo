@@ -23,7 +23,8 @@ namespace Expo3.AdminApp.Services
 			=> Get<EventProjection>(id.HasNotNullArg("event id"), f => UserQuery<EventProjection>(null));
 
 		/// <exception cref="AddEntityException"></exception>
-		public void AddEvent(string name, string caption, DateTime start, DateTime finish, Address address, EEventType type, Category category, bool refresh = false)
+		public void AddEvent(string name, string caption, DateTime start, DateTime finish, Address address, EEventType type,
+			Category category, bool refresh = false)
 			=> Insert(new EventProjection(Get<BaseUserProjection>(User.Id).HasNotNullArg("owner"))
 				{
 					Name = name,
