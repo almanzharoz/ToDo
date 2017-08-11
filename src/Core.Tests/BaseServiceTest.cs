@@ -655,10 +655,25 @@ namespace Core.Tests
 	    [TestMethod]
 	    public void QueryTest()
 	    {
+			Stopwatch sw1 = new Stopwatch();
+			Stopwatch sw2 = new Stopwatch();
+			sw1.Start();
 		    var q = new Query<Product>();
 		    q.Bool(x => x.Must("Name", 1));
-			q.Build();
-			Console.WriteLine(q.GetJson());
+		    q.Build();
+			sw1.Stop();
+		    string s;
+			sw2.Start();
+			for (var i = 0; i < 10000; i++)
+			{
+				//q = new Query<Product>();
+				//q.Bool(x => x.Must("Name", 1));
+				//q.Build();
+				//s = q.GetJson();
+				s = q.Bool(x => x.Must("Name", 1)).GetJson();
+			}
+			sw2.Stop();
+			//Console.WriteLine(q.GetJson());
 	    }
 	}
 }

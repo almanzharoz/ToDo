@@ -20,6 +20,7 @@ namespace Core.Tests
 		private readonly List<object> _parameters = new List<object>();
 		private int _counter=0;
 		private MatchCollection _matches;
+		private readonly Guid _hash;
 
 		public JsonWriter Json => _writer;
 
@@ -27,6 +28,7 @@ namespace Core.Tests
 
 		public Query()
 		{
+			_hash = Guid.NewGuid();
 			_writer = new JsonTextWriter(new StreamWriter(_stream));
 			_writer.WriteStartObject();
 		}
@@ -42,6 +44,7 @@ namespace Core.Tests
 
 		public Query<T> Bool(Func<BoolQuery<T>, BoolQuery<T>> query)
 		{
+			_counter = 0;
 			query(new BoolQuery<T>(this));
 			return this;
 		}
@@ -65,11 +68,6 @@ namespace Core.Tests
 				s = s.Remove(match.Index, match.Length).Insert(match.Index, _parameters[i++].ToString());
 			}
 			return s;
-		}
-
-		public override int GetHashCode()
-		{
-			return _result.GetHashCode();
 		}
 	}
 
