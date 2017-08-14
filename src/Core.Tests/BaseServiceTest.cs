@@ -712,7 +712,7 @@ namespace Core.Tests
 				s = q.Bool(x => x.Must("Name", 1)).GetJson();
 			}
 			sw2.Stop();
-			//Console.WriteLine(q.GetJson());
+			Console.WriteLine(sw2.ElapsedMilliseconds);
 		}
 
 		[TestMethod]
@@ -730,10 +730,15 @@ namespace Core.Tests
 			Console.WriteLine(sw.ElapsedTicks);
 			Console.WriteLine(q2);
 			sw.Restart();
-			var q3 = QueryFactory.GetOrAdd<Product>(q => q.Bool(x => x.Filter(y => y.Term(p => p.Name, "111"))));
+
+			for (var i = 0; i < 10000; i++)
+			{
+				var q3 = QueryFactory.GetOrAdd<Product>(q => q.Bool(x => x.Filter(y => y.Term(p => p.Name, "111"))));
+			}
+
 			sw.Stop();
-			Console.WriteLine(sw.ElapsedTicks);
-			Console.WriteLine(q3);
+			Console.WriteLine(sw.ElapsedMilliseconds);
+			//Console.WriteLine(q3);
 			Console.WriteLine(QueryFactory.Count);
 		}
 	}

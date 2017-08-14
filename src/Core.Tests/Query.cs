@@ -46,10 +46,10 @@ namespace Core.Tests
 		{
 			var q = query(new Query<T>());
 			return ((Query<T>) _queries.GetOrAdd(q.Hash, k =>
-			{
-				q.Build();
-				return q;
-			})).CopyParams(q).GetJson();
+		   {
+			   q.Build();
+			   return q;
+		   })).CopyParams(q).GetJson();
 		}
 	}
 
