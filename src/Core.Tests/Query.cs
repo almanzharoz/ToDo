@@ -1,62 +1,112 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq.Expressions;
+using System.Text;
 using System.Text.RegularExpressions;
+using BenchmarkDotNet.Exporters.Xml;
 using Newtonsoft.Json;
 
 namespace Core.Tests
 {
-	/// <summary>
-	/// Через Fluent-интерфейс строим JSON с определенными параметрами. При дальнейшем использовании запроса, JSON уже не строиться, а заполняются лишь параметры.
-	/// Параметры заполняются через тот же Fluent, что и строится при первом использовании JSON
-	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	public class Query<T>
+	public interface IQuery
 	{
-		private Regex _rx = new Regex("\"param\"", RegexOptions.Compiled);
+		void Build();
+	}
+	public abstract class BaseQuery<T> : IQuery
+	{
+		protected readonly Query<T> _query;
+		protected readonly List<IQuery> _queries = new List<IQuery>();
+
+		protected BaseQuery(Query<T> query)
+		{
+			_query = query;
+		}
+
+		protected TQuery AddQuery<TQuery, TValue>(TQuery query) where TQuery : BaseQuery<TValue>
+		{
+			_queries.Add(query);
+			return _query.AddQuery<TQuery, TValue>(query);
+		}
+
+		public void AddParam(object param)
+			=> _query.AddParam(param);
+
+		public abstract void Build();
+	}
+
+	public static class QueryFactory
+	{
+		private static ConcurrentDictionary<string, IQuery> _queries = new ConcurrentDictionary<string, IQuery>();
+
+		public static int Count => _queries.Count;
+
+		public static string GetOrAdd<T>(Func<Query<T>, Query<T>> query)
+		{
+			var q = query(new Query<T>());
+			return ((Query<T>) _queries.GetOrAdd(q.Hash, k =>
+			{
+				q.Build();
+				return q;
+			})).CopyParams(q).GetJson();
+		}
+	}
+
+	public class Query<T> : IDisposable, IQuery
+	{
+		public string Hash { get; private set; }
+		public readonly JsonTextWriter _jsonWriter;
+		private readonly TextWriter _writer;
+		private readonly MemoryStream _stream;
 		private string _result;
-		private MemoryStream _stream = new MemoryStream();
-		private readonly JsonTextWriter _writer;
-		private readonly List<object> _parameters = new List<object>();
-		private int _counter=0;
 		private MatchCollection _matches;
-		private readonly Guid _hash;
+		private Regex _rx = new Regex("\"param\"", RegexOptions.Compiled);
 
-		public JsonWriter Json => _writer;
-
-		public bool IsBuild { get; private set; }
+		protected List<object> _params = new List<object>();
+		protected List<IQuery> _queries = new List<IQuery>();
 
 		public Query()
 		{
-			_hash = Guid.NewGuid();
-			_writer = new JsonTextWriter(new StreamWriter(_stream));
-			_writer.WriteStartObject();
+			_jsonWriter = new JsonTextWriter(_writer = new StreamWriter(_stream = new MemoryStream(), Encoding.UTF8));
 		}
 
-		public void SetNextParam(object value)
+		internal TQuery AddQuery<TQuery, TValue>(TQuery query) where TQuery : BaseQuery<TValue>
 		{
-			if (_parameters.Count-1 < _counter)
-				_parameters.Add(value);
-			else
-				_parameters[_counter] = value;
-			_counter++;
+			Hash += " " + typeof(TQuery).Name + String.Concat("_", typeof(TValue).Name);
+			return query;
 		}
+
+		internal TQuery AddQuery<TQuery, TValue, TFieldValue>(TQuery query, Expression<Func<T, TFieldValue>> fieldExpression) where TQuery : BaseQuery<TValue>
+		{
+			var s = fieldExpression.Body.ToString();
+			s = s.Substring(s.IndexOf(".") + 1);
+			Hash += " " + typeof(TQuery).Name + String.Concat("_", typeof(TValue).Name, "_", s);
+			return query;
+		}
+
+		internal void AddParam(object param)
+			=> _params.Add(param);
 
 		public Query<T> Bool(Func<BoolQuery<T>, BoolQuery<T>> query)
 		{
-			_counter = 0;
-			query(new BoolQuery<T>(this));
+			var q = AddQuery<BoolQuery<T>, T>(query(new BoolQuery<T>(this)));
+			_queries.Add(q);
 			return this;
 		}
 
 		public void Build()
 		{
-			_writer.WriteEndObject();
-			_writer.Flush();
+			_jsonWriter.WriteStartObject();
+			foreach (var query in _queries)
+				query.Build();
+			_jsonWriter.WriteEndObject();
+
+			_jsonWriter.Flush();
 			_stream.Position = 0;
-			_result = new StreamReader(_stream).ReadToEnd();
+			using (var reader = new StreamReader(_stream))
+				_result = reader.ReadToEnd();
 			_matches = _rx.Matches(_result);
-			IsBuild = true;
 		}
 
 		public string GetJson()
@@ -64,33 +114,106 @@ namespace Core.Tests
 			var i = 0;
 			var s = _result;
 			foreach (Match match in _matches)
-			{
-				s = s.Remove(match.Index, match.Length).Insert(match.Index, _parameters[i++].ToString());
-			}
+				s = s.Remove(match.Index, match.Length).Insert(match.Index, _params[i++].ToString());
 			return s;
+		}
+
+		public void Dispose()
+		{
+			_writer.Dispose();
+			_stream.Dispose();
+			//_jsonWriter.Dispose();
+		}
+
+		public Query<T> CopyParams(Query<T> query)
+		{
+			_params = query._params;
+			return this;
 		}
 	}
 
-	public class BoolQuery<T>
+	public class BoolQuery<T> : BaseQuery<T>
 	{
-		private readonly Query<T> _query;
-		internal BoolQuery(Query<T> query)
+		public BoolQuery<T> Filter(Func<FilterQuery<T>, FilterQuery<T>> query)
 		{
-			_query = query;
+			AddQuery<FilterQuery<T>, T>(query(new FilterQuery<T>(_query)));
+			return this;
 		}
 
-		public BoolQuery<T> Must(string field, int value)
+
+		public BoolQuery(Query<T> query) : base(query)
 		{
-			if (!_query.IsBuild)
-			{
-				_query.Json.WritePropertyName("must");
-				_query.Json.WriteStartObject();
-				_query.Json.WritePropertyName(field);
-				_query.Json.WriteValue("param");
-				_query.Json.WriteEndObject();
-			}
-			_query.SetNextParam(value);
+		}
+
+		public override void Build()
+		{
+			_query._jsonWriter.WritePropertyName("Bool");
+			_query._jsonWriter.WriteStartObject();
+			foreach (var query in _queries)
+				query.Build();
+			_query._jsonWriter.WriteEndObject();
+		}
+	}
+
+	public class FilterQuery<T> : BaseQuery<T>
+	{
+
+		public FilterQuery<T> Term<TValue>(Expression<Func<T, TValue>> fieldExpression, TValue value)
+		{
+			var q = new TermQuery<T, TValue>(_query, fieldExpression, value);
+			_queries.Add(q);
+			_query.AddQuery<TermQuery<T, TValue>, T>(q);
 			return this;
+		}
+
+		public FilterQuery(Query<T> query) : base(query)
+		{
+		}
+
+		public override void Build()
+		{
+			_query._jsonWriter.WritePropertyName("Filter");
+			_query._jsonWriter.WriteStartObject();
+			foreach (var query in _queries)
+				query.Build();
+			_query._jsonWriter.WriteEndObject();
+		}
+	}
+
+	public class TermQuery<T, TValue> : BaseQuery<T>
+	{
+		internal TermQuery(Query<T> query, Expression<Func<T, TValue>> fieldExpression, TValue value) : base(query)
+		{
+			var q = new FieldQuery<T, TValue>(query, fieldExpression, value);
+			_query.AddQuery<FieldQuery<T, TValue>, T, TValue>(q, fieldExpression);
+			_queries.Add(q);
+		}
+
+		public override void Build()
+		{
+			_query._jsonWriter.WritePropertyName("Term");
+			_query._jsonWriter.WriteStartObject();
+			foreach (var query in _queries)
+				query.Build();
+			_query._jsonWriter.WriteEndObject();
+		}
+	}
+
+	public class FieldQuery<T, TValue> : BaseQuery<T>
+	{
+		private readonly Expression<Func<T, TValue>> _field;
+		public FieldQuery(Query<T> query, Expression<Func<T, TValue>> fieldExpression, TValue value) : base(query)
+		{
+			_field = fieldExpression;
+			AddParam(value);
+		}
+
+		public override void Build()
+		{
+			var s = _field.Body.ToString();
+			s = s.Substring(s.IndexOf(".") + 1);
+			_query._jsonWriter.WritePropertyName(s);
+			_query._jsonWriter.WriteValue("param");
 		}
 	}
 }
