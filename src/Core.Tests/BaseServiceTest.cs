@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using Core.ElasticQueryBuilder.Commands;
 using Core.ElasticSearch;
 using Core.ElasticSearch.Domain;
 using Core.ElasticSearch.Exceptions;
@@ -10,7 +11,6 @@ using Core.Tests.Models;
 using Core.Tests.Projections;
 using Elasticsearch.Net;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PlainElastic.Net.Queries;
 using SharpFuncExt;
 
 namespace Core.Tests
@@ -643,55 +643,6 @@ namespace Core.Tests
 		}
 
 		[TestMethod]
-		public void Test()
-		{
-			var parentCategory = new Category() {Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow};
-			_repository.Insert(parentCategory, true);
-			var childCategory1 = new Category() {Name = "Child Category1", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow};
-			_repository.Insert(childCategory1, true);
-			var childCategory2 = new Category() {Name = "Child Category2", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow};
-			_repository.Insert(childCategory2, true);
-			var childCategory3 = new Category() {Name = "Child Category3", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow};
-			_repository.Insert(childCategory3, true);
-			var category1 = new Category() {Name = "Category1", CreatedOnUtc = DateTime.UtcNow};
-			_repository.Insert(category1, true);
-			var category2 = new Category() {Name = "Category2", CreatedOnUtc = DateTime.UtcNow};
-			_repository.Insert(category2, true);
-
-			var sw = new Stopwatch();
-			sw.Restart();
-			var q = new QueryBuilder<Category>()
-				.Query(f => f.Bool(b => b.Must(m => m.Match(a => a.Field(p => p.Top).Query(parentCategory.Id)))));
-			var query = q.Build().Replace("\"must\"", "\"filter\"");
-			//query = query.Substring(query.IndexOf("{", 1));
-			//query = query.Substring(0, query.Length - 1);
-
-			//var childCategories = _repository.FilterPager<Category, Category>(query, 1, 2, sort => sort.Descending(c => c.CreatedOnUtc), true);
-			sw.Stop();
-			Console.WriteLine(query);
-			Console.WriteLine(sw.ElapsedMilliseconds);
-
-			//Assert.AreEqual(childCategories.Total, 3);
-			//   Assert.AreEqual(childCategories.Limit, 2);
-			//   Assert.AreEqual(childCategories.Page, 1);
-			//   Assert.AreEqual(childCategories.Count, 2);
-			//   Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category3")));
-			//   Assert.IsNotNull(childCategories.FirstOrDefault().Top);
-			//   Assert.IsNotNull(childCategories.FirstOrDefault().Top.Name);
-
-			var client = _repository.GetClient();
-			var r = client.Search<Nest.SearchResponse<Category>>(new PostData<object>(query));
-			for (var i = 0; i < 10; i++)
-			{
-				_repository.Clear();
-				sw.Restart();
-				r = client.Search<Nest.SearchResponse<Category>>(new PostData<object>(query));
-				sw.Stop();
-				Console.WriteLine(sw.ElapsedMilliseconds);
-			}
-		}
-
-		[TestMethod]
 		public void QueryTest()
 		{
 			Stopwatch sw1 = new Stopwatch();
@@ -740,6 +691,13 @@ namespace Core.Tests
 			Console.WriteLine(sw.ElapsedMilliseconds);
 			//Console.WriteLine(q3);
 			Console.WriteLine(QueryFactory.Count);
+		}
+
+		[TestMethod]
+		public void QueryTest3()
+		{
+			var s = ElasticQueryBuilder.QueryFactory.GetOrAdd<SearchCommand<Product>>(x => x.Query(q => q.Bool(b => b.Term(p => p.Name, "123"))));
+			Console.WriteLine(s);
 		}
 	}
 }
