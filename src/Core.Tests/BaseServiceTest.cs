@@ -16,7 +16,7 @@ namespace Core.Tests
     [TestClass]
     public class BaseServiceTest : BaseTest
     {
-		[TestMethod]
+        [TestMethod]
         public void AddObjectWithoutParentAndRelated()
         {
             var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
@@ -32,7 +32,7 @@ namespace Core.Tests
             var childCategory = new Category() { Name = "Child Category", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
             Assert.ThrowsException<UnexpectedElasticsearchClientException>(() =>
             {
-		            _repository.Insert(childCategory, true);
+                _repository.Insert(childCategory, true);
             });
         }
 
@@ -65,7 +65,7 @@ namespace Core.Tests
             Assert.IsNotNull(product.Parent);
             Assert.AreEqual(product.Parent.Id, category.Id);
             Assert.AreEqual(product.Parent.Name, category.Name);
-		}
+        }
 
         [TestMethod]
         public void GetObjectByIdWithoutAutoLoadAndWithoutParent()
@@ -162,7 +162,7 @@ namespace Core.Tests
         [TestMethod]
         public void GetProjectionObjectByIdWithAutoLoadAndWithoutParent()
         {
-            var category = new Category() { Name = "Category"};
+            var category = new Category() { Name = "Category" };
 
             _repository.Insert(category, true);
 
@@ -182,9 +182,9 @@ namespace Core.Tests
             var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
 
             _repository.Insert(category, true);
-	        _repository.Insert<Product, Category>(product, true);
+            _repository.Insert<Product, Category>(product, true);
 
-			var loadProduct = _repository.Get<Product, Category>(product.Id, category.Id, true);
+            var loadProduct = _repository.Get<Product, Category>(product.Id, category.Id, true);
 
             Assert.IsNotNull(loadProduct);
             Assert.IsNotNull(loadProduct.Parent);
@@ -201,9 +201,9 @@ namespace Core.Tests
             var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
 
             _repository.Insert(category, true);
-	        _repository.Insert<Product, Category>(product, true);
+            _repository.Insert<Product, Category>(product, true);
 
-			var loadProduct = _repository.Get<ProductProjection, Category>(product.Id, category.Id, true);
+            var loadProduct = _repository.Get<ProductProjection, Category>(product.Id, category.Id, true);
 
             Assert.IsNotNull(loadProduct);
             Assert.IsNotNull(loadProduct.Parent);
@@ -226,33 +226,33 @@ namespace Core.Tests
             Assert.AreEqual(loadCategory.Name, "New Category");
         }
 
-		//[TestMethod]
-		//public void UpdateObjectSimplyWithInvalidObjectId()
-		//{
-		//    var category = new Category() { Name = "Category" };
-		//    category.Name = "New Category";
-		//    category.Id = "NewId";
-		// category.Version = 2;
-		//    Assert.ThrowsException<QueryException>(() => _repository.Update(category, true));
-		//}
+        //[TestMethod]
+        //public void UpdateObjectSimplyWithInvalidObjectId()
+        //{
+        //    var category = new Category() { Name = "Category" };
+        //    category.Name = "New Category";
+        //    category.Id = "NewId";
+        // category.Version = 2;
+        //    Assert.ThrowsException<QueryException>(() => _repository.Update(category, true));
+        //}
 
-		// Тест больше не актуален, т.к. нельзя никак получить проекции и управлять номером версии в ней. А так же нельзя никак обновить проекцию в базе созданную из вне движка.
-		//[TestMethod]
-  //      public void UpdateObjectSimplyWithAnotherVersion()
-  //      {
-  //          var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
-  //          _repository.Insert(category, true);
-  //          category.Name = "New1 Category";
-  //          _repository.Update(category, true);
-  //          category.Version--;
-  //          category.Name = "New2 Category";
-  //          Assert.ThrowsException<VersionException>(() => _repository.Update(category, true));
+        // Тест больше не актуален, т.к. нельзя никак получить проекции и управлять номером версии в ней. А так же нельзя никак обновить проекцию в базе созданную из вне движка.
+        //[TestMethod]
+        //      public void UpdateObjectSimplyWithAnotherVersion()
+        //      {
+        //          var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
+        //          _repository.Insert(category, true);
+        //          category.Name = "New1 Category";
+        //          _repository.Update(category, true);
+        //          category.Version--;
+        //          category.Name = "New2 Category";
+        //          Assert.ThrowsException<VersionException>(() => _repository.Update(category, true));
 
-  //          var loadCategory = _repository.Get<Category>(category.Id, true);
+        //          var loadCategory = _repository.Get<Category>(category.Id, true);
 
-  //          Assert.IsNotNull(loadCategory);
-  //          Assert.AreEqual(loadCategory.Name, "New1 Category");
-  //      }
+        //          Assert.IsNotNull(loadCategory);
+        //          Assert.AreEqual(loadCategory.Name, "New1 Category");
+        //      }
 
         [TestMethod]
         public void UpdateObjectByQueryFuncSet()
@@ -290,13 +290,13 @@ namespace Core.Tests
             Assert.IsNull(loadCategory);
         }
 
-		// Ограничил такое поведение на уровне компиляции (Id - internal set)
+        // Ограничил такое поведение на уровне компиляции (Id - internal set)
         //[TestMethod]
         //public void RemoveObjectByInvalidId()
         //{
         //    var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
         //    category.Id = "NewId";
-	       // category.Version = 1;
+        // category.Version = 1;
         //    Assert.ThrowsException<VersionException>(() => _repository.Remove(category));
         //}
 
@@ -326,7 +326,7 @@ namespace Core.Tests
 
             var categories = _repository.Filter<Category, Category>(q => q.Match(x => x.Field(c => c.Name).Query("category")));
 
-			Assert.AreEqual(categories.Count, 1);
+            Assert.AreEqual(categories.Count, 1);
             Assert.IsTrue(categories.Any(c => c.Name.Equals("Test Category")));
         }
 
@@ -346,7 +346,7 @@ namespace Core.Tests
 
             var categories = _repository.Filter<Category, CategoryProjection>(q => q.Match(x => x.Field(c => c.Name).Query("category")));
 
-			Assert.AreEqual(categories.Count, 1);
+            Assert.AreEqual(categories.Count, 1);
             Assert.IsTrue(categories.Any(c => c.Name.Equals("Test Category")));
         }
 
@@ -514,7 +514,7 @@ namespace Core.Tests
             var category2 = new Category() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
             _repository.Insert(category2, true);
 
-			var childCategories = _repository.FilterPager<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 1, 2, sort => sort.Descending(c => c.CreatedOnUtc), true);
+            var childCategories = _repository.FilterPager<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 1, 2, sort => sort.Descending(c => c.CreatedOnUtc), true);
 
             Assert.AreEqual(childCategories.Total, 3);
             Assert.AreEqual(childCategories.Limit, 2);
@@ -525,74 +525,93 @@ namespace Core.Tests
             Assert.IsNotNull(childCategories.FirstOrDefault().Top.Name);
         }
 
-	    [TestMethod]
-	    public void InsertIntoAnotherIndex()
-	    {
-		    var producer = new Producer {Name = "Producer1"};
-		    _repository.Insert(producer, true);
+        [TestMethod]
+        public void InsertIntoAnotherIndex()
+        {
+            var producer = new Producer { Name = "Producer1" };
+            _repository.Insert(producer, true);
 
-		    var loaded = _repository.Get<Producer>(producer.Id);
+            var loaded = _repository.Get<Producer>(producer.Id);
 
-			Assert.AreEqual(loaded.Name, producer.Name);
-	    }
+            Assert.AreEqual(loaded.Name, producer.Name);
+        }
 
-	    [TestMethod]
-	    public void InsertIntoAnotherIndexWithJoin()
-	    {
-		    var producer = new Producer { Name = "Producer1" };
-		    _repository.Insert(producer, true);
+        [TestMethod]
+        public void InsertIntoAnotherIndexWithJoin()
+        {
+            var producer = new Producer { Name = "Producer1" };
+            _repository.Insert(producer, true);
 
-			var category = new Category {Name = "Category1"};
-		    _repository.Insert(category, true);
+            var category = new Category { Name = "Category1" };
+            _repository.Insert(category, true);
 
-		    var product = new Product {Name = "Product1", Producer = producer, Parent = category};
-		    _repository.Insert<Product, Category>(product, true);
+            var product = new Product { Name = "Product1", Producer = producer, Parent = category };
+            _repository.Insert<Product, Category>(product, true);
 
-			var loaded = _repository.Get<Product, Category>(product.Id, category.Id, true);
+            var loaded = _repository.Get<Product, Category>(product.Id, category.Id, true);
 
-		    Assert.AreEqual(loaded.Name, product.Name);
-		    Assert.AreEqual(loaded.Producer.Id, product.Producer.Id);
-		    Assert.AreEqual(loaded.Producer.Name, product.Producer.Name);
-		    Assert.AreEqual(loaded.Parent.Id, product.Parent.Id);
-		    Assert.AreEqual(loaded.Parent.Name, product.Parent.Name);
-		}
+            Assert.AreEqual(loaded.Name, product.Name);
+            Assert.AreEqual(loaded.Producer.Id, product.Producer.Id);
+            Assert.AreEqual(loaded.Producer.Name, product.Producer.Name);
+            Assert.AreEqual(loaded.Parent.Id, product.Parent.Id);
+            Assert.AreEqual(loaded.Parent.Name, product.Parent.Name);
+        }
 
-	    [TestMethod]
-	    public void UpdateProjection()
-	    {
-			// 1. Добавить новую проекцию с 1 private set полем и несколькими с public set
-			// 2. Вставить в базу полную проекцию включая поля, которые не указаны в новой проекции
-			// 3. Достать по Id новую проекцию (у проекции для этого должен быть IGetProjection)
-			// 4. Обновить
-			// 5. Достать полную проекцию и проверить, что обновляемые поля обновлены, а другие остались нетронутыми
+        [TestMethod]
+        public void UpdateProjection()
+        {
+            // 1. Добавить новую проекцию с 1 private set полем и несколькими с public set
+            // 2. Вставить в базу полную проекцию включая поля, которые не указаны в новой проекции
+            // 3. Достать по Id новую проекцию (у проекции для этого должен быть IGetProjection)
+            // 4. Обновить
+            // 5. Достать полную проекцию и проверить, что обновляемые поля обновлены, а другие остались нетронутыми
 
-	        var user = new User {Login = "user1", Email = "user1@user1.ru", Password = "123", Salt = "111"};
-	         _repository.Insert(user, true);
+            var user = new User { Login = "user1", Email = "user1@user1.ru", Password = "123", Salt = "111" };
+            _repository.Insert(user, true);
 
-	        var loaded = _repository.Get<UserUpdateProjection>(user.Id, true);
-	        loaded.Email = "new@user1.ru";
-	        loaded.Password = "newPass";
+            var loaded = _repository.Get<UserUpdateProjection>(user.Id, true);
+            loaded.Email = "new@user1.ru";
+            loaded.Password = "newPass";
 
-	        _repository.Update(loaded, true);
+            _repository.Update(loaded, true);
 
-	        var loadedFullUser = _repository.Get<User>(user.Id, true);
+            var loadedFullUser = _repository.Get<User>(user.Id, true);
 
             Assert.AreEqual("user1", loadedFullUser.Login);
             Assert.AreEqual("new@user1.ru", loadedFullUser.Email);
             Assert.AreEqual("newPass", loadedFullUser.Password);
             Assert.AreEqual("111", loadedFullUser.Salt);
-	    }
+        }
 
-	    [TestMethod]
-	    public void HtmlStripTest()
-	    {
-		    
-	    }
+        [TestMethod]
+        public void HtmlStripTest()
+        {
 
-	    [TestMethod]
-	    public void AutocompleteTest()
-	    {
-			// Есть уже анализатор, но лучше покурить это: https://www.red-gate.com/simple-talk/dotnet/net-development/how-to-build-a-search-page-with-elasticsearch-and-net/
-		}
-	}
+        }
+
+        [TestMethod]
+        public void AutocompleteTest()
+        {
+            var category = new Category { Name = "Category1" };
+            _repository.Insert(category, true);
+
+            var product = new Product { Name = "Product1", Title = "ProductA", Parent = category };
+            _repository.Insert<Product, Category>(product, true);
+
+            product = new Product { Name = "Product2", Title = "ProductB", Parent = category };
+            _repository.Insert<Product, Category>(product, true);
+
+            var products =
+                _repository.CompletionSuggest<Product, Product>(s => s.Field(p => p.Title).Prefix("pr"));
+
+            Assert.IsTrue(products.Any());
+
+            products =
+                _repository.CompletionSuggest<Product, Product>(s => s.Field(p => p.Title).Prefix("productA"));
+
+            Assert.IsTrue(products.Any());
+            Assert.AreEqual(products.Count, 1);
+            // Есть уже анализатор, но лучше покурить это: https://www.red-gate.com/simple-talk/dotnet/net-development/how-to-build-a-search-page-with-elasticsearch-and-net/
+        }
+    }
 }

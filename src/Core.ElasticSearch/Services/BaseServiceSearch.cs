@@ -72,7 +72,25 @@ namespace Core.ElasticSearch
 						r => r.Documents.If(load, Load),
 						RepositoryLoggingEvents.ES_SEARCH));
 
-		protected IReadOnlyCollection<KeyValuePair<TProjection, int>> SearchWithScore<T, TProjection>(
+        protected IReadOnlyCollection<KeyValuePair<TProjection, string>> CompletionSuggest<T, TProjection>(
+           Func<CompletionSuggesterDescriptor<T>, ICompletionSuggester> suggester, int page = 0, int take = 0, bool load = true)
+           where TProjection : class, IProjection<T>, ISearchProjection
+           where T : class, IModel
+           => _mapping.GetProjectionItem<TProjection>()
+               .Convert(
+                   projection => Try(
+                       c => c.Search<T, TProjection>(
+                           x => x
+                               .Index(projection.MappingItem.IndexName)
+                               .Type(projection.MappingItem.TypeName)
+                               .Source(s => s.Includes(f => f.Fields(projection.Fields)))
+                               .IfNotNull(suggester, y => y.Suggest(ss => ss.Completion("my-completion-suggest", suggester)))
+                               .If(y => typeof(IWithVersion).IsAssignableFrom(typeof(TProjection)), y => y.Version())
+                               .IfNotNull(take, y => y.Take(take).Skip(page * take))),
+                       r => r.Suggest["my-completion-suggest"].SelectMany(f => f.Options).Select(x => new KeyValuePair<TProjection, string>(x.Source, x.Text)).ToArray().If(load, Load),
+                       RepositoryLoggingEvents.ES_SEARCH));
+
+        protected IReadOnlyCollection<KeyValuePair<TProjection, int>> SearchWithScore<T, TProjection>(
 			Func<QueryContainerDescriptor<T>, QueryContainer> query,
 			Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, int page = 0, int take = 0, bool load = true)
 			where TProjection : class, IProjection<T>, ISearchProjection

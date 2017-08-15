@@ -113,5 +113,12 @@ namespace Core.Tests
             where TProjection : class, IProjection<T>, ISearchProjection
 			where T : class, IModel
             => base.SearchPager<T, TProjection>(query, page, take, sort, load);
+
+        public new IReadOnlyCollection<KeyValuePair<TProjection, string>> CompletionSuggest<T, TProjection>(
+            Func<CompletionSuggesterDescriptor<T>, ICompletionSuggester> suggester, int page = 0, int take = 0,
+            bool load = true)
+            where TProjection : class, IProjection<T>, ISearchProjection
+            where T : class, IModel
+            => base.CompletionSuggest<T, TProjection>(suggester, page, take, load);
     }
 }
