@@ -11,7 +11,7 @@ namespace Expo3.LoginApp.Projections
         [JsonProperty]
         public string Email { get; private set; }
         [JsonProperty]
-        public string Nickname { get; private set; }
+        public string Name { get; private set; }
         [JsonProperty]
         public string Password { get; private set; }
         [JsonProperty]
@@ -23,7 +23,7 @@ namespace Expo3.LoginApp.Projections
 	public class RegisterUserProjection : BaseEntity, IProjection<User>, IInsertProjection
 	{
 		public string Email { get; set; }
-		public string Nickname { get; set; }
+		public string Name { get; set; }
 		public string Password { get; set; }
 		public string Salt { get; set; }
 		public EUserRole[] Roles { get; set; }
@@ -32,7 +32,7 @@ namespace Expo3.LoginApp.Projections
 	public class LoginUserProjection : BaseEntity, IProjection<User>, ISearchProjection
 	{
         [JsonProperty]
-		public string Nickname { get; private set; }
+		public string Name { get; private set; }
         [JsonProperty]
 		public EUserRole[] Roles { get; private set; }
 
@@ -41,7 +41,7 @@ namespace Expo3.LoginApp.Projections
 		internal LoginUserProjection(UserProjection user) // for auth service (without RequestContainer)
 		{			
 			SetId(user.Id);
-			Nickname = user.Nickname;
+			Name = user.Name;
 			Roles = user.Roles;
 		}
 	}

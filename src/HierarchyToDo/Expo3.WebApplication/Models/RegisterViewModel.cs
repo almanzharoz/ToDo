@@ -9,7 +9,7 @@ namespace Expo3.WebApplication.Models
     public class RegisterViewModel
     {
         [Required]
-        public string Nickname { get; set; }
+        public string Name { get; set; }
         [Required]
         public string Password { get; set; }
         [Required]

@@ -10,7 +10,7 @@ namespace Expo3.LoginApp.Services
         Ok = 0,
         EmailIsEmpty = 1,
         WrongEmail = 2,
-        NicknameIsEmpty = 3,
+        NameIsEmpty = 3,
         PasswordIsEmpty = 4,
         EmailAlreadyExists = 5,
         UnknownError = 6

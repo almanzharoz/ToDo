@@ -21,7 +21,7 @@ namespace Expo3.AdminApp.Services
 		}
 
 		///<exception cref="EntityAlreadyExistsException"></exception>
-		public bool AddUser(string email, string password, string nickname, EUserRole[] roles, bool refresh = false)
+		public bool AddUser(string email, string password, string name, EUserRole[] roles, bool refresh = false)
 		{
 			if (FilterCount<UserInsertProjection>(q => q.Term(x => x.Email.ToLowerInvariant(), email.ToLowerInvariant())) != 0)
 				throw new EntityAlreadyExistsException();
@@ -34,18 +34,18 @@ namespace Expo3.AdminApp.Services
 			return Insert(new UserInsertProjection
 			{
 				Email = email,
-				Nickname = nickname,
+				Name = name,
 				Password = hashedPassword,
 				Salt = Base64UrlTextEncoder.Encode(salt),
 				Roles = roles
 			}, refresh);
 		}
 
-		public bool EditUser(string id, string email, string password, string nickname, EUserRole[] roles)
+		public bool EditUser(string id, string email, string password, string name, EUserRole[] roles)
 		=> Update(Get<UserUpdateProjection>(id), u =>
 			{
 				u.Email = email.ToLowerInvariant();
-				u.Nickname = nickname;
+				u.Name = name;
 				u.Password = HashPasswordHelper.GetHash(password, Base64UrlTextEncoder.Decode(u.Salt));
 				u.Roles = roles;
 				return u;

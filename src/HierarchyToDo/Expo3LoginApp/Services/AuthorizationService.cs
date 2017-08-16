@@ -27,7 +27,7 @@ namespace Expo3.LoginApp.Services
                 .If(user => user != null && HashPasswordHelper.GetHash(password, Base64UrlTextEncoder.Decode(user.Salt)) == user.Password,
                     user => new LoginUserProjection(user), user => null);
 
-        public UserRegistrationResult Register(string email, string nickname, string password, EUserRole[] roles)
+        public UserRegistrationResult Register(string email, string name, string password, EUserRole[] roles)
         {
             if (String.IsNullOrEmpty(email))
             {
@@ -41,9 +41,9 @@ namespace Expo3.LoginApp.Services
             {
                 return UserRegistrationResult.PasswordIsEmpty;
             }
-            if (String.IsNullOrEmpty(nickname))
+            if (String.IsNullOrEmpty(name))
             {
-                return UserRegistrationResult.NicknameIsEmpty;
+                return UserRegistrationResult.NameIsEmpty;
             }
 
             if (FilterCount<UserProjection>(q => q.Term(x => x.Email.ToLowerInvariant(), email.ToLowerInvariant())) > 0)
@@ -57,7 +57,7 @@ namespace Expo3.LoginApp.Services
             return Insert(new RegisterUserProjection
             {
                 Email = email,
-                Nickname = nickname,
+                Name = name,
                 Password = hashedPassword,
                 Salt = Base64UrlTextEncoder.Encode(salt),
                 Roles = roles

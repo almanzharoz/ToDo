@@ -10,7 +10,7 @@ namespace Expo3.AdminApp.Projections
 	public class UserInsertProjection : BaseEntityWithVersion, IProjection<User>, IInsertProjection
 	{
 		public string Email { get; set; }
-		public string Nickname { get; set; }
+		public string Name { get; set; }
 		public string Password { get; set; }
 		public string Salt { get; set; }
 		public EUserRole[] Roles { get; set; }
@@ -19,7 +19,7 @@ namespace Expo3.AdminApp.Projections
 	public class UserUpdateProjection : BaseEntityWithVersion, IProjection<User>, IGetProjection, IUpdateProjection
 	{
 		public string Email { get; set; }
-		public string Nickname { get; set; }
+		public string Name { get; set; }
 		public string Password { get; set; }
 		public EUserRole[] Roles { get; set; }
 		[JsonProperty]
@@ -31,7 +31,7 @@ namespace Expo3.AdminApp.Projections
 		[JsonProperty]
 		public string Email { get; private set; }
 		[JsonProperty]
-		public string Nickname { get; private set; }
+		public string Name { get; private set; }
 		[JsonProperty]
 		public EUserRole[] Roles { get; private set; }
 	}

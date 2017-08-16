@@ -1,5 +1,6 @@
 ﻿using System;
 using Core.ElasticSearch.Domain;
+using Expo3.Model;
 using Expo3.Model.Embed;
 using Expo3.Model.Interfaces;
 using Expo3.Model.Models;
@@ -21,13 +22,12 @@ namespace Expo3.OrganizersApp.Projections
 		}
 
 		public Category Category { get; set; }
-		public string Caption { get; set; }
-		public DateTime StartDateTime { get; set; }
-		public DateTime FinishDateTime { get; set; }
+		public EventDateTime DateTime { get; set; }
 		public Address Address { get; set; }
 		public EEventType Type { get; set; }
 		public string Name { get; set; }
-		public Visitor[] Visitors { get; set; }
+		public TicketPrice[] Prices { get; set; }
+		public EventPage Page { get; set; }
 
 		[Keyword]
 		[JsonProperty]

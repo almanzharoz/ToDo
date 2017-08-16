@@ -16,9 +16,7 @@ namespace Expo3.Model.Models
 		public string Name { get; set; }
 		[Keyword]
 		public User Owner { get; set; }
-		public DateTime StartDateTime { get; set; }
-		public DateTime FinishDateTime { get; set; }
-		public string Timezone { get; set; }
+		public EventDateTime DateTime { get; set; }
 		public Address Address { get; set; }
 		public EEventType Type { get; set; }
 		public TicketPrice[] Prices { get; set; }

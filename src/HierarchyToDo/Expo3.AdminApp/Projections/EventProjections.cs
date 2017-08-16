@@ -23,8 +23,7 @@ namespace Expo3.AdminApp.Projections
 
 		public Category Category { get; set; }
 		public string Caption { get; set; }
-		public DateTime StartDateTime { get; set; }
-		public DateTime FinishDateTime { get; set; }
+		public EventDateTime DateTime { get; set; }
 		public Address Address { get; set; }
 		public EEventType Type { get; set; }
 		public string Name { get; set; }

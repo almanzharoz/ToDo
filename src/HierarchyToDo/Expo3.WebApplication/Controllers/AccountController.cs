@@ -31,14 +31,14 @@ namespace Expo3.WebApplication.Controllers
             if (user == null)
                 return View(vm);
 
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.Nickname),
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim("IP", Request.Host.Host, ClaimValueTypes.String),
-                new Claim("permission-foo", "grant")
-            };
-            claims.AddRange((user.Roles ?? new[] { EUserRole.Anonym }).Select(x => new Claim(ClaimTypes.Role, x.ToString().ToLower())));
+			var claims = new List<Claim>
+			{
+				new Claim(ClaimTypes.Name, user.Name),
+				new Claim(ClaimTypes.NameIdentifier, user.Id),
+				new Claim("IP", Request.Host.Host, ClaimValueTypes.String),
+				new Claim("permission-foo", "grant")
+			};
+			claims.AddRange((user.Roles ?? new[] { EUserRole.Anonym }).Select(x => new Claim(ClaimTypes.Role, x.ToString().ToLower())));
 
             var identity = new ClaimsIdentity("MyCookieMiddlewareInstance");
             identity.AddClaims(claims);
@@ -84,8 +84,8 @@ namespace Expo3.WebApplication.Controllers
             if (ModelState.IsValid)
             {
                 model.Email = model.Email.Trim().ToLowerInvariant();
-                model.Nickname = model.Nickname.Trim();
-                var result = _service.Register(model.Email, model.Nickname, model.Password,
+                model.Name = model.Name.Trim();
+                var result = _service.Register(model.Email, model.Name, model.Password,
                     new[] { EUserRole.Organizer, EUserRole.User });
                 switch (result)
                 {
@@ -95,7 +95,7 @@ namespace Expo3.WebApplication.Controllers
                     case UserRegistrationResult.EmailAlreadyExists:
                         ModelState.AddModelError("", "”казанный email уже существует");
                         break;
-                    case UserRegistrationResult.NicknameIsEmpty:
+                    case UserRegistrationResult.NameIsEmpty:
                     case UserRegistrationResult.EmailIsEmpty:
                     case UserRegistrationResult.UnknownError:
                     case UserRegistrationResult.PasswordIsEmpty:

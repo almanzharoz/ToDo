@@ -22,14 +22,12 @@ namespace Expo3.OrganizersApp.Services
 
 		/// <exception cref="AddEntityException"></exception>
 		// TODO: добавить проверку пользователя
-		public void AddEvent(string name, string caption, DateTime start, DateTime finish, Address address, EEventType type,
+		public void AddEvent(string name, string caption, EventDateTime dateTime, Address address, EEventType type,
 			Category category, bool refresh = false)
 			=> Insert(new EventProjection(Get<BaseUserProjection>(User.Id).HasNotNullArg("owner"))
 				{
 					Name = name,
-					Caption = caption,
-					StartDateTime = start,
-					FinishDateTime = finish,
+					DateTime = dateTime,
 					Address = address,
 					Type = type,
 					Category = category
@@ -45,13 +43,11 @@ namespace Expo3.OrganizersApp.Services
 
 		///<exception cref="UpdateEntityException"></exception>
 		public void UpdateEvent(string id, string name, string caption,
-			DateTime startDateTime, DateTime finishDateTime, Address address, EEventType type, bool refresh = false)
+			EventDateTime dateTime, Address address, EEventType type, bool refresh = false)
 			=> Update(GetEvent(id).HasNotNullArg("event"), x =>
 				{
 					x.Name = name;
-					x.Caption = caption;
-					x.StartDateTime = startDateTime;
-					x.FinishDateTime = finishDateTime;
+					x.DateTime = dateTime;
 					x.Address = address;
 					x.Type = type;
 					return x;
