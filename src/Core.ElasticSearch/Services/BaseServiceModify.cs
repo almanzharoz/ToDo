@@ -13,8 +13,8 @@ namespace Core.ElasticSearch
 			=> Try(
 				c => c.Index(entity, s => s
 						.Index(_mapping.GetIndexName<T>())
-						.Type(_mapping.GetTypeName<T>())
-						.If(refresh, x => x.Refresh(Refresh.True)))
+						.Type(_mapping.GetTypeName<T>()))
+						//.If(refresh, x => x.Refresh(Refresh.True)))
 					.Fluent(x => entity
 						.Is<T, BaseEntityWithVersion>(s => (s as BaseEntityWithVersion).Version = (int) x.Version)
 						.Id = x.Id),

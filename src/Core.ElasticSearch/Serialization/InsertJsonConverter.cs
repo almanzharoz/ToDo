@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Core.ElasticSearch.Domain;
@@ -20,6 +21,8 @@ namespace Core.ElasticSearch.Serialization
 
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
 		{
+			var sw = new Stopwatch();
+			sw.Start();
 			writer.WriteStartObject();
 			foreach (var property in _projection.Properties.Where(x => x.CanWrite))
 			{
@@ -31,6 +34,8 @@ namespace Core.ElasticSearch.Serialization
 				o.WriteTo(writer);
 			}
 			writer.WriteEndObject();
+			sw.Stop();
+			Console.WriteLine("Insert WriteJson: "+sw.ElapsedMilliseconds);
 		}
 
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)

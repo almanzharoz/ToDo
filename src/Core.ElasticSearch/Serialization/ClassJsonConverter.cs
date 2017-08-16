@@ -35,6 +35,8 @@ namespace Core.ElasticSearch.Serialization
 
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
 		{
+			//var sw = new Stopwatch();
+			//sw.Start();
 			writer.WriteStartObject();
 			foreach (var property in _projectionItem.Properties)
 			{
@@ -46,6 +48,8 @@ namespace Core.ElasticSearch.Serialization
 				o.WriteTo(writer);
 			}
 			writer.WriteEndObject();
+			//sw.Stop();
+			//Console.WriteLine("WriteJson: " + sw.ElapsedMilliseconds);
 		}
 
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -56,7 +60,7 @@ namespace Core.ElasticSearch.Serialization
 			{
 				sw.Stop();
 				var r = _entityContainer.GetOrAdd<T>(reader.Value as string, true);
-				Debug.WriteLine($"DeserializeId<{typeof(T).Name}>: " + sw.ElapsedMilliseconds);
+				Console.WriteLine($"DeserializeId<{typeof(T).Name}>: " + sw.ElapsedMilliseconds);
 				return r;
 			}
 			var jsonObject = JObject.Load(reader);
@@ -69,7 +73,7 @@ namespace Core.ElasticSearch.Serialization
 			if (target is IWithVersion && jsonObject.TryGetValue("version", out var v))
 				((BaseEntityWithVersion) target).Version = (int)v;
 			sw.Stop();
-			Debug.WriteLine($"Deserialize<{typeof(T).Name}>: " + sw.ElapsedMilliseconds);
+			//Console.WriteLine($"Deserialize<{typeof(T).Name}>: " + sw.ElapsedMilliseconds);
 			return target;
 		}
 

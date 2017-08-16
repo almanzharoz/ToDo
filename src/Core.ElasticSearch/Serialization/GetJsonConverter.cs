@@ -44,4 +44,31 @@ namespace Core.ElasticSearch.Serialization
 			throw new NotImplementedException();
 		}
 	}
+
+	internal class IndexJsonConverter : JsonConverter
+	{
+		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+		{
+			var jsonObject = JObject.Load(reader);
+			var result = new IndexResponse();
+			using (var r = jsonObject.CreateReader())
+				serializer.Populate(r, result);
+			//if (result.Source is IWithVersion)
+			//	((IWithVersion)result.Source).Version = (int)result.Version;
+			//if (typeof(T).GetTypeInfo().GetInterfaces().Any(z => z.Name.IndexOf("IWithParent") == 0))
+			//	typeof(T).GetTypeInfo().GetProperty("Parent").SetValue(result.Source, _entityContainer.Get(result.Parent));
+			//result.Source.Id = result.Id;
+			return result;
+		}
+
+		public override bool CanConvert(Type objectType)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

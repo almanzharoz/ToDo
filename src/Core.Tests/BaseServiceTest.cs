@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Core.ElasticQueryBuilder.Commands;
 using Core.ElasticSearch;
 using Core.ElasticSearch.Domain;
@@ -11,6 +12,7 @@ using Core.Tests.Models;
 using Core.Tests.Projections;
 using Elasticsearch.Net;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Nest;
 using SharpFuncExt;
 
 namespace Core.Tests
@@ -541,12 +543,23 @@ namespace Core.Tests
 		[TestMethod]
 		public void SearchCategoryByParentWithPagingAndWithLoad()
 		{
+			var sw = new Stopwatch();
 			var parentCategory = new Category() {Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow};
+			sw.Restart();
 			_repository.Insert(parentCategory, true);
+			sw.Stop();
+			Console.WriteLine(sw.ElapsedMilliseconds);
 			var childCategory1 = new Category() {Name = "Child Category1", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow};
+			sw.Restart();
 			_repository.Insert(childCategory1, true);
+			sw.Stop();
+			Console.WriteLine(sw.ElapsedMilliseconds);
 			var childCategory2 = new Category() {Name = "Child Category2", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow};
-			_repository.Insert(childCategory2, true);
+			sw.Restart();
+			//_repository.Insert(childCategory2, true);
+			_repository.GetNestClient().Index(childCategory2, s => s.Index("first_test_index").Index("category").Refresh(Refresh.False));
+			sw.Stop();
+			Console.WriteLine(sw.ElapsedMilliseconds);
 			var childCategory3 = new Category() {Name = "Child Category3", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow};
 			_repository.Insert(childCategory3, true);
 			var category1 = new Category() {Name = "Category1", CreatedOnUtc = DateTime.UtcNow};
@@ -555,13 +568,31 @@ namespace Core.Tests
 			_repository.Insert(category2, true);
 
 			//var childCategories = _repository.FilterPager<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 1, 2, sort => sort.Descending(c => c.CreatedOnUtc), true);
-			var sw = new Stopwatch();
-			sw.Start();
+			sw.Restart();
 			var childCategories = _repository.FilterPager<Category, Category>(
 				q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 1, 2, sort => sort.Descending(c => c.CreatedOnUtc),
 				true);
 			sw.Stop();
 			Console.WriteLine(sw.ElapsedMilliseconds);
+
+			_repository.Clear();
+
+			sw.Restart();
+			childCategories = _repository.FilterPager<Category, Category>(
+				q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 1, 2, sort => sort.Descending(c => c.CreatedOnUtc),
+				true);
+			sw.Stop();
+			Console.WriteLine(sw.ElapsedMilliseconds);
+
+			//sw.Restart();
+			//for (var i = 0; i < 10000; i++)
+			//{
+			//	childCategories = _repository.FilterPager<Category, Category>(
+			//		q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 1, 2, sort => sort.Descending(c => c.CreatedOnUtc),
+			//		true);
+			//}
+			//sw.Stop();
+			//Console.WriteLine(sw.ElapsedMilliseconds);
 
 			Assert.AreEqual(childCategories.Total, 3);
 			Assert.AreEqual(childCategories.Limit, 2);
@@ -643,6 +674,49 @@ namespace Core.Tests
 		}
 
 		[TestMethod]
+		public void NestQueryTest()
+		{
+			var sw = new Stopwatch();
+			//var q = Nest.Query<Product>.Bool(b => b.Must(m => m.Term(p => p.Name, "123")));
+			//var s = _repository.GetNestClient().Serializer.SerializeToString(q);
+			//sw.Start();
+			//for (var i = 0; i < 10000; i++)
+			//{
+			//	q = Nest.Query<Product>.Bool(b => b.Must(m => m.Term(p => p.Name, Guid.NewGuid().ToString())));
+			//	s = _repository.GetNestClient().Serializer.SerializeToString(q);
+			//}
+			//Console.WriteLine(s);
+			//sw.Stop();
+			//Console.WriteLine(sw.ElapsedMilliseconds);
+			//Console.WriteLine(sw.ElapsedTicks);
+
+			sw.Restart();
+			var sd = new IndexDescriptor<Category>(new Category(){Name = "name"}).Type("category").Index("first_test_index");
+			//var sd = new SearchDescriptor<object>().Type(Types.Parse("project")).Query(q => q.Bool(b => b.Filter(Nest.Query<object>.Ids(z => z.Values(new[] { "AVx9SuIapC_PV5uTcKSj" })))));
+			_repository.GetNestClient().Serializer.SerializeToBytes(sd);
+			sw.Stop();
+			Console.WriteLine(sw.ElapsedTicks);
+			var d = new PostData<object>(_repository.GetNestClient()
+				.Serializer.SerializeToBytes(new Category() {Name = Guid.NewGuid().ToString()}));
+			var a = new List<Task<IIndexResponse>>(100);
+			sw.Restart();
+			for (var i = 0; i < 100; i++)
+			{
+				//sd = new SearchDescriptor<object>().Type(Types.Parse("project"))
+				//	.Query(q => q.Bool(b => b.Filter(Nest.Query<object>.Ids(z => z.Values(new[] {Guid.NewGuid().ToString()})))));
+				//sd = new IndexDescriptor<Category>(new Category() { Name = Guid.NewGuid().ToString() }).Type("category").Index("first_test_index");
+				//_repository.GetNestClient().Serializer.SerializeToString(sd);
+				var r = _repository.GetNestClient().IndexAsync(new IndexRequest<Category>(new Category() { Name = Guid.NewGuid().ToString() }, "first_test_index", "category"));
+				a.Add(r);
+				//_repository.GetClient().IndexAsync<Category>("first_test_index", "category", d);
+			}
+			Task.WaitAll(a.ToArray());
+			sw.Stop();
+			Console.WriteLine(sw.ElapsedMilliseconds);
+			Console.WriteLine(sw.ElapsedTicks);
+		}
+
+		[TestMethod]
 		public void QueryTest()
 		{
 			Stopwatch sw1 = new Stopwatch();
@@ -709,7 +783,7 @@ namespace Core.Tests
 			for (var i = 0; i < 10000; i++)
 			{
 				//q3 = ElasticQueryBuilder.QueryFactory.GetOrAdd<SearchCommand<Product>>(x => x.Query(q => q.Bool(b => b.Term(p => p.FullName, new FullName() { Category = "category", Name = "name", Producer = "producer" }))));
-				q3 = ElasticQueryBuilder.QueryFactory.GetOrAdd<SearchCommand<Product>>(x => x.Query(q => q.Bool(b => b.Term(p => p.Name, "321"))));
+				q3 = ElasticQueryBuilder.QueryFactory.GetOrAdd<SearchCommand<Product>>(x => x.Query(q => q.Bool(b => b.Term(p => p.Name, Guid.NewGuid().ToString()))));
 			}
 
 			sw.Stop();

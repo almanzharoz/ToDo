@@ -123,6 +123,9 @@ namespace Core.Tests
 	    public IElasticLowLevelClient GetClient()
 		    => base._client.LowLevel;
 
-	    public void Clear() => base.Clear();
+	    public ElasticClient GetNestClient()
+		    => base._client;
+
+		public void Clear() => base.Clear();
     }
 }

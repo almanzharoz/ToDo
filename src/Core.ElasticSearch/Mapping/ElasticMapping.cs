@@ -59,6 +59,7 @@ namespace Core.ElasticSearch.Mapping
 		{
 			_settings = settings;
 			_logger = loggerFactory.CreateLogger<ElasticMapping<TSettings>>();
+			_converters.TryAdd(typeof(IndexResponse), new IndexJsonConverter());
 			_converters.TryAdd(typeof(GetResponse<IProjection>), new GetJsonConverter<IProjection>());
 			_converters.TryAdd(typeof(SearchResponse<IProjection>), new SearchJsonConverter<IProjection>());
 		}
