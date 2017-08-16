@@ -11,7 +11,7 @@ namespace Expo3.ClientApp
 {
 	public static class BuilderExtensions
 	{
-		public static IServiceCollection AddExpo3ClientApp(this IServiceCollection services, Uri connectionString)
+		public static IServiceCollection AddExpo3ClientApp(this IServiceCollection services)
 		{
 			return services
 				.AddService<EventService, Expo3ElasticConnection>();

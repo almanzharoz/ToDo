@@ -598,10 +598,13 @@ namespace Core.Tests
             var product = new Product { Name = "Product1", Title = "ProductA", Parent = category };
             _repository.Insert<Product, Category>(product, true);
 
-            product = new Product { Name = "Product2", Title = "ProductB", Parent = category };
+            product = new Product { Name = "Product2", Title = "ProductA1", Parent = category };
             _repository.Insert<Product, Category>(product, true);
 
-            var products =
+	        product = new Product { Name = "Product3", Title = "ProductB", Parent = category };
+	        _repository.Insert<Product, Category>(product, true);
+
+			var products =
                 _repository.CompletionSuggest<Product, Product>(s => s.Field(p => p.Title).Prefix("pr"));
 
             Assert.IsTrue(products.Any());
@@ -610,7 +613,7 @@ namespace Core.Tests
                 _repository.CompletionSuggest<Product, Product>(s => s.Field(p => p.Title).Prefix("productA"));
 
             Assert.IsTrue(products.Any());
-            Assert.AreEqual(products.Count, 1);
+            Assert.AreEqual(products.Count, 2);
             // Есть уже анализатор, но лучше покурить это: https://www.red-gate.com/simple-talk/dotnet/net-development/how-to-build-a-search-page-with-elasticsearch-and-net/
         }
     }

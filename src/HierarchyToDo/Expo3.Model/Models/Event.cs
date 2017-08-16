@@ -16,7 +16,6 @@ namespace Expo3.Model.Models
 		public string Name { get; set; }
 		[Keyword]
 		public User Owner { get; set; }
-		[Keyword(Index = false)]
 		public DateTime StartDateTime { get; set; }
 		public DateTime FinishDateTime { get; set; }
 		public string Timezone { get; set; }

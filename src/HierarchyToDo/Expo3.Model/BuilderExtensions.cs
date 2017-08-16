@@ -18,7 +18,6 @@ namespace Expo3.Model
 				    // маппинг
 				    .AddMapping<User>(x => x.UserIndexName)
 				    .AddMapping<Event>(x => x.EventIndexName)
-				    .AddMapping<EventPage>(x => x.EventIndexName)
 				    .AddMapping<OwnerEvent>(x => x.EventIndexName)
 				    // внутренние документы
 				    .AddStruct<Price>()
