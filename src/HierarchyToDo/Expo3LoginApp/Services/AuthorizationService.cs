@@ -13,56 +13,72 @@ using SharpFuncExt;
 
 namespace Expo3.LoginApp.Services
 {
-	public class AuthorizationService : BaseExpo3Service
-	{
-		public AuthorizationService(ILoggerFactory loggerFactory, Expo3ElasticConnection settings,
-			ElasticScopeFactory<Expo3ElasticConnection> factory, UserName user) : base(loggerFactory, settings, factory,
-			user)
-		{
-		}
+    public class AuthorizationService : BaseExpo3Service
+    {
+        public AuthorizationService(ILoggerFactory loggerFactory, Expo3ElasticConnection settings,
+            ElasticScopeFactory<Expo3ElasticConnection> factory, UserName user) : base(loggerFactory, settings, factory,
+            user)
+        {
+        }
 
-		public LoginUserProjection TryLogin(string email, string password)
-			=> Filter<User, UserProjection>(q => q.Term(x => x.Email, email), null, 1)
-				.FirstOrDefault()
-				.If(user => user != null && HashPasswordHelper.GetHash(password, Base64UrlTextEncoder.Decode(user.Salt)) == user.Password,
-					user => new LoginUserProjection(user), user => null);
+        public LoginUserProjection TryLogin(string email, string password)
+            => Filter<User, UserProjection>(q => q.Term(x => x.Email, email), null, 1)
+                .FirstOrDefault()
+                .If(user => user != null && HashPasswordHelper.GetHash(password, Base64UrlTextEncoder.Decode(user.Salt)) == user.Password,
+                    user => new LoginUserProjection(user), user => null);
 
-		/// <exception cref="EntityAlreadyExistsException"></exception>
-		public bool Register(string email, string nickname, string password, EUserRole[] roles)
-		{
-			if (FilterCount<UserProjection>(q => q.Term(x => x.Email.ToLowerInvariant(), email.ToLowerInvariant())) > 0)
-				throw new EntityAlreadyExistsException();
+        public UserRegistrationResult Register(string email, string nickname, string password, EUserRole[] roles)
+        {
+            if (String.IsNullOrEmpty(email))
+            {
+                return UserRegistrationResult.EmailIsEmpty;
+            }
+            if (!CommonHelper.IsValidEmail(email))
+            {
+                return UserRegistrationResult.WrongEmail;
+            }
+            if (String.IsNullOrWhiteSpace(password))
+            {
+                return UserRegistrationResult.PasswordIsEmpty;
+            }
+            if (String.IsNullOrEmpty(nickname))
+            {
+                return UserRegistrationResult.NicknameIsEmpty;
+            }
 
-			email = email.ToLowerInvariant();
-			var salt = HashPasswordHelper.GenerateSalt();
-			var hashedPassword = HashPasswordHelper.GetHash(password, salt);
-			password = null;
+            if (FilterCount<UserProjection>(q => q.Term(x => x.Email.ToLowerInvariant(), email.ToLowerInvariant())) > 0)
+            {
+                return UserRegistrationResult.EmailAlreadyExists;
+            }
 
-			return Insert(new RegisterUserProjection
-			{
-				Email = email,
-				Nickname = nickname,
-				Password = hashedPassword,
-				Salt =  Base64UrlTextEncoder.Encode(salt),
-				Roles = roles
-			});
-		}
+            var salt = HashPasswordHelper.GenerateSalt();
+            var hashedPassword = HashPasswordHelper.GetHash(password, salt);
 
-		public bool ChangePassword(string email, string oldPassword, string newPassword)
-		{
-			var user = TryLogin(email, oldPassword);
-			oldPassword = null;
-			if (user == null) return false;
+            return Insert(new RegisterUserProjection
+            {
+                Email = email,
+                Nickname = nickname,
+                Password = hashedPassword,
+                Salt = Base64UrlTextEncoder.Encode(salt),
+                Roles = roles
+            }) ? UserRegistrationResult.Ok : UserRegistrationResult.UnknownError;
+        }
 
-			var salt = HashPasswordHelper.GenerateSalt();
-			var hashedPassword = HashPasswordHelper.GetHash(newPassword, salt);
-			newPassword = null;
+        public bool ChangePassword(string email, string oldPassword, string newPassword)
+        {
+            var user = TryLogin(email, oldPassword);
+            oldPassword = null;
+            if (user == null) return false;
 
-			var userUpdate = Get<UpdatePasswordProjection>(user.Id);
-			userUpdate.Password = hashedPassword;
-			userUpdate.Salt = Base64UrlTextEncoder.Encode(salt);
+            var salt = HashPasswordHelper.GenerateSalt();
+            var hashedPassword = HashPasswordHelper.GetHash(newPassword, salt);
+            newPassword = null;
 
-			return Update(userUpdate);
-		}
-	}
+            var userUpdate = Get<UpdatePasswordProjection>(user.Id);
+            userUpdate.Password = hashedPassword;
+            userUpdate.Salt = Base64UrlTextEncoder.Encode(salt);
+
+            return Update(userUpdate);
+        }
+    }
 }

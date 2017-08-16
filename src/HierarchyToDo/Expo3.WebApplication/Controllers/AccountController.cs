@@ -11,71 +11,100 @@ using Expo3.WebApplication.Models;
 
 namespace Expo3.WebApplication.Controllers
 {
-	public class AccountController : BaseController<AuthorizationService>
-	{
-		public AccountController(AuthorizationService service) : base(service)
-		{
-		}
+    public class AccountController : BaseController<AuthorizationService>
+    {
+        public AccountController(AuthorizationService service) : base(service)
+        {
+        }
 
-		[HttpGet]
-		public IActionResult Login(string returnUrl = null)
-		{
-			return View(new LoginViewModel() { ReturnUrl = returnUrl });
-		}
+        [HttpGet]
+        public IActionResult Login(string returnUrl = null)
+        {
+            return View(new LoginViewModel() { ReturnUrl = returnUrl });
+        }
 
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Login(LoginViewModel vm)
-		{
-			var user = _service.TryLogin(vm.Login.Trim().ToLower(), vm.Pass.Trim());
-			if (user == null)
-				return View(vm);
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel vm)
+        {
+            var user = _service.TryLogin(vm.Login.Trim().ToLower(), vm.Pass.Trim());
+            if (user == null)
+                return View(vm);
 
-			var claims = new List<Claim>
-			{
-				new Claim(ClaimTypes.Name, user.Nickname),
-				new Claim(ClaimTypes.NameIdentifier, user.Id),
-				new Claim("IP", Request.Host.Host, ClaimValueTypes.String),
-				new Claim("permission-foo", "grant")
-			};
-			claims.AddRange((user.Roles ?? new[] { EUserRole.Anonym }).Select(x => new Claim(ClaimTypes.Role, x.ToString().ToLower())));
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.Nickname),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim("IP", Request.Host.Host, ClaimValueTypes.String),
+                new Claim("permission-foo", "grant")
+            };
+            claims.AddRange((user.Roles ?? new[] { EUserRole.Anonym }).Select(x => new Claim(ClaimTypes.Role, x.ToString().ToLower())));
 
-			var identity = new ClaimsIdentity("MyCookieMiddlewareInstance");
-			identity.AddClaims(claims);
+            var identity = new ClaimsIdentity("MyCookieMiddlewareInstance");
+            identity.AddClaims(claims);
 
-			var principal = new ClaimsPrincipal(identity);
+            var principal = new ClaimsPrincipal(identity);
 
-			await HttpContext.Authentication.SignInAsync("MyCookieMiddlewareInstance",
-				principal,
-				new AuthenticationProperties
-				{
-					ExpiresUtc = DateTime.UtcNow.AddMinutes(20)
-				});
+            await HttpContext.Authentication.SignInAsync("MyCookieMiddlewareInstance",
+                principal,
+                new AuthenticationProperties
+                {
+                    ExpiresUtc = DateTime.UtcNow.AddMinutes(20)
+                });
 
-			//_logger.LogInformation(4, "User logged in.");
+            //_logger.LogInformation(4, "User logged in.");
 
-			return Redirect(vm.ReturnUrl ?? "/");
-		}
+            return Redirect(vm.ReturnUrl ?? "/");
+        }
 
-		[HttpGet]
-		public async Task<IActionResult> LogOff()
-		{
-			await HttpContext.Authentication.SignOutAsync("MyCookieMiddlewareInstance");
+        [HttpGet]
+        public async Task<IActionResult> LogOff()
+        {
+            await HttpContext.Authentication.SignOutAsync("MyCookieMiddlewareInstance");
 
-			//_logger.LogInformation(4, "User logged out.");
+            //_logger.LogInformation(4, "User logged out.");
 
-			return Redirect("/");
-		}
+            return Redirect("/");
+        }
 
-		public IActionResult AccessDenied()
-		{
-			return Content("Access Denied");
-		}
+        public IActionResult AccessDenied()
+        {
+            return Content("Access Denied");
+        }
 
-		public IActionResult Register() // TODO: добавить регистрацию
-		{
-			_service.Register("admin@mail.ru", "admin", "123", new[] {EUserRole.Organizer, EUserRole.User});
-			return Content("Done");
-		}
-	}
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View(new RegisterViewModel());
+        }
+
+        [HttpPost]
+        public IActionResult Register(RegisterViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                model.Email = model.Email.Trim().ToLowerInvariant();
+                model.Nickname = model.Nickname.Trim();
+                var result = _service.Register(model.Email, model.Nickname, model.Password,
+                    new[] { EUserRole.Organizer, EUserRole.User });
+                switch (result)
+                {
+                    case UserRegistrationResult.Ok:
+                        model.Result = "Пользователь успешно зарегистрирован.";
+                        break;
+                    case UserRegistrationResult.EmailAlreadyExists:
+                        ModelState.AddModelError("", "Указанный email уже существует");
+                        break;
+                    case UserRegistrationResult.NicknameIsEmpty:
+                    case UserRegistrationResult.EmailIsEmpty:
+                    case UserRegistrationResult.UnknownError:
+                    case UserRegistrationResult.PasswordIsEmpty:
+                    case UserRegistrationResult.WrongEmail:
+                        ModelState.AddModelError("", "При регистрации пользователя произошла неизвестная ошибка");
+                        break;
+                }
+            }
+            return View(model);
+        }
+    }
 }
