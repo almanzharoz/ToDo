@@ -17,12 +17,9 @@ namespace Expo3.ClientApp.Projections
 
 		[JsonProperty]
 		public string Cover { get; private set; }
-
 		[JsonProperty]
-		public DateTime StartDateTime { get; private set; }
+		public EventDateTime DateTime { get; private set; }
 
-		[JsonProperty]
-		public DateTime FinishDateTime { get; private set; }
 
 		[JsonProperty]
 		public Address Address { get; private set; }
