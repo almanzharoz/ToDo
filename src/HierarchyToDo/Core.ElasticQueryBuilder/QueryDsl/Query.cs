@@ -15,7 +15,7 @@ namespace Core.ElasticQueryBuilder.QueryDsl
 
 		public Query<T> Bool(Func<Bool<T>, Bool<T>> func)
 		{
-			AddItem(func(new Bool<T>()));
+			AddItem(func(new Bool<T>(_addParam)));
 			return this;
 		}
 

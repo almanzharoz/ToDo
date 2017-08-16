@@ -10,7 +10,7 @@ namespace Core.ElasticQueryBuilder.Commands
 
 		public SearchCommand<T> Query(Func<Query<T>, Query<T>> func)
 		{
-			AddItem(func(new Query<T>()));
+			AddItem(func(new Query<T>(AddParam)));
 			return this;
 		}
 

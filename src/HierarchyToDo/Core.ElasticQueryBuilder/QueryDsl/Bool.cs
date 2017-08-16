@@ -15,7 +15,7 @@ namespace Core.ElasticQueryBuilder.QueryDsl
 
 		public Bool<T> Term<TValue>(Expression<Func<T, TValue>> fieldExpression, TValue value)
 		{
-			AddItem(new Term<T, TValue>(fieldExpression));
+			AddItem(new Term<T, TValue>(fieldExpression, value, _addParam));
 			
 			return this;
 		}

@@ -696,8 +696,27 @@ namespace Core.Tests
 		[TestMethod]
 		public void QueryTest3()
 		{
+			var sw = new Stopwatch();
+			sw.Start();
+			//var s = ElasticQueryBuilder.QueryFactory.GetOrAdd<SearchCommand<Product>>(x => x.Query(q => q.Bool(b => b.Term(p => p.FullName, new FullName(){Category="category", Name="name", Producer = "producer"}))));
 			var s = ElasticQueryBuilder.QueryFactory.GetOrAdd<SearchCommand<Product>>(x => x.Query(q => q.Bool(b => b.Term(p => p.Name, "123"))));
+			sw.Stop();
 			Console.WriteLine(s);
+			Console.WriteLine(sw.ElapsedTicks);
+
+			sw.Restart();
+			string q3 = null;
+			for (var i = 0; i < 10000; i++)
+			{
+				//q3 = ElasticQueryBuilder.QueryFactory.GetOrAdd<SearchCommand<Product>>(x => x.Query(q => q.Bool(b => b.Term(p => p.FullName, new FullName() { Category = "category", Name = "name", Producer = "producer" }))));
+				q3 = ElasticQueryBuilder.QueryFactory.GetOrAdd<SearchCommand<Product>>(x => x.Query(q => q.Bool(b => b.Term(p => p.Name, "321"))));
+			}
+
+			sw.Stop();
+			Console.WriteLine(q3);
+			Console.WriteLine(sw.ElapsedMilliseconds);
+			Console.WriteLine(sw.ElapsedTicks);
+			Console.WriteLine(ElasticQueryBuilder.QueryFactory.Count);
 		}
 	}
 }

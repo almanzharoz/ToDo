@@ -9,7 +9,7 @@ namespace Core.ElasticQueryBuilder
 {
 	public abstract class BaseCommand
 	{
-		private static Regex _rx = new Regex("\"param\"", RegexOptions.Compiled);
+		private static Regex _rx = new Regex("\"#param\"", RegexOptions.Compiled);
 		private string _result;
 
 		protected List<string> _params = new List<string>();  //json serialized values
@@ -28,7 +28,7 @@ namespace Core.ElasticQueryBuilder
 			_hashBuilder.Append(baseHash);
 		}
 
-		internal void AddParam(object value) => _params.Add(value.ToString()); // add json serialize
+		internal void AddParam(object value) => _params.Add(JsonConvert.SerializeObject(value));
 
 		protected void AddItem<TItem>(TItem item) where TItem : BaseCommandItem
 		{
@@ -59,10 +59,8 @@ namespace Core.ElasticQueryBuilder
 			if (Hash != command.Hash)
 				throw new Exception("Commands hashes not equals");
 			var i = 0;
-			var s = _result;
 			var p = command.GetParams();
-			_rx.Replace(_result, match => p[i++]);
-			return s;
+			return _rx.Replace(_result, match => p[i++]);
 		}
 
 		internal string[] GetParams()

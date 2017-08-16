@@ -39,8 +39,8 @@ namespace Core.ElasticQueryBuilder
 		{
 			var s = fieldExpression.Body.ToString();
 			s = s.Substring(s.IndexOf(".") + 1);
-			writer.WritePropertyName(s);
-			writer.WriteValue("param");
+			writer.WritePropertyName(s.ToLower());
+			writer.WriteValue("#param");
 		}
 	}
 }

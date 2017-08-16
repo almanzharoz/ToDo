@@ -12,6 +12,8 @@ namespace Core.ElasticQueryBuilder
 		public static string GetOrAdd<TCommand>(Func<TCommand, TCommand> query) where TCommand : BaseCommand, new()
 		{
 			var q = query(new TCommand());
+			//q.Build();
+			//return q.GetJson(q);
 			return ((TCommand) Commands.GetOrAdd(q.Hash, k =>
 			{
 				q.Build();

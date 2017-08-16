@@ -12,7 +12,7 @@ namespace Core.ElasticQueryBuilder
 		protected List<BaseCommandItem> _items = new List<BaseCommandItem>();
 
 		public string Hash => _hashBuilder.ToString().Trim();
-		private readonly Action<object> _addParam;
+		protected readonly Action<object> _addParam;
 
 		protected BaseCommandItem(string baseHash, Action<object> addParam)
 		{
