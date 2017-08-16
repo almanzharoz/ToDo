@@ -28,7 +28,7 @@ namespace Expo3.LoginApp.Services
 					user => new LoginUserProjection(user), user => null);
 
 		/// <exception cref="EntityAlreadyExistsException"></exception>
-		public bool Register(string email, string nickname, string password, EUserRole[] roles)
+		public bool Register(string email, string name, string password, EUserRole[] roles)
 		{
 			if (FilterCount<UserProjection>(q => q.Term(x => x.Email.ToLowerInvariant(), email.ToLowerInvariant())) > 0)
 				throw new EntityAlreadyExistsException();
@@ -41,7 +41,7 @@ namespace Expo3.LoginApp.Services
 			return Insert(new RegisterUserProjection
 			{
 				Email = email,
-				Nickname = nickname,
+				Name = name,
 				Password = hashedPassword,
 				Salt =  Base64UrlTextEncoder.Encode(salt),
 				Roles = roles

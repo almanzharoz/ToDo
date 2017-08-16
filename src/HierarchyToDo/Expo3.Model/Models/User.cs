@@ -9,7 +9,7 @@ namespace Expo3.Model.Models
 	public class BaseUserProjection : BaseEntity, IProjection<User>, IGetProjection
 	{
 		[JsonProperty]
-		public string Nickname { get; private set; }
+		public string Name { get; private set; }
 		[JsonProperty]
 		public EUserRole[] Roles { get; private set; }
 	}
@@ -19,7 +19,7 @@ namespace Expo3.Model.Models
         [Keyword]
         public string Email { get; set; }
         [Keyword]
-        public string Nickname { get; set; }
+        public string Name { get; set; }
 		[Keyword(Index = false, Store = true)]
         public string Password { get; set; }
 		[Keyword(Index = false, Store = true)]
