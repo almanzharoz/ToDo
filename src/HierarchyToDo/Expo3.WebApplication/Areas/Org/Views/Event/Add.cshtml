@@ -1,0 +1,47 @@
+@using System
+@using System.Linq
+@using Expo3.Model.Embed
+@model Expo3.WebApplication.Areas.Org.Models.AddEventViewModel
+@{
+    ViewData["Title"] = "Add";
+}
+
+<h2>Add</h2>
+
+<form asp-action="Add" asp-controller="Event">
+    <div class="validation" asp-validation-summary="ModelOnly"></div>
+    <div>
+        <div>
+            <label>Name:</label>
+            <input type="text" class="form-control" asp-for="Name" placeholder="Name"/>
+            <span asp-validation-for="Name"></span>
+        </div>
+        <div>
+            <label>Category:</label>
+            <input type="text" class="form-control" asp-for="Category" placeholder="Category"/>
+            <span asp-validation-for="Category"></span>
+        </div>
+        <div>
+            <label>Address:</label>
+            <input type="text" class="form-control" asp-for="Address" placeholder="Address" />
+            <span asp-validation-for="Address"></span>
+        </div>
+        <div>
+            <label>Type:</label>
+            <select class="form-control">
+                @foreach (var option in Enum.GetValues(typeof(EEventType)).Cast<EEventType>())
+                {
+                    <option>@option</option>
+                }
+            </select>
+        </div>
+        <div>
+            <label>Page (HTML):</label>
+            <textarea class="form-control" rows="10" placeholder="HTML here"></textarea>
+        </div>
+        <br />
+        <div>
+            <input type="submit" value="Save" class="btn" />
+        </div>
+    </div>
+</form>
