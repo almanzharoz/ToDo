@@ -1,5 +1,6 @@
 ﻿using Core.ElasticSearch.Domain;
 using Nest;
+using Newtonsoft.Json;
 
 namespace Expo3.Model.Models
 {
@@ -7,5 +8,11 @@ namespace Expo3.Model.Models
 	{
 		[Keyword]
 		public string Name { get; set; }
+	}
+
+	public class BaseCategoryProjection : BaseEntity, IProjection<Category>, IGetProjection, ISearchProjection
+	{
+		[JsonProperty]
+		public string Name { get; private set; }
 	}
 }

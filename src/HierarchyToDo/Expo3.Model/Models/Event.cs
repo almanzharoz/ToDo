@@ -11,7 +11,9 @@ namespace Expo3.Model.Models
 	/// </summary>
 	public abstract class Event : BaseEntityWithVersion, IModel, IProjection, IWithName
 	{
+		[Keyword]
 		public Category Category { get; set; }
+		[Keyword]
 		public string Name { get; set; }
 		[Keyword]
 		public User Owner { get; set; }

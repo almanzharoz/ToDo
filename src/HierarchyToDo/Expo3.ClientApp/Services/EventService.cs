@@ -32,20 +32,20 @@ namespace Expo3.ClientApp.Services
 					      Query<Event>.Match(m => m.Field(x => x.Address.City).Query(city)))));
 
 
-		public void RegisterToEvent(string id, string email, string name, string phoneNumber)
-			=> RegisterToEvent(id, new Visitor
-			{
-				Email = email,
-				Name = name,
-				PhoneNumber = phoneNumber
-			});
+		//public void RegisterToEvent(string id, string email, string name, string phoneNumber)
+		//	=> RegisterToEvent(id, new Visitor
+		//	{
+		//		Email = email,
+		//		Name = name,
+		//		PhoneNumber = phoneNumber
+		//	});
 
-		public void RegisterToEvent(string id, Visitor visitor)
-			=> Update(Get<EventProjectionWithVisitors>(id).HasNotNullArg("event"),
-				x =>
-				{
-					x.Visitors.Add(visitor);
-					return x;
-				}, false);
+		//public void RegisterToEvent(string id, Visitor visitor)
+		//	=> Update(Get<EventProjectionWithVisitors>(id).HasNotNullArg("event"),
+		//		x =>
+		//		{
+		//			x.Visitors.Add(visitor);
+		//			return x;
+		//		}, false);
 	}
 }

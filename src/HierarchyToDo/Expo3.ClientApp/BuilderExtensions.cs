@@ -21,7 +21,6 @@ namespace Expo3.ClientApp
 		{
 			return services.UseExpo3Projections(x => x
 				.AddProjection<EventProjection, Event>()
-				.AddProjection<EventProjectionWithVisitors, Event>()
 				.AddProjection<EventSearchProjection, Event>());
 		}
 	}
