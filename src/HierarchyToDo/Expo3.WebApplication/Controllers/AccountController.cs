@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -31,7 +31,7 @@ namespace Expo3.WebApplication.Controllers
             var user = _service.TryLogin(vm.Login.Trim().ToLower(), vm.Pass.Trim());
             if (user == null)
                 return View(vm);
-
+			
 			var claims = new List<Claim>
 			{
 				new Claim(ClaimTypes.Name, user.Name),
@@ -84,24 +84,21 @@ namespace Expo3.WebApplication.Controllers
         {
             if (ModelState.IsValid)
             {
-                model.Email = model.Email.Trim().ToLowerInvariant();
-                model.Name = model.Name.Trim();
-                var result = _service.Register(model.Email, model.Name, model.Password,
-                    new[] { EUserRole.Organizer, EUserRole.User });
+                var result = _service.Register(model.Email, model.Name, model.Password);
                 switch (result)
                 {
                     case UserRegistrationResult.Ok:
-                        model.Result = "Пользователь успешно зарегистрирован.";
+                        model.Result = "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СѓСЃРїРµС€РЅРѕ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ.";
                         break;
                     case UserRegistrationResult.EmailAlreadyExists:
-                        ModelState.AddModelError("", "Указанный email уже существует");
+                        ModelState.AddModelError("", "РЈРєР°Р·Р°РЅРЅС‹Р№ email СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚");
                         break;
                     case UserRegistrationResult.NameIsEmpty:
                     case UserRegistrationResult.EmailIsEmpty:
                     case UserRegistrationResult.UnknownError:
                     case UserRegistrationResult.PasswordIsEmpty:
                     case UserRegistrationResult.WrongEmail:
-                        ModelState.AddModelError("", "При регистрации пользователя произошла неизвестная ошибка");
+                        ModelState.AddModelError("", "РџСЂРё СЂРµРіРёСЃС‚СЂР°С†РёРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РїСЂРѕРёР·РѕС€Р»Р° РЅРµРёР·РІРµСЃС‚РЅР°СЏ РѕС€РёР±РєР°");
                         break;
                 }
             }

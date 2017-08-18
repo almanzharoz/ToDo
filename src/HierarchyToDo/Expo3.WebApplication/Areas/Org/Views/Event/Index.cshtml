@@ -1,0 +1,27 @@
+﻿@model IReadOnlyCollection<Expo3.OrganizersApp.Projections.EventProjection>
+
+<h2>My events:</h2>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Name</th>
+        @*<th>Category</th>*@
+        <th>Type</th>
+        <th>Start date</th>
+        <th>Finish date</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var eventProjection in Model)
+    {
+        <tr>
+            <th>@eventProjection.Name</th>
+            @*<th>@eventProjection.Category.Name</th>*@
+            <th>@eventProjection.Type.ToString()</th>
+            <th>@eventProjection.DateTime.StartDateTime</th>
+            <th>@eventProjection.DateTime.FinishDateTime</th>
+        </tr>
+    }
+    </tbody>
+</table>

@@ -67,21 +67,21 @@ namespace Expo3.ClientApp.Services
         }
 
 
-        public void RegisterToEvent(string id, string email, string name, string phoneNumber)
-            => RegisterToEvent(id, new Visitor
-            {
-                Email = email,
-                Name = name,
-                PhoneNumber = phoneNumber
-            });
+        //public void RegisterToEvent(string id, string email, string name, string phoneNumber)
+        //	=> RegisterToEvent(id, new Visitor
+        //	{
+        //		Email = email,
+        //		Name = name,
+        //		PhoneNumber = phoneNumber
+        //	});
 
-        public void RegisterToEvent(string id, Visitor visitor)
-            => Update(Get<EventProjectionWithVisitors>(id).HasNotNullArg("event"),
-                x =>
-                {
-                    x.Visitors.Add(visitor);
-                    return x;
-                }, false);
+        //public void RegisterToEvent(string id, Visitor visitor)
+        //	=> Update(Get<EventProjectionWithVisitors>(id).HasNotNullArg("event"),
+        //		x =>
+        //		{
+        //			x.Visitors.Add(visitor);
+        //			return x;
+        //		}, false);
 
         public IReadOnlyCollection<string> GetAllCities()
             => Search<Event, OnlyAddressEventProjections>(q => q).Select(a => a.Address.City).Distinct().OrderBy(c => c).ToArray();

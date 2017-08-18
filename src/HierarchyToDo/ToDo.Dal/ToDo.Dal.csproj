@@ -7,20 +7,12 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="1.1.2" />
     <PackageReference Include="NEST" Version="5.5.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core.ElasticSearch\Core.ElasticSearch.csproj" />
     <ProjectReference Include="..\..\Sharp7Func\Sharp7Func.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Microsoft.AspNetCore.WebUtilities">
-    </Reference>
-    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Logging.Abstractions">
-    </Reference>
   </ItemGroup>
 
 </Project>

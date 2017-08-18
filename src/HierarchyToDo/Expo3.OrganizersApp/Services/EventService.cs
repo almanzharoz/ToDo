@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.ElasticSearch;
 using Expo3.Model;
 using Expo3.Model.Embed;

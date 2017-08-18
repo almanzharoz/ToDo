@@ -8,12 +8,14 @@ using Expo3.Model.Models;
 using Expo3.OrganizersApp.Services;
 using Expo3.WebApplication.Areas.Org.Models;
 using Expo3.WebApplication.Controllers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SharpFuncExt;
 
 namespace Expo3.WebApplication.Areas.Org.Controllers
 {
 	[Area("Org")]
+	//[Authorize(Roles= "organizer")]
     public class EventController : BaseController<EventService>
     {
 	    public EventController(EventService service) : base(service)
@@ -25,27 +27,33 @@ namespace Expo3.WebApplication.Areas.Org.Controllers
 		//    return View();
 		//}
 
+	    public IActionResult Index()
+	    {
+		    return View(_service.GetMyEvents());
+	    }
+
 		[HttpGet]
 	    public IActionResult Add()
 	    {
-		    return View();
+		    return View(new AddEventViewModel() {StartDateTime = DateTime.Now, FinishDateTime = DateTime.Now.AddDays(1)});
 	    }
 
 	    [HttpPost]
-	    public IActionResult Add(AddEventViewModel model)
+	    public IActionResult Add(AddEventViewModel addEventViewModel)
 	    {
 		    if (ModelState.IsValid)
 		    {
 			    _service.AddEvent(
-				    model.Name,
-				    new EventDateTime {StartDateTime = model.StartDateTime, FinishDateTime = model.FinishDateTime},
-				    new Address {AddressString = model.Address},
-				    model.Type,
-				    new Category {Name = model.Category},
-				    new EventPage {Html = model.Page});
+				    addEventViewModel.Name,
+				    new EventDateTime() /* {StartDateTime = model.StartDateTime, FinishDateTime = model.FinishDateTime}*/,
+				    new Address {AddressString = addEventViewModel.Address},
+				    addEventViewModel.Type,
+				    null,
+				    addEventViewModel.Page);
+			    return RedirectToAction("Index");
 		    }
 
-		    return View();
+		    return View(addEventViewModel);
 	    }
     }
 }

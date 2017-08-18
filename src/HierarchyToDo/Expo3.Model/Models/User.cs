@@ -30,7 +30,7 @@ namespace Expo3.Model.Models
 
 	public class UserName
 	{
-		public string Id { get; }
+		public string Id { get; private set; }
 
 		public UserName(string id)
 		{
@@ -41,5 +41,7 @@ namespace Expo3.Model.Models
 		{
 			Id = user.Id;
 		}
+
+		public void SetId(string id) => Id = id; //Hack for tests
 	}
 }

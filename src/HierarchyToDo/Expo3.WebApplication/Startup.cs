@@ -106,9 +106,9 @@ namespace Expo3.WebApplication
 
 	        app.ApplicationServices
 		        .UseExpo3Model(false)
-				.UseExpo3LoginApp();
+				.UseExpo3LoginApp()
 	        //.UseExpo3ClientApp()
-	        //.UseExpo3OrganizerApp();
+				.UseExpo3OrganizerApp();
         }
     }
 }
