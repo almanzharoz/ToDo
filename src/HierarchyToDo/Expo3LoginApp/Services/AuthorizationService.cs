@@ -27,40 +27,32 @@ namespace Expo3.LoginApp.Services
                 .If(user => user != null && HashPasswordHelper.GetHash(password, Base64UrlTextEncoder.Decode(user.Salt)) == user.Password,
                     user => new LoginUserProjection(user), user => null);
 
-        public UserRegistrationResult Register(string email, string name, string password, EUserRole[] roles)
+        public UserRegistrationResult Register(string email, string name, string password)
         {
             if (String.IsNullOrEmpty(email))
-            {
                 return UserRegistrationResult.EmailIsEmpty;
-            }
-            if (!CommonHelper.IsValidEmail(email))
-            {
-                return UserRegistrationResult.WrongEmail;
-            }
-            if (String.IsNullOrWhiteSpace(password))
-            {
-                return UserRegistrationResult.PasswordIsEmpty;
-            }
-            if (String.IsNullOrEmpty(name))
-            {
-                return UserRegistrationResult.NameIsEmpty;
-            }
 
-            if (FilterCount<UserProjection>(q => q.Term(x => x.Email.ToLowerInvariant(), email.ToLowerInvariant())) > 0)
-            {
+            if (!CommonHelper.IsValidEmail(email))
+                return UserRegistrationResult.WrongEmail;
+
+            if (String.IsNullOrWhiteSpace(password))
+                return UserRegistrationResult.PasswordIsEmpty;
+
+            if (String.IsNullOrEmpty(name))
+                return UserRegistrationResult.NameIsEmpty;
+
+            if (FilterCount<UserProjection>(q => q.Term(x => x.Email, email.ToLowerInvariant())) > 0)
                 return UserRegistrationResult.EmailAlreadyExists;
-            }
 
             var salt = HashPasswordHelper.GenerateSalt();
-            var hashedPassword = HashPasswordHelper.GetHash(password, salt);
 
             return Insert(new RegisterUserProjection
             {
-                Email = email,
-                Name = name,
-                Password = hashedPassword,
+                Email = email.ToLowerInvariant(),
+                Name = name.Trim(),
+                Password = HashPasswordHelper.GetHash(password, salt),
                 Salt = Base64UrlTextEncoder.Encode(salt),
-                Roles = roles
+                Roles = new [] {EUserRole.User}
             }) ? UserRegistrationResult.Ok : UserRegistrationResult.UnknownError;
         }
 

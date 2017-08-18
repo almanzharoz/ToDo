@@ -30,7 +30,7 @@ namespace Expo3.WebApplication.Controllers
             var user = _service.TryLogin(vm.Login.Trim().ToLower(), vm.Pass.Trim());
             if (user == null)
                 return View(vm);
-
+			
 			var claims = new List<Claim>
 			{
 				new Claim(ClaimTypes.Name, user.Name),
@@ -83,10 +83,7 @@ namespace Expo3.WebApplication.Controllers
         {
             if (ModelState.IsValid)
             {
-                model.Email = model.Email.Trim().ToLowerInvariant();
-                model.Name = model.Name.Trim();
-                var result = _service.Register(model.Email, model.Name, model.Password,
-                    new[] { EUserRole.Organizer, EUserRole.User });
+                var result = _service.Register(model.Email, model.Name, model.Password);
                 switch (result)
                 {
                     case UserRegistrationResult.Ok:

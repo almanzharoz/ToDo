@@ -34,11 +34,11 @@ namespace Expo3.LoginApp.Tests
 	    [TestMethod]
 	    public void RegisterAndGetUser()
 	    {
-		    var registered = _service.Register("test@test", "iam", "123", new[] {EUserRole.User});
+		    var registered = _service.Register("test@test", "iam", "123");
 		    Assert.AreEqual(true, registered);
 
 		    var user = _service.TryLogin("test@test", "123");
-		    Assert.AreEqual("iam", user.Nickname);
+		    Assert.AreEqual("iam", user.Name);
 			Assert.AreEqual(1, user.Roles.Length);
 			Assert.AreEqual(EUserRole.User, user.Roles[0]);
 	    }
@@ -53,11 +53,11 @@ namespace Expo3.LoginApp.Tests
 	    [TestMethod]
 	    public void TryToRegisterExistingUser()
 	    {
-		    var registered = _service.Register("test@test", "123", "123", new[] {EUserRole.User});
+		    var registered = _service.Register("test@test", "123", "123");
 		    Assert.AreEqual(true, registered);
 
 		    Assert.ThrowsException<EntityAlreadyExistsException>(() =>
-			    _service.Register("test@test", "234", "234", new[] {EUserRole.User}));
+			    _service.Register("test@test", "234", "234"));
 	    }
     }
 }
