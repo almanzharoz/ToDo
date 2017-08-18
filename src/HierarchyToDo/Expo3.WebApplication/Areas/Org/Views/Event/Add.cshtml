@@ -1,4 +1,3 @@
-@using System
 @using System.Linq
 @using Expo3.Model.Embed
 @model Expo3.WebApplication.Areas.Org.Models.AddEventViewModel
@@ -8,36 +7,45 @@
 
 <h2>Add</h2>
 
-<form asp-action="Add" asp-controller="Event">
+<form asp-action="Add" asp-controller="Event" method="post" class="form-horizontal">
     <div class="validation" asp-validation-summary="ModelOnly"></div>
     <div>
         <div>
-            <label>Name:</label>
-            <input type="text" class="form-control" asp-for="Name" placeholder="Name"/>
-            <span asp-validation-for="Name"></span>
+            <input class="form-control" asp-for="Name" placeholder="Name"/>
+            <span asp-validation-for="Name" class="text-danger"></span>
         </div>
         <div>
-            <label>Category:</label>
             <input type="text" class="form-control" asp-for="Category" placeholder="Category"/>
             <span asp-validation-for="Category"></span>
         </div>
         <div>
-            <label>Address:</label>
+            @Html.DropDownListFor(x => x.Type, Html.GetEnumSelectList<EEventType>(), new { @class = "form-control"})
+        </div>
+        <div>
             <input type="text" class="form-control" asp-for="Address" placeholder="Address" />
             <span asp-validation-for="Address"></span>
         </div>
-        <div>
-            <label>Type:</label>
-            <select class="form-control">
-                @foreach (var option in Enum.GetValues(typeof(EEventType)).Cast<EEventType>())
+        <div class="container">
+            <div>
+                <input type="text" asp-for="StartDateTime" class="form-control" id="startDateTimePicker"/>
+            </div>
+            <script type="text/javascript">
+                $(function ()
                 {
-                    <option>@option</option>
-                }
-            </select>
+                    $("#startDateTimePicker").datetimepicker(
+                        {
+                            showTodayButton: true,
+                            format: 'YYYY-MM-DD HH:mm',
+                            showClose: true,
+                            showClear: true,
+                            toolbarPlacement: 'bottom',
+                            stepping: 15
+                        });
+                });
+            </script>
         </div>
         <div>
-            <label>Page (HTML):</label>
-            <textarea class="form-control" rows="10" placeholder="HTML here"></textarea>
+            <textarea class="form-control" rows="10" placeholder="HTML here" asp-for="Page.Html"></textarea>
         </div>
         <br />
         <div>

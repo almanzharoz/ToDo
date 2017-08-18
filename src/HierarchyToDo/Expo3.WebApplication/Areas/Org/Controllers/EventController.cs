@@ -33,24 +33,25 @@ namespace Expo3.WebApplication.Areas.Org.Controllers
 		[HttpGet]
 	    public IActionResult Add()
 	    {
-		    return View();
+		    return View(new AddEventViewModel());
 	    }
 
 	    [HttpPost]
-	    public IActionResult Add(AddEventViewModel model)
+	    public IActionResult Add(AddEventViewModel addEventViewModel)
 	    {
 		    if (ModelState.IsValid)
 		    {
 			    _service.AddEvent(
-				    model.Name,
-				    new EventDateTime {StartDateTime = model.StartDateTime, FinishDateTime = model.FinishDateTime},
-				    new Address {AddressString = model.Address},
-				    model.Type,
-				    new Category {Name = model.Category},
-				    new EventPage {Html = model.Page});
+				    addEventViewModel.Name,
+				    new EventDateTime() /* {StartDateTime = model.StartDateTime, FinishDateTime = model.FinishDateTime}*/,
+				    new Address {AddressString = addEventViewModel.Address},
+				    addEventViewModel.Type,
+				    null,
+				    addEventViewModel.Page);
+			    return RedirectToAction("Index");
 		    }
 
-		    return View();
+		    return View(addEventViewModel);
 	    }
     }
 }

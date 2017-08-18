@@ -6,7 +6,7 @@
     <thead>
     <tr>
         <th>Name</th>
-        <th>Category</th>
+        @*<th>Category</th>*@
         <th>Type</th>
         <th>Start date</th>
         <th>Finish date</th>
@@ -17,7 +17,7 @@
     {
         <tr>
             <th>@eventProjection.Name</th>
-            <th>@eventProjection.Category.Name</th>
+            @*<th>@eventProjection.Category.Name</th>*@
             <th>@eventProjection.Type.ToString()</th>
             <th>@eventProjection.DateTime.StartDateTime</th>
             <th>@eventProjection.DateTime.FinishDateTime</th>
