@@ -1,4 +1,4 @@
-﻿namespace Expo3.WebApplication.Models
+﻿namespace Expo3.WebApplication.Models.Account
 {
 	public class LoginViewModel
 	{

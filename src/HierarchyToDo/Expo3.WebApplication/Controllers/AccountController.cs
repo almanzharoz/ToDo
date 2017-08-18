@@ -8,6 +8,7 @@ using Expo3.Model.Embed;
 using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Expo3.WebApplication.Models;
+using Expo3.WebApplication.Models.Account;
 
 namespace Expo3.WebApplication.Controllers
 {

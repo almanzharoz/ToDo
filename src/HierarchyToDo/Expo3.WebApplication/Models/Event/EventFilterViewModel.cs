@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace Expo3.WebApplication.Models.Event
+{
+    public class EventFilterViewModel
+    {
+        public List<string> Cities { get; set; }
+        public DateTime StartDate{ get; set; }
+        public DateTime EndDate { get; set; 
+    }
+}

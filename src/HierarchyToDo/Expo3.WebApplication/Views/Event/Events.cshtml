@@ -1,0 +1,60 @@
+@using Microsoft.AspNetCore.Mvc.Routing
+@model Expo3.WebApplication.Models.Event.EventFilterViewModel
+@{
+    ViewData["Title"] = "Events";
+}
+
+<h2>Events</h2>
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <label for="txtSearchText">Ключевые слова:</label>
+            <input type="text" class="form-control" id="txtSearchText" placeholder="ключевые слова">
+        </div>
+        <div class="form-group">
+            <label for="selectCity">Выберите город:</label>
+            <select id="selectCity">
+                <option val="0">Не задан</option>
+                @{
+                    var index =1;
+                    foreach (var city in Model.Cities)
+                    {
+                        <option val="@index">@city</option>
+                        index++;
+                    }
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="startDate">Дата "с":</label>
+            <input type="date" id="startDate">
+        </div>
+        <div class="form-group">
+            <label for="endDate">Дата "по":</label>
+            <input type="date" id="endDate">
+        </div>
+        <div class="checkbox">
+            <label>Выберите тип:</label>
+            <label class="checkbox-inline">
+                <input type="checkbox" id="chkConcert" checked> Концерт
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" id="chkExhibition" checked> Выставка
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" id="chkExcursion" checked> Экскурсия
+            </label>
+        </div>
+        <div class="form-group">
+            <label for="maxPrice">Максимальная цена билета:</label>
+            <input type="number" id="maxPrice">
+        </div>
+        <button type="button" class="btn btn-default" id="btnLoad">Поиск</button>
+    </div>
+</div>
+<div class="row" id="listContainer">
+</div>
+<script language="javascript">
+    eventsPageInit(@Url.Action());
+</script>
+

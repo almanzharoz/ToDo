@@ -34,6 +34,7 @@
     <Folder Include="Areas\Org\Controllers\" />
     <Folder Include="Areas\Org\Views\Home\" />
     <Folder Include="Areas\Org\Views\Event\" />
+    <Folder Include="Views\Event\" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.AspNetCore.Authentication.Cookies">
