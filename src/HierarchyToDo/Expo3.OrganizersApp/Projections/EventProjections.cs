@@ -21,6 +21,7 @@ namespace Expo3.OrganizersApp.Projections
 			Owner = owner;
 		}
 
+		[Keyword]
 		public Category Category { get; set; }
 		public EventDateTime DateTime { get; set; }
 		public Address Address { get; set; }

@@ -8,12 +8,14 @@ using Expo3.Model.Models;
 using Expo3.OrganizersApp.Services;
 using Expo3.WebApplication.Areas.Org.Models;
 using Expo3.WebApplication.Controllers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SharpFuncExt;
 
 namespace Expo3.WebApplication.Areas.Org.Controllers
 {
 	[Area("Org")]
+	//[Authorize(Roles= "organizer")]
     public class EventController : BaseController<EventService>
     {
 	    public EventController(EventService service) : base(service)

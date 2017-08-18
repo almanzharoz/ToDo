@@ -33,6 +33,7 @@
   <ItemGroup>
     <Folder Include="Areas\Org\Controllers\" />
     <Folder Include="Areas\Org\Views\Home\" />
+    <Folder Include="Helpers\" />
   </ItemGroup>
 
 </Project>
