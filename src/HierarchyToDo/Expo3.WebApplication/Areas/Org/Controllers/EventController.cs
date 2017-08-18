@@ -25,6 +25,11 @@ namespace Expo3.WebApplication.Areas.Org.Controllers
 		//    return View();
 		//}
 
+	    public IActionResult Index()
+	    {
+		    return View(_service.GetMyEvents());
+	    }
+
 		[HttpGet]
 	    public IActionResult Add()
 	    {

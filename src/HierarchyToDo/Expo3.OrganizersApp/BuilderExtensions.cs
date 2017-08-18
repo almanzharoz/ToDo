@@ -19,7 +19,7 @@ namespace Expo3.OrganizersApp
 		public static IServiceProvider UseExpo3OrganizerApp(this IServiceProvider services)
 		{
 			return services.UseExpo3Projections(p => p
-			.AddProjection<EventProjection, Event>());
+				.AddProjection<EventProjection, Event>());
 		}
 	}
 }
