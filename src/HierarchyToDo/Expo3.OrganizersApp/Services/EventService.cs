@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Core.ElasticSearch;
 using Expo3.Model;
 using Expo3.Model.Embed;
@@ -22,15 +23,16 @@ namespace Expo3.OrganizersApp.Services
 
 		/// <exception cref="AddEntityException"></exception>
 		// TODO: добавить проверку пользователя
-		public void AddEvent(string name, string caption, EventDateTime dateTime, Address address, EEventType type,
-			Category category, bool refresh = false)
+		public void AddEvent(string name, EventDateTime dateTime, Address address, EEventType type,
+			Category category, EventPage page, bool refresh = false)
 			=> Insert(new EventProjection(Get<BaseUserProjection>(User.Id).HasNotNullArg("owner"))
 				{
 					Name = name,
 					DateTime = dateTime,
 					Address = address,
 					Type = type,
-					Category = category
+					Category = category,
+					Page = page
 				}, refresh)
 				.ThrowIfNot<AddEntityException>();
 		
@@ -53,5 +55,8 @@ namespace Expo3.OrganizersApp.Services
 					return x;
 				}, false)
 				.ThrowIfNot<UpdateEntityException>();
+
+		public IReadOnlyCollection<EventProjection> GetMyEvents() 
+			=> Filter<Event, EventProjection>(q => UserQuery<EventProjection>(null));
 	}
 }

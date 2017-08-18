@@ -59,9 +59,9 @@ namespace Expo3.WebApplication
 
 			services
 		        .AddExpo3Model(new Uri("http://localhost:9200/"))
-		        .AddExpo3LoginApp();
+		        .AddExpo3LoginApp()
 	        //.AddExpo3ClientApp()
-	        //.AddExpo3OrganizerApp();
+				.AddExpo3OrganizerApp();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -106,9 +106,9 @@ namespace Expo3.WebApplication
 
 	        app.ApplicationServices
 		        .UseExpo3Model(false)
-				.UseExpo3LoginApp();
+				.UseExpo3LoginApp()
 	        //.UseExpo3ClientApp()
-	        //.UseExpo3OrganizerApp();
+				.UseExpo3OrganizerApp();
         }
     }
 }
