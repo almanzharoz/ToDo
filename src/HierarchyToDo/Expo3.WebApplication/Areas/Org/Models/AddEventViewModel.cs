@@ -14,7 +14,7 @@ namespace Expo3.WebApplication.Areas.Org.Models
 		public string Category { get; set; }
 
 		[DataType(DataType.DateTime)]
-		[DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+		[DisplayFormat(DataFormatString = "{0:dd.MM.yyyy HH:mm}", ApplyFormatInEditMode = true)]
 		public DateTime StartDateTime { get; set; }
 
 		[DataType(DataType.DateTime)]

@@ -35,7 +35,7 @@ namespace Expo3.WebApplication.Areas.Org.Controllers
 		[HttpGet]
 	    public IActionResult Add()
 	    {
-		    return View(new AddEventViewModel());
+		    return View(new AddEventViewModel() {StartDateTime = DateTime.Now, FinishDateTime = DateTime.Now.AddDays(1)});
 	    }
 
 	    [HttpPost]
