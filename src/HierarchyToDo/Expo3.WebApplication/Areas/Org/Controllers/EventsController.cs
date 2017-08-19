@@ -18,16 +18,11 @@ namespace Expo3.WebApplication.Areas.Org.Controllers
 {
 	[Area("Org")]
 	[Authorize(Roles = "organizer")]
-	public class EventController : BaseController<EventService>
+	public class EventsController : BaseController<EventService>
     {
-	    public EventController(EventService service) : base(service)
+	    public EventsController(EventService service) : base(service)
 	    {
 	    }
-
-		//public IActionResult Index()
-		//{
-		//    return View();
-		//}
 
 	    public IActionResult Index()
 	    {
@@ -47,7 +42,7 @@ namespace Expo3.WebApplication.Areas.Org.Controllers
 		    {
 			    _service.AddEvent(
 				    addEventEditModel.Name,
-				    new EventDateTime {StartDateTime = addEventEditModel.StartDateTime, FinishDateTime = addEventEditModel.FinishDateTime},
+				    new EventDateTime {Start = addEventEditModel.StartDateTime, Finish = addEventEditModel.FinishDateTime},
 				    new Address {City = addEventEditModel.City, AddressString = addEventEditModel.Address},
 				    addEventEditModel.Type,
 					null, //TODO: работа с категориями
@@ -56,6 +51,32 @@ namespace Expo3.WebApplication.Areas.Org.Controllers
 			    return RedirectToAction("Index");
 		    }
 
+		    return View(addEventEditModel);
+	    }
+
+	    [HttpGet]
+	    public IActionResult Edit(string id)
+	    {
+		    return View(new AddEventEditModel(_service.GetEvent(id)));
+	    }
+
+	    [HttpPost]
+	    public IActionResult Edit(AddEventEditModel addEventEditModel)
+	    {
+		    if (ModelState.IsValid)
+		    {
+			    _service.UpdateEvent(
+					addEventEditModel.Id,
+					addEventEditModel.Name,
+					new EventDateTime() { Start = addEventEditModel.StartDateTime, Finish = addEventEditModel.FinishDateTime},
+					new Address() { City = addEventEditModel.City, AddressString = addEventEditModel.Address},
+					addEventEditModel.Type,
+					null, //TODO: работа с категориями
+					new[] {new TicketPrice() {Price = new Price(addEventEditModel.Price)}},
+					addEventEditModel.Page
+					);
+			    return RedirectToAction("Index");
+		    }
 		    return View(addEventEditModel);
 	    }
 

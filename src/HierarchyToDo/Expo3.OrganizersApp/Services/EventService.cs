@@ -52,16 +52,19 @@ namespace Expo3.OrganizersApp.Services
 					.ThrowIf(x => x.Version != version, x => new RemoveEntityException()), version);
 
 		///<exception cref="UpdateEntityException"></exception>
-		public void UpdateEvent(string id, string name, string caption,
-			EventDateTime dateTime, Address address, EEventType type, bool refresh = false)
+		public void UpdateEvent(string id, string name, EventDateTime dateTime, Address address, EEventType type,
+			Category category, TicketPrice[] prices, EventPage page, bool refresh = false)
 			=> Update(GetEvent(id).HasNotNullArg("event"), x =>
 				{
 					x.Name = name;
 					x.DateTime = dateTime;
 					x.Address = address;
 					x.Type = type;
+					x.Category = category;
+					x.Prices = prices;
+					x.Page = page;
 					return x;
-				}, false)
+				}, refresh)
 				.ThrowIfNot<UpdateEntityException>();
 
 		public IReadOnlyCollection<EventProjection> GetMyEvents() 

@@ -57,7 +57,7 @@ namespace Expo3.Model.Embed
 
 	    public override string ToString()
 	    {
-		    return $"{Rubles}.{Pennies:D2}₽";
+		    return $"{Rubles}.{Pennies:D2}\u20bd";
 	    }
     }
 }

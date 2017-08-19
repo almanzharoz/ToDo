@@ -3,15 +3,17 @@ using System.ComponentModel.DataAnnotations;
 using Expo3.Model;
 using Expo3.Model.Embed;
 using Expo3.Model.Models;
+using Expo3.OrganizersApp.Projections;
 
 namespace Expo3.WebApplication.Areas.Org.Models
 {
 	public class AddEventEditModel
 	{
+		public string Id { get; set; }
 		[Required(ErrorMessage = "Name is required")]
 		public string Name { get; set; }
 
-		public string Category { get; set; }
+		public Category Category { get; set; }
 
 		[Required(ErrorMessage = "Start date is required")]
 		[DataType(DataType.DateTime)]
@@ -36,5 +38,23 @@ namespace Expo3.WebApplication.Areas.Org.Models
 
 		//public TicketPrice[] Prices { get; set; }
 		public EventPage Page { get; set; }
+
+		public AddEventEditModel()
+		{
+		}
+
+		public AddEventEditModel(EventProjection eventProjection)
+		{
+			Id = eventProjection.Id;
+			Name = eventProjection.Name;
+			Category = eventProjection.Category;
+			StartDateTime = eventProjection.DateTime.Start;
+			FinishDateTime = eventProjection.DateTime.Finish;
+			City = eventProjection.Address.City;
+			Address = eventProjection.Address.AddressString;
+			Type = eventProjection.Type;
+			Price = eventProjection.Prices[0].Price.ToString().TrimEnd('\u20bd'); //TODO
+			Page = eventProjection.Page;
+		}
 	}
 }

@@ -4,11 +4,11 @@ namespace Expo3.Model.Embed
 {
 	public struct EventDateTime
 	{
-		public DateTime StartDateTime { get; set; }
-		public DateTime FinishDateTime { get; set; }
+		public DateTime Start { get; set; }
+		public DateTime Finish { get; set; }
 		public string Timezone { get; set; }
 
 		public override string ToString()
-			=> String.Concat(StartDateTime.ToString("g"), " - ", FinishDateTime.ToString("g"));
+			=> String.Concat(Start.ToString("g"), " - ", Finish.ToString("g"));
 	}
 }
