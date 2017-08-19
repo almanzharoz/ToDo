@@ -20,12 +20,14 @@ namespace Expo3.OrganizersApp.Services
 		}
 
 		public EventProjection GetEvent(string id)
-			=> Get<EventProjection>(id.HasNotNullArg("event id"), f => UserQuery<EventProjection>(null));
+			//=> Get<EventProjection>(id.HasNotNullArg("event id"), f => UserQuery<EventProjection>(null));
+			=> Search<Event, EventProjection>(q => UserQuery<EventProjection>(q.Ids(x => x.Values(id))))
+				.FirstOrDefault();
 
 		/// <exception cref="AddEntityException"></exception>
 		// TODO: добавить проверку пользователя
 		public void AddEvent(string name, EventDateTime dateTime, Address address, EEventType type,
-			Category category, EventPage page, bool refresh = false)
+			Category category, TicketPrice[] prices, EventPage page, bool refresh = false)
 			=> Insert(new EventProjection(Get<BaseUserProjection>(User.Id).HasNotNullArg("owner"))
 				{
 					Name = name,
@@ -33,16 +35,21 @@ namespace Expo3.OrganizersApp.Services
 					Address = address,
 					Type = type,
 					Category = category,
+					Prices = prices,
 					Page = page
 				}, refresh)
 				.ThrowIfNot<AddEntityException>();
-		
+
 		///<exception cref="RemoveEntityException"></exception>
 		public void RemoveEvent(string id, int version)
+			//=> Remove(
+			//		Get<EventRemoveProjection>(id.HasNotNullArg("event id"), f => UserQuery<EventProjection>(null))
+			//			.HasNotNullArg("event"), version)
+			//	.ThrowIfNot<RemoveEntityException>();
 			=> Remove(
-					Get<EventRemoveProjection>(id.HasNotNullArg("event id"), f => UserQuery<EventProjection>(null))
-						.HasNotNullArg("event"), version)
-				.ThrowIfNot<RemoveEntityException>();
+				GetEvent(id)
+					.HasNotNullArg("event")
+					.ThrowIf(x => x.Version != version, x => new RemoveEntityException()), version);
 
 		///<exception cref="UpdateEntityException"></exception>
 		public void UpdateEvent(string id, string name, string caption,

@@ -2,26 +2,46 @@
 
 <h2>My events:</h2>
 
-<table class="table">
-    <thead>
-    <tr>
-        <th>Name</th>
-        @*<th>Category</th>*@
-        <th>Type</th>
-        <th>Start date</th>
-        <th>Finish date</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var eventProjection in Model)
-    {
+@if (Model.Count > 0)
+{
+    <table class="table table-striped">
+        <thead>
         <tr>
-            <th>@eventProjection.Name</th>
-            @*<th>@eventProjection.Category.Name</th>*@
-            <th>@eventProjection.Type.ToString()</th>
-            <th>@eventProjection.DateTime.StartDateTime</th>
-            <th>@eventProjection.DateTime.FinishDateTime</th>
+            <th>Name</th>
+            @*<th>Category</th>*@
+            <th>Type</th>
+            <th>Start date</th>
+            <th>Finish date</th>
+            <th>City</th>
+            <th>Address</th>
+            <th>Price</th>
+            <th></th>
         </tr>
-    }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+        @foreach (var eventProjection in Model)
+        {
+            <tr>
+                <th>@eventProjection.Name</th>
+                @*<th>@eventProjection.Category.Name</th>*@
+                <th>@eventProjection.Type.ToString()</th>
+                <th>@eventProjection.DateTime.StartDateTime</th>
+                <th>@eventProjection.DateTime.FinishDateTime</th>
+                <th>@eventProjection.Address.City</th>
+                <th>@eventProjection.Address.AddressString</th>
+                <th>@eventProjection.Prices?[0].Price.ToString()</th>
+                <th>@Html.ActionLink("Remove", "Remove", new {id = eventProjection.Id, version = eventProjection.Version})</th>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+else
+{
+    <div class="text-center">
+        You don't have any events
+    </div>
+}
+<br /><br />
+@Html.ActionLink("Add new event", "Add")

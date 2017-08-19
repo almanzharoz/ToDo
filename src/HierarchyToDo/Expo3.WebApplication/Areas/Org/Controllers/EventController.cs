@@ -1,6 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using Expo3.Model;
 using Expo3.Model.Embed;
@@ -15,8 +17,8 @@ using SharpFuncExt;
 namespace Expo3.WebApplication.Areas.Org.Controllers
 {
 	[Area("Org")]
-	//[Authorize(Roles= "organizer")]
-    public class EventController : BaseController<EventService>
+	[Authorize(Roles = "organizer")]
+	public class EventController : BaseController<EventService>
     {
 	    public EventController(EventService service) : base(service)
 	    {
@@ -35,25 +37,32 @@ namespace Expo3.WebApplication.Areas.Org.Controllers
 		[HttpGet]
 	    public IActionResult Add()
 	    {
-		    return View(new AddEventViewModel() {StartDateTime = DateTime.Now, FinishDateTime = DateTime.Now.AddDays(1)});
+		    return View(new AddEventEditModel() {StartDateTime = DateTime.Now, FinishDateTime = DateTime.Now.AddDays(1)});
 	    }
 
 	    [HttpPost]
-	    public IActionResult Add(AddEventViewModel addEventViewModel)
+	    public IActionResult Add(AddEventEditModel addEventEditModel)
 	    {
 		    if (ModelState.IsValid)
 		    {
 			    _service.AddEvent(
-				    addEventViewModel.Name,
-				    new EventDateTime() /* {StartDateTime = model.StartDateTime, FinishDateTime = model.FinishDateTime}*/,
-				    new Address {AddressString = addEventViewModel.Address},
-				    addEventViewModel.Type,
-				    null,
-				    addEventViewModel.Page);
+				    addEventEditModel.Name,
+				    new EventDateTime {StartDateTime = addEventEditModel.StartDateTime, FinishDateTime = addEventEditModel.FinishDateTime},
+				    new Address {City = addEventEditModel.City, AddressString = addEventEditModel.Address},
+				    addEventEditModel.Type,
+					null, //TODO: работа с категориями
+					new[] {new TicketPrice {Price = new Price(addEventEditModel.Price)} }, 
+				    addEventEditModel.Page);
 			    return RedirectToAction("Index");
 		    }
 
-		    return View(addEventViewModel);
+		    return View(addEventEditModel);
+	    }
+
+	    public IActionResult Remove(string id, int version)
+	    {
+			_service.RemoveEvent(id, version);
+		    return RedirectToAction("Index");
 	    }
     }
 }

@@ -1,6 +1,6 @@
 @using System.Linq
 @using Expo3.Model.Embed
-@model Expo3.WebApplication.Areas.Org.Models.AddEventViewModel
+@model Expo3.WebApplication.Areas.Org.Models.AddEventEditModel
 @{
     ViewData["Title"] = "Add";
 }
@@ -23,6 +23,11 @@
 
         <div class="form-group">
             @Html.DropDownListFor(x => x.Type, Html.GetEnumSelectList<EEventType>(), new {@class = "form-control"})
+        </div>
+        
+        <div class="form-group">
+            <input type="text" class="form-control" asp-for="City" placeholder="City" />
+            <span asp-validation-for="City"></span>
         </div>
 
         <div class="form-group">
@@ -56,6 +61,11 @@
                     </div>
                 </div>
             </div>
+        </div>
+        
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Price" asp-for="Price" />
+            <span asp-validation-for="Price"></span>
         </div>
 
         <div class="form-group">

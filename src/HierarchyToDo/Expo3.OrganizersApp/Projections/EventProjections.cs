@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 namespace Expo3.OrganizersApp.Projections
 {
 	public class EventProjection : BaseEntityWithVersion, IProjection<Event>, IGetProjection, ISearchProjection,
-		IInsertProjection, IUpdateProjection, IWithName, IWithOwner
+		IInsertProjection, IUpdateProjection, IRemoveProjection, IWithName, IWithOwner
 	{
 		public EventProjection()
 		{
@@ -37,5 +37,12 @@ namespace Expo3.OrganizersApp.Projections
 
 	public class EventRemoveProjection : BaseEntityWithVersion, IProjection<Event>, IRemoveProjection, IGetProjection
 	{
+
+		public EventRemoveProjection() { }
+
+		public EventRemoveProjection(EventProjection eventProjection)
+		{
+			SetId(eventProjection.Id);
+		}
 	}
 }
