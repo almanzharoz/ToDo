@@ -1,0 +1,50 @@
+﻿@using System.Collections.Generic
+@model System.Collections.Generic.IReadOnlyCollection<Expo3.OrganizersApp.Projections.EventProjection>
+
+<h2>My events:</h2>
+
+@if (Model.Count > 0)
+{
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Name</th>
+            @*<th>Category</th>*@
+            <th>Type</th>
+            <th>Dates</th>
+            <th>City</th>
+            <th>Address</th>
+            <th>Price</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var eventProjection in Model)
+        {
+            <tr>
+                <th>@eventProjection.Name</th>
+                @*<th>@eventProjection.Category.Name</th>*@
+                <th>@eventProjection.Type.ToString()</th>
+                <th>@eventProjection.DateTime</th>
+                <th>@eventProjection.Address.City</th>
+                <th>@eventProjection.Address.AddressString</th>
+                <th>@eventProjection.Prices?[0].Price.ToString()</th>
+                <th>
+                    @Html.ActionLink("Edit", "Edit", new {id = eventProjection.Id})
+                    &nbsp;
+                    @Html.ActionLink("Remove", "Remove", new {id = eventProjection.Id, version = eventProjection.Version})
+                </th>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+else
+{
+    <div class="text-center">
+        You don't have any events
+    </div>
+}
+<br /><br />
+@Html.ActionLink("Add new event", "Add")

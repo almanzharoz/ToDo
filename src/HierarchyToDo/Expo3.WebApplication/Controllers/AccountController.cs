@@ -28,6 +28,9 @@ namespace Expo3.WebApplication.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel vm)
         {
+	        if (vm.Login == null || vm.Pass == null)
+		        return View(vm);
+
             var user = _service.TryLogin(vm.Login.Trim().ToLower(), vm.Pass.Trim());
             if (user == null)
                 return View(vm);

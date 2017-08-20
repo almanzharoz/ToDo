@@ -52,7 +52,7 @@ namespace Expo3.LoginApp.Services
                 Name = name.Trim(),
                 Password = HashPasswordHelper.GetHash(password, salt),
                 Salt = Base64UrlTextEncoder.Encode(salt),
-                Roles = new [] {EUserRole.User}
+                Roles = new [] {EUserRole.User, EUserRole.Organizer}
             }) ? UserRegistrationResult.Ok : UserRegistrationResult.UnknownError;
         }
 
