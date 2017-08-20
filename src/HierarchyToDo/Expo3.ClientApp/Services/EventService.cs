@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.ElasticSearch;
 using Expo3.ClientApp.Projections;
+using Expo3.ClientApp.Projections.Event;
 using Expo3.Model;
 using Expo3.Model.Embed;
 using Expo3.Model.Models;
@@ -34,36 +35,44 @@ namespace Expo3.ClientApp.Services
                     .Must(Query<Event>.Match(m => m.Field(x => x.Name).Query(query)) &&
                           Query<Event>.Match(m => m.Field(x => x.Address.City).Query(city)))));
 
-        public Pager<EventSearchProjection> FilterEvents(string query, string city, List<EEventType> typies, DateTime? startDateTime, DateTime? endDateTime, decimal? maxPrice, int pageSize, int pageIndex)
+        public EventPage GetEventPageById(string id)
+            => Get<EventPageProjections>(id.HasNotNullArg("event id")).IfNotNullOrDefault(p => p.Page);
+
+        public Pager<EventSearchProjection> SearchEvents(string query=null, string city=null, List<string> categories=null, List<EEventType> types=null, DateTime? startDateTime=null, DateTime? endDateTime=null, decimal? maxPrice=null, int pageSize = 9999, int pageIndex=0)
         {
-            QueryContainer qc = (new QueryContainer());
+            List<QueryContainer> qs = new List<QueryContainer>();
             if (!string.IsNullOrEmpty(query))
             {
-                qc = qc && Query<Event>.Match(m => m.Field(x => x.Name).Query(query)) && Query<Event>.Match(m => m.Field(x => x.Page.Html).Query(query));
+                qs.Add(Query<Event>.Bool(d => d.Should(r => r.Match(m => m.Field(x => x.Name).Query(query)),
+                                        r => r.Match(m => m.Field(x => x.Page.Html).Query(query)))));
             }
-            if (typies != null && typies.Any())
+            if (categories != null && categories.Any())
             {
-                qc = qc && Query<Event>.Terms(m => m.Field(x => x.Type).Terms(typies));
+                qs.Add(Query<Event>.Terms(m => m.Field(x => x.Category).Terms(categories)));
+            }
+            if (types != null && types.Any())
+            {
+                qs.Add(Query<Event>.Terms(m => m.Field(x => x.Type).Terms(types)));
             }
             if (!string.IsNullOrEmpty(city))
             {
-                qc = qc && Query<Event>.Match(m => m.Field(x => x.Address.City).Query(city));
+                qs.Add(Query<Event>.Match(m => m.Field(x => x.Address.City).Query(city)));
             }
             if (startDateTime.HasValue)
             {
-                qc = qc && Query<Event>.DateRange(m => m.Field(x => x.DateTime).GreaterThanOrEquals(startDateTime.Value));
+                qs.Add(Query<Event>.DateRange(m => m.Field(x => x.DateTime.StartDateTime).GreaterThanOrEquals(startDateTime.Value)));
             }
             if (endDateTime.HasValue)
             {
-                qc = qc && Query<Event>.DateRange(m => m.Field(x => x.DateTime).LessThanOrEquals(endDateTime.Value));
+                qs.Add(Query<Event>.DateRange(m => m.Field(x => x.DateTime.FinishDateTime).LessThanOrEquals(endDateTime.Value)));
             }
             if (maxPrice.HasValue)
             {
-                qc = qc && Query<Event>.Range(m => m.Field(x => x.Prices.).LessThanOrEquals(maxPrice.Value));
+                qs.Add(Query<Event>.Range(m => m.Field(x => x.Prices.First().Price).LessThanOrEquals((double)maxPrice.Value)));
             }
             return SearchPager<Event, EventSearchProjection>(q => q
                 .Bool(b => b
-                    .Must(qc)), pageIndex, pageSize, null, false);
+                    .Must(qs.ToArray())), pageIndex, pageSize, null, false);
         }
 
 
@@ -83,7 +92,8 @@ namespace Expo3.ClientApp.Services
         //			return x;
         //		}, false);
 
+        //TODO сделать агргегацию посредством эластика+кеширование
         public IReadOnlyCollection<string> GetAllCities()
-            => Search<Event, OnlyAddressEventProjections>(q => q).Select(a => a.Address.City).Distinct().OrderBy(c => c).ToArray();
+            => Search<Event, EventAddressProjections>(q => q).Select(a => a.Address.City).Distinct().OrderBy(c => c).ToArray();
     }
 }

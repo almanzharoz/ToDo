@@ -10,6 +10,7 @@ namespace Expo3.WebApplication.Controllers
     {
         public IActionResult Index()
         {
+            return RedirectToAction("Events", "Event");
             return View();
         }
 

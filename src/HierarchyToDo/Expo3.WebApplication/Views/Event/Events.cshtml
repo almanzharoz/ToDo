@@ -1,5 +1,4 @@
-@using Microsoft.AspNetCore.Mvc.Routing
-@model Expo3.WebApplication.Models.Event.EventFilterViewModel
+п»ї@model Expo3.WebApplication.Models.Event.EventFilterViewModel
 @{
     ViewData["Title"] = "Events";
 }
@@ -8,53 +7,86 @@
 <div class="row">
     <div class="col-md-12">
         <div class="form-group">
-            <label for="txtSearchText">Ключевые слова:</label>
-            <input type="text" class="form-control" id="txtSearchText" placeholder="ключевые слова">
+            <label for="txtSearchText">РљР»СЋС‡РµРІС‹Рµ СЃР»РѕРІР°:</label>
+            <input type="text" class="form-control" id="txtSearchText" placeholder="РєР»СЋС‡РµРІС‹Рµ СЃР»РѕРІР°" />
         </div>
         <div class="form-group">
-            <label for="selectCity">Выберите город:</label>
+            <label for="selectCity">Р’С‹Р±РµСЂРёС‚Рµ РіРѕСЂРѕРґ:</label>
             <select id="selectCity">
-                <option val="0">Не задан</option>
+                <option value="0">РќРµ Р·Р°РґР°РЅ</option>
                 @{
-                    var index =1;
+                    var index = 1;
                     foreach (var city in Model.Cities)
                     {
-                        <option val="@index">@city</option>
+                        <option value="@index">@city</option>
                         index++;
                     }
                 }
             </select>
         </div>
         <div class="form-group">
-            <label for="startDate">Дата "с":</label>
-            <input type="date" id="startDate">
+            <label>Р’С‹Р±РµСЂРёС‚Рµ РєР°С‚РµРіРѕСЂРёСЋ:</label>
+            @if (Model.Categories.Count > 0)
+            {
+                <label class="checkbox-inline">
+                    <input type="checkbox" id="chkAllCategories" checked /> Р’СЃРµ РєР°С‚РµРіРѕСЂРёРё
+                </label>
+                foreach (var category in Model.Categories)
+                {
+                    <label class="checkbox-inline">
+                        <input type="checkbox" class="class-category" value="@category.Value" /> @category.Text
+                    </label>
+                }
+            }
+            else
+            {
+                <span class="text-danger">Р”РѕСЃС‚СѓРїРЅС‹С… РєР°С‚РµРіРѕСЂРёР№ РЅРµ РЅР°Р№РґРµРЅРѕ</span>
+            }
         </div>
         <div class="form-group">
-            <label for="endDate">Дата "по":</label>
-            <input type="date" id="endDate">
+            <label for="startDate">Р”Р°С‚Р° "СЃ":</label>
+            <input type="text" id="startDate" value="@Model.StartDate.Date" />
+        </div>
+        <div class="form-group">
+            <label for="endDate">Р”Р°С‚Р° "РїРѕ":</label>
+            <input type="text" id="endDate" value="@Model.EndDate.Date" />
         </div>
         <div class="checkbox">
-            <label>Выберите тип:</label>
+            <label>Р’С‹Р±РµСЂРёС‚Рµ С‚РёРї:</label>
             <label class="checkbox-inline">
-                <input type="checkbox" id="chkConcert" checked> Концерт
+                <input type="checkbox" id="chkConcert" checked /> РљРѕРЅС†РµСЂС‚
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" id="chkExhibition" checked> Выставка
+                <input type="checkbox" id="chkExhibition" checked /> Р’С‹СЃС‚Р°РІРєР°
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" id="chkExcursion" checked> Экскурсия
+                <input type="checkbox" id="chkExcursion" checked /> Р­РєСЃРєСѓСЂСЃРёСЏ
             </label>
         </div>
         <div class="form-group">
-            <label for="maxPrice">Максимальная цена билета:</label>
-            <input type="number" id="maxPrice">
+            <label for="maxPrice">РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ С†РµРЅР° Р±РёР»РµС‚Р°:</label>
+            <input type="number" id="maxPrice" />
         </div>
-        <button type="button" class="btn btn-default" id="btnLoad">Поиск</button>
+        <button type="button" class="btn btn-default" id="btnLoad">РџРѕРёСЃРє</button>
     </div>
 </div>
 <div class="row" id="listContainer">
-</div>
-<script language="javascript">
-    eventsPageInit(@Url.Action());
-</script>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>РќР°Р·РІР°РЅРёРµ</th>
+                <th>Р”Р°С‚Р°</th>
+                <th>РЎСЃС‹Р»РєР° РЅР° РєР°СЂС‚РёРЅРєСѓ</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            eventsPageInit();
+        });
+    </script>
+}

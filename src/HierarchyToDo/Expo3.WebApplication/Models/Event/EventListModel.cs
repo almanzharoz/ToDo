@@ -10,5 +10,6 @@ namespace Expo3.WebApplication.Models.Event
         public string Title { get; set; }
         public string DateTimeString{ get; set; }
         public string ImageUrl { get; set; }
+        public string Id { get; set; }
     }
 }

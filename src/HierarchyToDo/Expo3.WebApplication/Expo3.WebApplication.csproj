@@ -2,12 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp1.1</TargetFramework>
+	<EnableDefaultContentItems>False</EnableDefaultContentItems>
   </PropertyGroup>
-
   <PropertyGroup>
     <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8+wp8+wpa81;</PackageTargetFallback>
     <UserSecretsId>fa8f6b9d-60a4-443c-a22a-41ea5130f614</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Helpers\**" />
+    <Content Remove="Helpers\**" />
+    <EmbeddedResource Remove="Helpers\**" />
+    <None Remove="Helpers\**" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore" Version="1.1.2" />
@@ -33,7 +40,6 @@
   <ItemGroup>
     <Folder Include="Areas\Org\Controllers\" />
     <Folder Include="Areas\Org\Views\Home\" />
-    <Folder Include="Helpers\" />
   </ItemGroup>
 
 </Project>

@@ -9,6 +9,7 @@ using Expo3.LoginApp;
 using Expo3.Model;
 using Expo3.Model.Models;
 using Expo3.OrganizersApp;
+using Expo3.WebApplication.Infrastructure.Binders;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -36,7 +37,7 @@ namespace Expo3.WebApplication
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
-            services.AddMvc();
+            services.AddMvc(opts=>opts.ModelBinderProviders.Insert(0, new CustomDateTimeModelBinderProvider()));
 
 	        services.AddLogging();
 
@@ -60,7 +61,7 @@ namespace Expo3.WebApplication
 			services
 		        .AddExpo3Model(new Uri("http://localhost:9200/"))
 		        .AddExpo3LoginApp()
-	        //.AddExpo3ClientApp()
+	            .AddExpo3ClientApp()
 				.AddExpo3OrganizerApp();
         }
 
@@ -107,7 +108,7 @@ namespace Expo3.WebApplication
 	        app.ApplicationServices
 		        .UseExpo3Model(false)
 				.UseExpo3LoginApp()
-	        //.UseExpo3ClientApp()
+	            .UseExpo3ClientApp()
 				.UseExpo3OrganizerApp();
         }
     }

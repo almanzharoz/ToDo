@@ -13,7 +13,8 @@ namespace Expo3.TestsApp
 		public static IServiceCollection AddExpo3TestsApp(this IServiceCollection services)
 		{
 			return services
-				.AddService<TestsEventService, Expo3ElasticConnection>();
+				.AddService<TestsEventService, Expo3ElasticConnection>()
+                .AddService<TestsCaterogyService, Expo3ElasticConnection>();
 		}
 
 		public static IServiceProvider UseExpo3TestsApp(this IServiceProvider services)

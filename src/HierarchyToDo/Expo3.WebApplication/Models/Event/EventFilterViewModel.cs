@@ -9,7 +9,8 @@ namespace Expo3.WebApplication.Models.Event
     public class EventFilterViewModel
     {
         public List<string> Cities { get; set; }
+        public List<SelectListItem> Categories { get; set; }
         public DateTime StartDate{ get; set; }
-        public DateTime EndDate { get; set; 
+        public DateTime EndDate { get; set; }
     }
 }
