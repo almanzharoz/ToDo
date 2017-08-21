@@ -38,6 +38,7 @@
     <ProjectReference Include="..\Expo3LoginApp\Expo3.LoginApp.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Areas\Admin\Controllers\" />
     <Folder Include="Areas\Org\Views\Home\" />
   </ItemGroup>
 
