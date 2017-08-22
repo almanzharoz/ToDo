@@ -7,7 +7,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Expo3.AdminApp.Projections
 {
-	public class UserInsertProjection : BaseEntityWithVersion, IProjection<User>, IInsertProjection
+	public class UserInsertProjection : BaseEntity, IProjection<User>, IInsertProjection
 	{
 		public string Email { get; set; }
 		public string Name { get; set; }
@@ -16,7 +16,7 @@ namespace Expo3.AdminApp.Projections
 		public EUserRole[] Roles { get; set; }
 	}
 
-	public class UserUpdateProjection : BaseEntityWithVersion, IProjection<User>, IGetProjection, IUpdateProjection
+	public class UserUpdateProjection : BaseEntity, IProjection<User>, IGetProjection, IUpdateProjection
 	{
 		public string Email { get; set; }
 		public string Name { get; set; }
@@ -26,7 +26,7 @@ namespace Expo3.AdminApp.Projections
 		public string Salt { get; private set; }
 	}
 
-	public class UserSearchProjection : BaseEntityWithVersion, IProjection<User>, IGetProjection, ISearchProjection
+	public class UserSearchProjection : BaseEntity, IProjection<User>, IGetProjection, ISearchProjection
 	{
 		[JsonProperty]
 		public string Email { get; private set; }
@@ -36,7 +36,7 @@ namespace Expo3.AdminApp.Projections
 		public EUserRole[] Roles { get; private set; }
 	}
 
-	public class UserRemoveProjection : BaseEntityWithVersion, IProjection<User>, IGetProjection, IRemoveProjection
+	public class UserRemoveProjection : BaseEntity, IProjection<User>, IGetProjection, IRemoveProjection
 	{
 	}
 }

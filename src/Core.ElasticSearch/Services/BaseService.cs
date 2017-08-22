@@ -89,8 +89,10 @@ namespace Core.ElasticSearch
             Debug.WriteLine("Load: " + sw.ElapsedMilliseconds);
         }
 
-        #region Try
-        protected TResult Try<TResponse, TResult>(Func<ElasticClient, TResponse> func, Func<TResponse, TResult> result, EventId eventId, string operationText = null)
+	    protected void Clear() => _container.Clear();
+
+		#region Try
+		protected TResult Try<TResponse, TResult>(Func<ElasticClient, TResponse> func, Func<TResponse, TResult> result, EventId eventId, string operationText = null)
             where TResponse : IResponse
         {
             try

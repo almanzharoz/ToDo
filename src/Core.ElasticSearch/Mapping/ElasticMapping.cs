@@ -4,7 +4,6 @@ using System.Diagnostics;
  using System.Linq;
  using System.Reflection;
  using System.Threading;
- using BenchmarkDotNet.Extensions;
  using Core.ElasticSearch.Domain;
 using Core.ElasticSearch.Serialization;
 using Elasticsearch.Net;
@@ -15,22 +14,12 @@ using SharpFuncExt;
 
 namespace Core.ElasticSearch.Mapping
 {
-	public interface IElasticMapping<TSettings> where TSettings : BaseElasticConnection
+	public interface IElasticMapping<TSettings> : IElasticProjections<TSettings> where TSettings : BaseElasticConnection
 	{
 		IElasticMapping<TSettings> AddMapping<T>(Func<TSettings, string> indexName) where T : class, IModel;
-		IElasticMapping<TSettings> AddStruct<T>() where T : struct;
 
-		IElasticMapping<TSettings> AddProjection<T, TMapping>()
-			where T : BaseEntity, IProjection<TMapping>, new()
-			where TMapping : class, IModel;
-
-		IElasticMapping<TSettings> AddProjection<T, TMapping, TParent>()
-			where T : BaseEntity, IProjection<TMapping>, IWithParent<TParent>, new()
-			where TMapping : class, IModel, IWithParent<TParent>
-			where TParent : BaseEntity, IProjection, new();
-
-		string GetIndexName<T>() where T : IProjection;
-		string GetTypeName<T>() where T : IProjection;
+		string GetIndexName<T>() where T : IEntity;
+		string GetTypeName<T>() where T : IEntity;
 	}
 
 	public interface IElasticProjections<TSettings> where TSettings : BaseElasticConnection
@@ -38,16 +27,16 @@ namespace Core.ElasticSearch.Mapping
 		IElasticMapping<TSettings> AddStruct<T>() where T : struct;
 
 		IElasticMapping<TSettings> AddProjection<T, TMapping>()
-			where T : BaseEntity, IProjection<TMapping>, new()
+			where T : class, IProjection, IProjection<TMapping>, new()
 			where TMapping : class, IModel;
 
 		IElasticMapping<TSettings> AddProjection<T, TMapping, TParent>()
-			where T : BaseEntity, IProjection<TMapping>, IWithParent<TParent>, new()
+			where T : class, IProjection, IProjection<TMapping>, IWithParent<TParent>, new()
 			where TMapping : class, IModel, IWithParent<TParent>
-			where TParent : BaseEntity, IProjection, new();
+			where TParent : class, IProjection, new();
 	}
 
-	internal class ElasticMapping<TSettings> : IElasticMapping<TSettings>, IElasticProjections<TSettings> where TSettings : BaseElasticConnection
+	internal class ElasticMapping<TSettings> : IElasticMapping<TSettings> where TSettings : BaseElasticConnection
 	{
 		private readonly ConcurrentDictionary<Type, IMappingItem> _mapping = new ConcurrentDictionary<Type, IMappingItem>();
 		private readonly ConcurrentDictionary<Type, IProjectionItem> _projection = new ConcurrentDictionary<Type, IProjectionItem>();
@@ -76,11 +65,11 @@ namespace Core.ElasticSearch.Mapping
 			return this;
 		}
 
-		public string GetIndexName<T>() where T : IProjection
-			=> _projection[typeof(T)].MappingItem.IndexName;
+		public string GetIndexName<T>() where T : IEntity
+			=> typeof(IModel).IsAssignableFrom(typeof(T)) ? _mapping[typeof(T)].IndexName : _projection[typeof(T)].MappingItem.IndexName;
 
-		public string GetTypeName<T>() where T : IProjection
-			=> _projection[typeof(T)].MappingItem.TypeName;
+		public string GetTypeName<T>() where T : IEntity
+			=> typeof(IModel).IsAssignableFrom(typeof(T)) ? _mapping[typeof(T)].TypeName : _projection[typeof(T)].MappingItem.TypeName;
 
 		/// <summary>
 		/// Регистрирует внутренний документ
@@ -100,15 +89,15 @@ namespace Core.ElasticSearch.Mapping
 		/// <typeparam name="TMapping"></typeparam>
 		/// <returns></returns>
 		public IElasticMapping<TSettings> AddProjection<T, TMapping>()
-			where T : BaseEntity, IProjection<TMapping>, new()
+			where T : class, IProjection, IProjection<TMapping>, new()
 			where TMapping : class, IModel
 		{
 			_projection.AddOrUpdate(typeof(T), x =>
 				{
 					var result = new ProjectionItem<T, TMapping, TSettings>((MappingItem<TMapping, TSettings>) _mapping.GetOrAdd(typeof(TMapping),
 						y => throw new Exception($"Not found mapping for type \"{y.Name}\"")));
-					if (typeof(IInsertProjection).IsAssignableFrom(x))
-						_converters.TryAdd(typeof(T), new InsertJsonConverter<T>(result));
+					//if (typeof(IInsertProjection).IsAssignableFrom(x))
+					//	_converters.TryAdd(typeof(T), new InsertJsonConverter<T>(result));
 					if (typeof(IGetProjection).IsAssignableFrom(x))
 						_converters.TryAdd(typeof(GetResponse<T>), new GetJsonConverter<T>());
 					if (typeof(ISearchProjection).IsAssignableFrom(x))
@@ -128,16 +117,16 @@ namespace Core.ElasticSearch.Mapping
 		/// <typeparam name="TParent"></typeparam>
 		/// <returns></returns>
 		public IElasticMapping<TSettings> AddProjection<T, TMapping, TParent>()
-			where T : BaseEntity, IProjection<TMapping>, IWithParent<TParent>, new()
+			where T : class, IProjection, IProjection<TMapping>, IWithParent<TParent>, new()
 			where TMapping : class, IModel, IWithParent<TParent>
-			where TParent : BaseEntity, IProjection, new()
+			where TParent : class, IProjection, new()
 		{
 			_projection.AddOrUpdate(typeof(T), x =>
 				{
 					var result = new ProjectionWithParentItem<T, TMapping, TParent, TSettings>((MappingItem<TMapping, TSettings>)_mapping.GetOrAdd(typeof(TMapping),
 						y => throw new Exception($"Not found mapping for type \"{y.Name}\"")));
-					if (typeof(IInsertProjection).IsAssignableFrom(x))
-						_converters.TryAdd(typeof(T), new InsertJsonConverter<T>(result));
+					//if (typeof(IInsertProjection).IsAssignableFrom(x))
+					//	_converters.TryAdd(typeof(T), new InsertJsonConverter<T>(result));
 					if (typeof(IGetProjection).IsAssignableFrom(x))
 						_converters.TryAdd(typeof(GetResponse<T>), new GetJsonConverter<T>());
 					if (typeof(ISearchProjection).IsAssignableFrom(x))

@@ -24,17 +24,13 @@ namespace Core.Tests
         }
 
         public void Clean() => _client.DeleteIndex("*");
+        public new void Clear() => base.Clear();
         
-        public new Task<IReadOnlyCollection<T>> FilterAsync<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query, int take = 0,
-            int skip = 0, bool load = true)
-            where T : class, IProjection, ISearchProjection
-            => base.FilterAsync<T>(query, take, skip, load);
-
 	    public new IReadOnlyCollection<TProjection> Filter<T, TProjection>(Func<QueryContainerDescriptor<T>, QueryContainer> query,
-		    Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, int take = 0, int skip = 0, bool load = true)
+		    Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, int page = 0, int take = 0, bool load = true)
 		    where TProjection : class, IProjection<T>, ISearchProjection
 			where T : class, IModel
-		    => base.Filter<T, TProjection>(query, sort, take, skip, load);
+		    => base.Filter<T, TProjection>(query, sort, page, take, load);
     
         public new IReadOnlyCollection<TProjection> Search<T, TProjection>(
             Func<QueryContainerDescriptor<T>, QueryContainer> query,
@@ -44,64 +40,70 @@ namespace Core.Tests
             => base.Search<T, TProjection>(query, sort, page, take, load);
 
         public new T Get<T>(string id, bool load = true)
-            where T : class, IProjection, IGetProjection
+            where T : BaseEntity, IProjection, IGetProjection
             => base.Get<T>(id, load);
 
-	    public new T Get<T, TParent>(string id, string parent, bool load = true)
-		    where T : class, IProjection, IGetProjection, IWithParent<TParent>
+	    public new T GetWithVersion<T>(string id, bool load = true)
+		    where T : BaseEntityWithVersion, IProjection, IGetProjection
+		    => base.GetWithVersion<T>(id, load);
+
+		public new T Get<T, TParent>(string id, string parent, bool load = true)
+		    where T : BaseEntityWithParent<TParent>, IProjection, IGetProjection
 		    where TParent : class, IProjection
 		    => base.Get<T, TParent>(id, parent, load);
 
-        public new Task<T> GetAsync<T>(string id, bool load = true)
-            where T : class, IProjection, IGetProjection
-			=> base.GetAsync<T>(id, load);
+	    public new T GetWithVersion<T, TParent>(string id, string parent, bool load = true)
+		    where T : BaseEntityWithParentAndVersion<TParent>, IProjection, IGetProjection
+		    where TParent : class, IProjection
+		    => base.GetWithVersion<T, TParent>(id, parent, load);
 
-        public new int FilterCount<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query) where T : class, IProjection
+		public new T Get<T>(string id, int version, bool load = true)
+		    where T : BaseEntityWithVersion, IProjection, IGetProjection
+		    => base.Get<T>(id, version, load);
+
+	    public new T Get<T, TParent>(string id, string parent, int version, bool load = true)
+		    where T : BaseEntityWithParentAndVersion<TParent>, IProjection, IGetProjection
+		    where TParent : class, IProjection
+		    => base.Get<T, TParent>(id, parent, version, load);
+
+		public new int FilterCount<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query) where T : class, IProjection
             => base.FilterCount<T>(query);
 
-        public new Task<int> FilterCountAsync<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query) where T : class, IProjection
-			=> base.FilterCountAsync<T>(query);
+        public bool Insert<T>(T entity) where T : BaseNewEntity, IProjection
+			=> base.Insert<T>(entity, true);
 
-        public new bool Insert<T>(T entity, bool refresh) where T : BaseEntity, IProjection, IInsertProjection
-			=> base.Insert<T>(entity, refresh);
+		public new T Insert<TNew, T>(TNew entity) where TNew : BaseNewEntity, IProjection
+		    where T : BaseEntity, IProjection, IGetProjection
+		    => base.Insert<TNew, T>(entity);
 
-        public new bool Insert<T, TParent>(T entity, bool refresh)
-            where T : BaseEntity, IWithParent<TParent>, IProjection, IInsertProjection
-			where TParent : IProjection
-            => base.Insert<T, TParent>(entity, refresh);
+	    public new T InsertWithVersion<TNew, T>(TNew entity) where TNew : BaseNewEntity, IProjection
+		    where T : BaseEntityWithVersion, IProjection, IGetProjection
+		    => base.InsertWithVersion<TNew, T>(entity);
 
-        public new Task<bool> InsertAsync<T>(T entity, bool refresh = true) where T : BaseEntity, IProjection, IInsertProjection
-            => base.InsertAsync<T>(entity, refresh);
+		public bool InsertWithParent<T, TParent>(T entity)
+            where T : BaseNewEntityWithParent<TParent>
+			where TParent : class, IProjection
+            => base.Insert<T, TParent>(entity, true);
 
-        public new bool Update<T>(T entity, bool refresh) where T : BaseEntityWithVersion, IProjection, IWithVersion, IUpdateProjection
-			=> base.Update<T>(entity, refresh);
+        public bool UpdateWithVersion<T>(T entity) where T : BaseEntityWithVersion, IProjection, IUpdateProjection
+			=> base.UpdateWithVersion<T>(entity, true);
 
-        public new Task<bool> UpdateAsync<T>(T entity, bool refresh = true) where T : BaseEntityWithVersion, IProjection, IWithVersion, IUpdateProjection
-			=> base.UpdateAsync<T>(entity, refresh);
-
-        public new int Update<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query, Func<UpdateByQueryBuilder<T>, UpdateByQueryBuilder<T>> update, bool refresh = true)
+        public int Update<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query, Func<UpdateByQueryBuilder<T>, UpdateByQueryBuilder<T>> update)
             where T : class, IEntity, IWithVersion, IProjection, IUpdateProjection
-			=> base.Update<T>(query, update, refresh);
+			=> base.Update<T>(query, update, true);
 
-        public new Task<(int updated, int total)> UpdateAsync<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query, Func<UpdateByQueryBuilder<T>, UpdateByQueryBuilder<T>> update,
-            bool refresh = true)
-            where T : class, IEntity, IWithVersion, IProjection, IUpdateProjection
-            => base.UpdateAsync<T>(query, update, refresh);
+        public bool Remove<T>(T entity) 
+			where T : BaseEntity, IProjection, IRemoveProjection
+			=> base.Remove<T>(entity, true);
 
-        public new bool Remove<T>(T entity) 
-			where T : class, IProjection, IWithVersion, IRemoveProjection
-			=> base.Remove<T>(entity);
+	    public bool RemoveWithVersion<T>(T entity)
+		    where T : BaseEntityWithVersion, IProjection, IRemoveProjection
+		    => base.RemoveWithVersion<T>(entity, true);
 
-        public new Task<bool> RemoveAsync<T>(T entity) where T : class, IProjection, IWithVersion, IRemoveProjection
-			=> base.RemoveAsync<T>(entity);
+		public int Remove<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query) where T : class, IRemoveProjection
+			=> base.Remove<T>(query, true);
 
-        public new int Remove<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query) where T : class, IProjection, IRemoveProjection
-			=> base.Remove<T>(query);
-
-        public new Task<int> RemoveAsync<T>(Func<QueryContainerDescriptor<T>, QueryContainer> query) where T : class, IProjection, IRemoveProjection
-			=> base.RemoveAsync<T>(query);
-
-        public new Pager<TProjection> FilterPager<T, TProjection>(Func<QueryContainerDescriptor<T>, QueryContainer> query, int page, int take,
+		public new Pager<TProjection> FilterPager<T, TProjection>(Func<QueryContainerDescriptor<T>, QueryContainer> query, int page, int take,
             Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, bool load = true)
             where TProjection : class, IProjection<T>, ISearchProjection
 			where T : class, IModel

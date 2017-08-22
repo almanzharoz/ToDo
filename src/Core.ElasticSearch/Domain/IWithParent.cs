@@ -3,6 +3,6 @@
 	public interface IWithParent<T>
 		where T : IProjection
 	{
-		T Parent { get; set; }
+		T Parent { get; }
 	}
 }

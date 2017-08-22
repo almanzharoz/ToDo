@@ -42,14 +42,14 @@ namespace Expo3.AdminApp.Services
 		}
 
 		public bool EditUser(string id, string email, string password, string name, EUserRole[] roles)
-		=> Update(Get<UserUpdateProjection>(id), u =>
+		=> Update(id, u =>
 			{
 				u.Email = email.ToLowerInvariant();
 				u.Name = name;
 				u.Password = HashPasswordHelper.GetHash(password, Base64UrlTextEncoder.Decode(u.Salt));
 				u.Roles = roles;
 				return u;
-			});
+			}, true);
 
 		public UserUpdateProjection GetUser(string id)
 			=> Get<UserUpdateProjection>(id);

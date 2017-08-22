@@ -1,4 +1,5 @@
 ﻿using Core.ElasticSearch.Domain;
+using Expo3.Model;
 using Expo3.Model.Embed;
 using Expo3.Model.Models;
 using Nest;
@@ -27,6 +28,9 @@ namespace Expo3.ClientApp.Projections.Event
 
 		[JsonProperty]
 		public TicketPrice[] Prices { get; private set; }
+
+		[JsonProperty]
+		public EventPage Page { get; private set; }
 	}
 
 	public class EventSearchProjection : BaseEntityWithVersion, IProjection<Model.Models.Event>, IGetProjection, ISearchProjection

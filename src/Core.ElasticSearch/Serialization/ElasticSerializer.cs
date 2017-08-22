@@ -36,7 +36,7 @@ namespace Core.ElasticSearch.Serialization
 				return _innerValueJsonConverter;
 			if (x == typeof(IProjection))
 				return _converters.GetOrAdd(x, z => new BaseClassJsonConverter<TSettings>(_container));
-			if (x.GetInterfaces().Any(z => z.Name == "IProjection`1"))
+			if (typeof(IProjection).IsAssignableFrom(x))
 				return _converters.GetOrAdd(x, z => _mapping.GetJsonConverter(z, _container));
 			if (_mapping.TryGetResponseJsonConverter(x, out JsonConverter result))
 				return result;

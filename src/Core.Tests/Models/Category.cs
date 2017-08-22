@@ -5,11 +5,19 @@ using Newtonsoft.Json;
 
 namespace Core.Tests.Models
 {
-	public class Category : BaseEntityWithVersion, IModel, IProjection<Category>, IGetProjection, IInsertProjection, IUpdateProjection, ISearchProjection, IRemoveProjection
+	public class Category : BaseEntityWithVersion, IModel, IProjection<Category>, IGetProjection, IUpdateProjection, ISearchProjection, IRemoveProjection
 	{
         [Keyword]
 		public Category Top { get; set; }
 		public string Name { get; set; }
         public DateTime CreatedOnUtc { get; set; }
     }
+
+	public class NewCategory : BaseNewEntity, IProjection<Category>
+	{
+		[Keyword]
+		public Category Top { get; set; }
+		public string Name { get; set; }
+		public DateTime CreatedOnUtc { get; set; }
+	}
 }
