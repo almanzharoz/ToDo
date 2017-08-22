@@ -18,9 +18,9 @@ namespace Expo3.WebApplication.Areas.Org.Controllers
 {
 	[Area("Org")]
 	[Authorize(Roles = "organizer")]
-	public class EventsController : BaseController<EventService>
+	public class EventController : BaseController<EventService>
     {
-	    public EventsController(EventService service) : base(service)
+	    public EventController(EventService service) : base(service)
 	    {
 	    }
 
@@ -47,7 +47,7 @@ namespace Expo3.WebApplication.Areas.Org.Controllers
 				    addEventEditModel.Type,
 					null, //TODO: работа с категориями
 					new[] {new TicketPrice {Price = new Price(addEventEditModel.Price)} }, 
-				    addEventEditModel.Page);
+				    addEventEditModel.Html);
 			    return RedirectToAction("Index");
 		    }
 
@@ -66,15 +66,14 @@ namespace Expo3.WebApplication.Areas.Org.Controllers
 		    if (ModelState.IsValid)
 		    {
 			    _service.UpdateEvent(
-					addEventEditModel.Id,
-					addEventEditModel.Name,
-					new EventDateTime() { Start = addEventEditModel.StartDateTime, Finish = addEventEditModel.FinishDateTime},
-					new Address() { City = addEventEditModel.City, AddressString = addEventEditModel.Address},
-					addEventEditModel.Type,
-					null, //TODO: работа с категориями
-					new[] {new TicketPrice() {Price = new Price(addEventEditModel.Price)}},
-					addEventEditModel.Page
-					);
+				    addEventEditModel.Id,
+				    addEventEditModel.Name,
+				    new EventDateTime {Start = addEventEditModel.StartDateTime, Finish = addEventEditModel.FinishDateTime},
+				    new Address {City = addEventEditModel.City, AddressString = addEventEditModel.Address},
+				    addEventEditModel.Type,
+				    null, //TODO: работа с категориями
+				    new[] {new TicketPrice() {Price = new Price(addEventEditModel.Price)}},
+				    addEventEditModel.Html, addEventEditModel.Version);
 			    return RedirectToAction("Index");
 		    }
 		    return View(addEventEditModel);

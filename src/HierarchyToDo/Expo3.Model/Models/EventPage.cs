@@ -32,5 +32,11 @@ namespace Expo3.Model
 		public string Date { get; set; }
 		public string Category { get; set; }
 		public string Company { get; set; }
+
+		public EventPage SetHtml(string html)
+		{
+			Html = html;
+			return this;
+		}
 	}
 }

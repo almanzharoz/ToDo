@@ -2,22 +2,36 @@
 
 namespace Core.ElasticSearch.Domain
 {
-	public class BaseEntity : IEntity
+	public abstract class BaseEntity : IEntity
+	{
+		[JsonProperty]
+		[JsonIgnore]
+		public string Id { get; internal set; }
+	}
+
+	public abstract class BaseEntityWithVersion : IEntity, IWithVersion
 	{
 		[JsonProperty]
 		[JsonIgnore]
 		public string Id { get; internal set; }
 
-		protected void SetId(string id)
+		[JsonProperty]
+		[JsonIgnore]
+		public int Version { get; internal set; }
+	}
+
+	public abstract class BaseNewEntity : IInsertProjection
+	{
+		[JsonProperty]
+		[JsonIgnore]
+		public string Id { get; internal set; }
+
+		protected BaseNewEntity() { }
+
+		protected BaseNewEntity(string id)
 		{
 			Id = id;
 		}
 	}
 
-	public class BaseEntityWithVersion : BaseEntity, IWithVersion
-	{
-		[JsonProperty]
-		[JsonIgnore]
-		public int Version { get; internal set; }
-	}
 }

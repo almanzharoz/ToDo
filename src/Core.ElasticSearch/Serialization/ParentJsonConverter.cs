@@ -8,8 +8,8 @@ using Newtonsoft.Json.Linq;
 namespace Core.ElasticSearch.Serialization
 {
 	internal class ParentJsonConverter<T, TParent> : JsonConverter 
-		where T : BaseEntity, IWithParent<TParent>, new()
-		where TParent : BaseEntity, IProjection, new()
+		where T : class, IEntity, IProjection, IWithParent<TParent>, new()
+		where TParent : class, IEntity, IProjection, new()
 	{
 		private readonly IRequestContainer _entityContainer;
 		private readonly IProjectionItem _projection;
@@ -45,7 +45,12 @@ namespace Core.ElasticSearch.Serialization
 			using (var r = jsonObject.CreateReader())
 				serializer.Populate(r, target);
 			if (jsonObject.TryGetValue("parent", out var v))
-				target.Parent = _entityContainer.GetOrAdd<TParent>(v.Value<string>(), true);
+			{
+				if (target is BaseEntityWithParent<TParent>)
+					(target as BaseEntityWithParent<TParent>).Parent = _entityContainer.GetOrAdd<TParent>(v.Value<string>(), true);
+				else
+					(target as BaseEntityWithParentAndVersion<TParent>).Parent = _entityContainer.GetOrAdd<TParent>(v.Value<string>(), true);
+			}
 			return target;
 		}
 

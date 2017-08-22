@@ -22,7 +22,7 @@ namespace Core.ElasticSearch.Serialization
 		}
 	}
 
-	internal class ClassJsonConverter<T> : JsonConverter where T : BaseEntity, new()
+	internal class ClassJsonConverter<T> : JsonConverter where T : class, IProjection, new()
 	{
 		private readonly IRequestContainer _entityContainer;
 		private readonly IProjectionItem _projectionItem;

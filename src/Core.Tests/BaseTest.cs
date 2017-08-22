@@ -29,11 +29,15 @@ namespace Core.Tests
                 .AddMapping<User>(x => x.FirstIndex)
 
                 .AddProjection<Producer, Producer>()
+                .AddProjection<NewProducer, Producer>()
                 .AddProjection<Category, Category>()
-                .AddProjection<CategoryProjection, Category>()
+                .AddProjection<NewCategory, Category>()
+				.AddProjection<CategoryProjection, Category>()
                 .AddProjection<ProductProjection, Product, Category>()
                 .AddProjection<Product, Product, Category>()
+                .AddProjection<NewProduct, Product, Category>()
                 .AddProjection<User, User>()
+                .AddProjection<NewUser, User>()
                 .AddProjection<UserUpdateProjection, User>());
 
             _repository = serviceProvider.GetService<TestService>();

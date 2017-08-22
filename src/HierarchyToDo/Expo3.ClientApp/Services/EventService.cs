@@ -35,8 +35,8 @@ namespace Expo3.ClientApp.Services
                     .Must(Query<Event>.Match(m => m.Field(x => x.Name).Query(query)) &&
                           Query<Event>.Match(m => m.Field(x => x.Address.City).Query(city)))));
 
-        public EventPage GetEventPageById(string id)
-            => Get<EventPageProjections>(id.HasNotNullArg("event id")).IfNotNullOrDefault(p => p.Page);
+        public EventProjection GetEventPageById(string id)
+            => Get<EventProjection>(id.HasNotNullArg("event id"));
 
         public Pager<EventSearchProjection> SearchEvents(string query=null, string city=null, List<string> categories=null, List<EEventType> types=null, DateTime? startDateTime=null, DateTime? endDateTime=null, decimal? maxPrice=null, int pageSize = 9999, int pageIndex=0)
         {

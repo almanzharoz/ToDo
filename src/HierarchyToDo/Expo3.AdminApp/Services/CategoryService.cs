@@ -3,6 +3,7 @@ using Expo3.AdminApp.Projections;
 using Expo3.Model;
 using Expo3.Model.Models;
 using Microsoft.Extensions.Logging;
+using SharpFuncExt;
 
 namespace Expo3.AdminApp.Services
 {
@@ -14,13 +15,13 @@ namespace Expo3.AdminApp.Services
 		}
 
 		public bool Add(string name)
-			=> Insert(new CategoryProjection {Name = name});
+			=> InsertWithVersion(new CategoryProjection {Name = name});
 
 		public bool Remove(string id)
 			=> Remove(Get<CategoryProjection>(id));
 
-		public bool Rename(string id, string name)
-			=> Update(Get<CategoryProjection>(id), x =>
+		public bool Rename(string id, int version, string name)
+			=> Update<CategoryProjection>(id, version, x =>
 			{
 				x.Name = name;
 				return x;

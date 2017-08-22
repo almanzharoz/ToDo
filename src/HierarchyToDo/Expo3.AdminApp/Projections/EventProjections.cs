@@ -21,7 +21,7 @@ namespace Expo3.AdminApp.Projections
 			Owner = owner;
 		}
 
-		public Category Category { get; set; }
+		public BaseCategoryProjection Category { get; set; }
 		public string Caption { get; set; }
 		public EventDateTime DateTime { get; set; }
 		public Address Address { get; set; }
