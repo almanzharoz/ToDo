@@ -1,0 +1,21 @@
+@model IReadOnlyCollection<Expo3.AdminApp.Projections.CategoryProjection>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>All categories</h2>
+    
+<table>
+    <thead>
+    <tr>
+        <th>Name</th>
+    </tr>
+    </thead>
+    
+    <tbody>
+    @foreach (var categoryProjection in Model)
+    {
+        <tr>@categoryProjection.Name</tr>
+    }
+    </tbody>
+</table>

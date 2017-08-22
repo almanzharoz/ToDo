@@ -1,4 +1,5 @@
-﻿using Core.ElasticSearch;
+﻿using System.Collections.Generic;
+using Core.ElasticSearch;
 using Expo3.AdminApp.Projections;
 using Expo3.Model;
 using Expo3.Model.Models;
@@ -25,5 +26,8 @@ namespace Expo3.AdminApp.Services
 				x.Name = name;
 				return x;
 			});
+
+		public IReadOnlyCollection<CategoryProjection> GetAllCategories()
+			=> Search<Category, CategoryProjection>(q => q.MatchAll());
 	}
 }
