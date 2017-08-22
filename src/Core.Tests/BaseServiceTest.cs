@@ -66,7 +66,7 @@ namespace Core.Tests
             var category = new NewCategory() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
             var parent =  _repository.InsertWithVersion<NewCategory, Category>(category);
             var product = new NewProduct(parent) { Name = "Product", FullName = new FullName() { Name = "Product", Category = category.Name } };
-	        _repository.Clear();
+	        _repository.ClearCache();
             _repository.InsertWithParent<NewProduct, Category>(product);
             Assert.IsNotNull(product.Id);
             Assert.IsNotNull(product.Parent);
@@ -82,7 +82,7 @@ namespace Core.Tests
             var category = new NewCategory() { Name = "Category", Top = parent, CreatedOnUtc = DateTime.UtcNow };
 
 	        Assert.IsTrue(_repository.Insert(category));
-	        _repository.Clear();
+	        _repository.ClearCache();
 			var loadCategory = _repository.GetWithVersion<Category>(category.Id, false);
 
             Assert.IsNotNull(loadCategory);
@@ -101,7 +101,7 @@ namespace Core.Tests
 
             Assert.IsTrue(_repository.Insert(category));
 
-	        _repository.Clear();
+	        _repository.ClearCache();
             var loadCategory = _repository.Get<CategoryProjection>(category.Id, false);
 
             Assert.IsNotNull(loadCategory);
@@ -120,7 +120,7 @@ namespace Core.Tests
 
 			Assert.IsTrue(_repository.InsertWithParent<NewProduct, Category>(product));
 
-	        _repository.Clear();
+	        _repository.ClearCache();
             var loadProduct = _repository.GetWithVersion<Product, Category>(product.Id, category.Id, false);
 
             Assert.IsNotNull(loadProduct);
@@ -139,7 +139,7 @@ namespace Core.Tests
 			var product = new NewProduct(parent) { Name = "Product", FullName = new FullName() { Name = "Product", Category = category.Name } };
             _repository.InsertWithParent<NewProduct, Category>(product);
 
-	        _repository.Clear();
+	        _repository.ClearCache();
             var loadProduct = _repository.Get<ProductProjection, Category>(product.Id, category.Id, false);
 
             Assert.IsNotNull(loadProduct);
@@ -159,7 +159,7 @@ namespace Core.Tests
 
             _repository.Insert(category);
 
-	        _repository.Clear();
+	        _repository.ClearCache();
             var loadCategory = _repository.GetWithVersion<Category>(category.Id, true);
 
             Assert.IsNotNull(loadCategory);
@@ -178,7 +178,7 @@ namespace Core.Tests
 
             _repository.Insert(category);
 
-	        _repository.Clear();
+	        _repository.ClearCache();
             var loadCategory = _repository.Get<CategoryProjection>(category.Id, true);
 
             Assert.IsNotNull(loadCategory);
@@ -197,7 +197,7 @@ namespace Core.Tests
 
             _repository.InsertWithParent<NewProduct, Category>(product);
 
-	        _repository.Clear();
+	        _repository.ClearCache();
             var loadProduct = _repository.GetWithVersion<Product, Category>(product.Id, category.Id, true);
 
             Assert.IsNotNull(loadProduct);
@@ -217,7 +217,7 @@ namespace Core.Tests
 
 	        _repository.InsertWithParent<NewProduct, Category>(product);
 
-	        _repository.Clear();
+	        _repository.ClearCache();
 			var loadProduct = _repository.Get<ProductProjection, Category>(product.Id, category.Id, true);
 
             Assert.IsNotNull(loadProduct);
@@ -234,7 +234,7 @@ namespace Core.Tests
             c.Name = "New Category";
             _repository.UpdateWithVersion(c);
 
-	        _repository.Clear();
+	        _repository.ClearCache();
             var loadCategory = _repository.GetWithVersion<Category>(category.Id, true);
 
             Assert.IsNotNull(loadCategory);
@@ -278,7 +278,7 @@ namespace Core.Tests
             _repository.Insert(category);
             _repository.Update<Category>(q => q.Ids(x => x.Values(category.Id)), u => u.Set(x => x.Name, "New Category"));
 
-	        _repository.Clear();
+	        _repository.ClearCache();
             var loadCategory = _repository.GetWithVersion<Category>(category.Id, true);
 
             Assert.IsNotNull(loadCategory);
@@ -296,7 +296,7 @@ namespace Core.Tests
 
 			Assert.AreEqual(2, _repository.Update<Category>(q => q.Ids(x => x.Values(category1.Id, category2.Id)), u => u.Unset(x => x.Name)));
 
-	        _repository.Clear();
+	        _repository.ClearCache();
 			var loadCategory1 = _repository.GetWithVersion<Category>(category1.Id, true);
 			var loadCategory2 = _repository.GetWithVersion<Category>(category2.Id, true);
 
@@ -315,7 +315,7 @@ namespace Core.Tests
 			var c = _repository.InsertWithVersion<NewCategory, Category>(category);
 			_repository.RemoveWithVersion(c);
 
-	        _repository.Clear();
+	        _repository.ClearCache();
 			var loadCategory = _repository.GetWithVersion<Category>(category.Id, true);
 			Assert.IsNull(loadCategory);
 		}
@@ -397,7 +397,7 @@ namespace Core.Tests
 			var category2 = new NewCategory() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
 			_repository.Insert(category2);
 
-	        _repository.Clear();
+	        _repository.ClearCache();
 			var childCategories = _repository.Filter<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), sort => sort.Descending(c => c.CreatedOnUtc), 0, 0, false);
 
 			Assert.AreEqual(childCategories.Count, 3);
@@ -426,7 +426,7 @@ namespace Core.Tests
 			var category2 = new NewCategory() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
 			_repository.Insert(category2);
 
-			_repository.Clear();
+			_repository.ClearCache();
 
 			var childCategories = _repository.Filter<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), sort => sort.Ascending(c => c.CreatedOnUtc), 1, 1, false);
 
@@ -452,7 +452,7 @@ namespace Core.Tests
 			var category2 = new NewCategory() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
 			_repository.Insert(category2);
 
-			_repository.Clear();
+			_repository.ClearCache();
 
 			var childCategories = _repository.Filter<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), sort => sort.Ascending(c => c.CreatedOnUtc), 1, 1, true);
 
@@ -477,7 +477,7 @@ namespace Core.Tests
 			var category2 = new NewCategory() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
 			_repository.Insert(category2);
 
-			_repository.Clear();
+			_repository.ClearCache();
 
 			var childCategories = _repository.Search<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), sort => sort.Descending(c => c.CreatedOnUtc), 1, 2, false);
 
@@ -503,7 +503,7 @@ namespace Core.Tests
 			var category2 = new NewCategory() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
 			_repository.Insert(category2);
 
-			_repository.Clear();
+			_repository.ClearCache();
 			var childCategories = _repository.Search<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), sort => sort.Descending(c => c.CreatedOnUtc), 1, 2, true);
 
 			Assert.AreEqual(childCategories.Count, 1);
@@ -528,7 +528,7 @@ namespace Core.Tests
 			var category2 = new NewCategory() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
 			_repository.Insert(category2);
 
-			_repository.Clear();
+			_repository.ClearCache();
 
 			var childCategories = _repository.FilterPager<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 0, 1, sort => sort.Descending(c => c.CreatedOnUtc), false);
 
@@ -555,7 +555,7 @@ namespace Core.Tests
 			var category2 = new NewCategory() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
 			_repository.Insert(category2);
 
-			_repository.Clear();
+			_repository.ClearCache();
 
 			var childCategories = _repository.FilterPager<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 1, 2, sort => sort.Descending(c => c.CreatedOnUtc), true);
 
@@ -591,7 +591,7 @@ namespace Core.Tests
 			var product = new NewProduct(c) { Name = "Product1", Producer = p };
 			_repository.InsertWithParent<NewProduct, Category>(product);
 
-			_repository.Clear();
+			_repository.ClearCache();
 			var loaded = _repository.GetWithVersion<Product, Category>(product.Id, category.Id, true);
 
 			Assert.AreEqual(loaded.Name, product.Name);

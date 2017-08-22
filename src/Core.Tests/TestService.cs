@@ -24,7 +24,7 @@ namespace Core.Tests
         }
 
         public void Clean() => _client.DeleteIndex("*");
-        public new void Clear() => base.Clear();
+        public new void ClearCache() => base.ClearCache();
         
 	    public new IReadOnlyCollection<TProjection> Filter<T, TProjection>(Func<QueryContainerDescriptor<T>, QueryContainer> query,
 		    Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, int page = 0, int take = 0, bool load = true)

@@ -115,7 +115,7 @@ namespace Core.ElasticSearch
 			return result;
 		}
 
-		public void Clear()
+		public void ClearCache()
 		{
 			_cache.Clear();
 			_loadBag = new ConcurrentBag<IEntity>();

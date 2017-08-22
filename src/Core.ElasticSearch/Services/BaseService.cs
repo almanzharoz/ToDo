@@ -89,7 +89,7 @@ namespace Core.ElasticSearch
             Debug.WriteLine("Load: " + sw.ElapsedMilliseconds);
         }
 
-	    protected void Clear() => _container.Clear();
+	    protected void ClearCache() => _container.ClearCache();
 
 		#region Try
 		protected TResult Try<TResponse, TResult>(Func<ElasticClient, TResponse> func, Func<TResponse, TResult> result, EventId eventId, string operationText = null)
