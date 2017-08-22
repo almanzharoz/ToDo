@@ -12,7 +12,7 @@ namespace Core.ElasticSearch
 {
 	internal interface IRequestContainer
 	{
-		T GetOrAdd<T>(string key, bool load) where T : BaseEntity, new();
+		T GetOrAdd<T>(string key, bool load) where T : class, IEntity, new();
 		IEntity Get(string key);
 		IEnumerable<(string index, IEnumerable<string> types, IEnumerable<string> fields, IEnumerable<string> ids)> PopEntitiesForLoad();
 	}
@@ -36,13 +36,19 @@ namespace Core.ElasticSearch
 			_mapping = mapping;
 		}
 
-		public T GetOrAdd<T>(string key, bool load) where T : BaseEntity, new()
+		//TODO: Возможно, нужно добавить GetOrAdd<T, TParent>(id, parent)
+		public T GetOrAdd<T>(string key, bool load) where T : class, IEntity, new()
 		{
 			var type = typeof(T);
 			return (T) _cache.AddOrUpdate(key,
 					x =>
 					{
-						var result = new T {Id = key};
+						T result = new T();
+						if (result is BaseEntity)
+							(result as BaseEntity).Id = key;
+						else
+							(result as BaseEntityWithVersion).Id = key;
+
 						if (load)
 							lock (_locker)
 								_loadBag.Add(result);
@@ -54,7 +60,12 @@ namespace Core.ElasticSearch
 					{
 						if (e.All(x => x.Key.GetType() != type))
 						{
-							var result = new T {Id = key};
+							T result = new T();
+							if (result is BaseEntity)
+								(result as BaseEntity).Id = key;
+							else
+								(result as BaseEntityWithVersion).Id = key;
+
 							if (load)
 								lock (_locker)
 									_loadBag.Add(result);
@@ -102,6 +113,12 @@ namespace Core.ElasticSearch
 					ids: item.ids));
 			}
 			return result;
+		}
+
+		public void ClearCache()
+		{
+			_cache.Clear();
+			_loadBag = new ConcurrentBag<IEntity>();
 		}
 	}
 }

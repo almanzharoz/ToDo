@@ -37,7 +37,7 @@ namespace Expo3.WebApplication.Controllers
 
         public IActionResult Event(string id)
         {
-            var model = _service.GetEventPageById(id).IfNotNullOrDefault(m => new EventPageModel() { Caption = m.Caption, Date = m.Date, Html = m.Html, Title = m.Title });
+            var model = _service.GetEventPageById(id).IfNotNullOrDefault(m => new EventPageModel() { Caption = m.Name, Date = m.DateTime.ToString(), Html = m.Page.Html, Title = m.Page.Title });
             if (model == null)
                 return NotFound();
             return View(model);

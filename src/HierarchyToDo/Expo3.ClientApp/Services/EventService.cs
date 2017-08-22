@@ -35,44 +35,45 @@ namespace Expo3.ClientApp.Services
                     .Must(Query<Event>.Match(m => m.Field(x => x.Name).Query(query)) &&
                           Query<Event>.Match(m => m.Field(x => x.Address.City).Query(city)))));
 
-        public EventPage GetEventPageById(string id)
-            => Get<EventPageProjections>(id.HasNotNullArg("event id")).IfNotNullOrDefault(p => p.Page);
+        public EventProjection GetEventPageById(string id)
+            => Get<EventProjection>(id.HasNotNullArg("event id"));
 
         public Pager<EventSearchProjection> SearchEvents(string query=null, string city=null, List<string> categories=null, List<EEventType> types=null, DateTime? startDateTime=null, DateTime? endDateTime=null, decimal? maxPrice=null, int pageSize = 9999, int pageIndex=0)
         {
-            List<QueryContainer> qs = new List<QueryContainer>();
+            List<QueryContainer> qc = new List<QueryContainer>();
             if (!string.IsNullOrEmpty(query))
             {
-                qs.Add(Query<Event>.Bool(d => d.Should(r => r.Match(m => m.Field(x => x.Name).Query(query)),
+                qc.Add(Query<Event>.Bool(d => d.Should(r => r.Match(m => m.Field(x => x.Name).Query(query)),
                                         r => r.Match(m => m.Field(x => x.Page.Html).Query(query)))));
             }
+            List<QueryContainer> qf = new List<QueryContainer>();
             if (categories != null && categories.Any())
             {
-                qs.Add(Query<Event>.Terms(m => m.Field(x => x.Category).Terms(categories)));
+                qf.Add(Query<Event>.Terms(m => m.Field(x => x.Category).Terms(categories)));
             }
             if (types != null && types.Any())
             {
-                qs.Add(Query<Event>.Terms(m => m.Field(x => x.Type).Terms(types)));
+                qf.Add(Query<Event>.Terms(m => m.Field(x => x.Type).Terms(types)));
             }
             if (!string.IsNullOrEmpty(city))
             {
-                qs.Add(Query<Event>.Match(m => m.Field(x => x.Address.City).Query(city)));
+                qf.Add(Query<Event>.Match(m => m.Field(x => x.Address.City).Query(city)));
             }
             if (startDateTime.HasValue)
             {
-                qs.Add(Query<Event>.DateRange(m => m.Field(x => x.DateTime.Start).GreaterThanOrEquals(startDateTime.Value)));
+                qf.Add(Query<Event>.DateRange(m => m.Field(x => x.DateTime.Start).GreaterThanOrEquals(startDateTime.Value)));
             }
             if (endDateTime.HasValue)
             {
-                qs.Add(Query<Event>.DateRange(m => m.Field(x => x.DateTime.Finish).LessThanOrEquals(endDateTime.Value)));
+                qf.Add(Query<Event>.DateRange(m => m.Field(x => x.DateTime.Finish).LessThanOrEquals(endDateTime.Value)));
             }
             if (maxPrice.HasValue)
             {
-                qs.Add(Query<Event>.Range(m => m.Field(x => x.Prices.First().Price).LessThanOrEquals((double)maxPrice.Value)));
+                qf.Add(Query<Event>.Range(m => m.Field(x => x.Prices.First().Price).LessThanOrEquals((double)maxPrice.Value)));
             }
             return SearchPager<Event, EventSearchProjection>(q => q
                 .Bool(b => b
-                    .Must(qs.ToArray())), pageIndex, pageSize, null, false);
+                    .Must(qc.ToArray()).Filter(qf.ToArray())), pageIndex, pageSize, null, false);
         }
 
 

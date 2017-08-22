@@ -89,13 +89,15 @@ namespace Core.ElasticSearch
             Debug.WriteLine("Load: " + sw.ElapsedMilliseconds);
         }
 
-        #region Try
-        protected TResult Try<TResponse, TResult>(Func<ElasticClient, TResponse> func, Func<TResponse, TResult> result, EventId eventId, string operationText = null)
+	    protected void ClearCache() => _container.ClearCache();
+
+		#region Try
+		protected TResult Try<TResponse, TResult>(Func<ElasticClient, TResponse> func, Func<TResponse, TResult> result, EventId eventId, string operationText = null)
             where TResponse : IResponse
         {
             try
             {
-                //Debug.WriteLine(func(_client).DebugInformation);
+                Debug.WriteLine(func(_client).DebugInformation);
                 var sw = new Stopwatch();
                 return result(_client.Stopwatch(sw, x => func(_client)).Fluent(x => Debug.WriteLine("Try: " + sw.ElapsedMilliseconds))
                     .LogDebug(_logger, operationText ?? eventId.Name)

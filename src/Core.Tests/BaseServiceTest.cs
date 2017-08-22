@@ -19,48 +19,55 @@ namespace Core.Tests
         [TestMethod]
         public void AddObjectWithoutParentAndRelated()
         {
-            var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category, true);
+            var category = new NewCategory { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
+            _repository.Insert(category);
 
             Assert.IsNotNull(category.Id);
         }
 
-        [TestMethod]
-        public void AddObjectWithInvalidRelatedAndWithoutParent()
-        {
-            var parentCategory = new Category() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
-            var childCategory = new Category() { Name = "Child Category", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
-            Assert.ThrowsException<UnexpectedElasticsearchClientException>(() =>
-            {
-                _repository.Insert(childCategory, true);
-            });
-        }
+		// TODO: Тест не компилируется за счет введения BaseNewEntity
+        //[TestMethod]
+        //public void AddObjectWithInvalidRelatedAndWithoutParent()
+        //{
+        //    var parentCategory = new NewCategory() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
+        //    var childCategory = new NewCategory() { Name = "Child Category", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
+        //    Assert.ThrowsException<UnexpectedElasticsearchClientException>(() =>
+        //    {
+        //        _repository.Insert(childCategory);
+        //    });
+        //}
 
         [TestMethod]
         public void AddObjectWithValidRelatedAndWithoutParent()
         {
-            var parentCategory = new Category() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(parentCategory, true);
-            var childCategory = new Category() { Name = "Child Category", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(childCategory, true);
+            var parentCategory = new NewCategory() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
+            var parent = _repository.InsertWithVersion<NewCategory, Category>(parentCategory);
+			Assert.IsNotNull(parent);
+			Assert.IsNotNull(parent.Id);
+			Assert.AreEqual(parent.Id, parentCategory.Id);
+			Assert.AreEqual(parent.Version, 1);
+			var childCategory = new NewCategory() { Name = "Child Category", Top = parent, CreatedOnUtc = DateTime.UtcNow };
+            _repository.Insert(childCategory);
             Assert.IsNotNull(childCategory.Id);
         }
 
-        [TestMethod]
-        public void AddObjectWithInvalidParentAndWithoutRelated()
-        {
-            var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
-            var product = new Product() { Name = "Product", Parent = category };
-            Assert.ThrowsException<QueryException>(() => _repository.Insert<Product, Category>(product, true));
-        }
+		//TODO: Такое использование неприемлено и не компилируется
+        //[TestMethod]
+        //public void AddObjectWithInvalidParentAndWithoutRelated()
+        //{
+        //    var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
+        //    var product = new Product() { Name = "Product", Parent = category };
+        //    Assert.ThrowsException<QueryException>(() => _repository.Insert<Product, Category>(product, true));
+        //}
 
         [TestMethod]
         public void AddObjectWithValidParentAndWithoutRelated()
         {
-            var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category, true);
-            var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
-            _repository.Insert<Product, Category>(product, true);
+            var category = new NewCategory() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
+            var parent =  _repository.InsertWithVersion<NewCategory, Category>(category);
+            var product = new NewProduct(parent) { Name = "Product", FullName = new FullName() { Name = "Product", Category = category.Name } };
+	        _repository.ClearCache();
+            _repository.InsertWithParent<NewProduct, Category>(product);
             Assert.IsNotNull(product.Id);
             Assert.IsNotNull(product.Parent);
             Assert.AreEqual(product.Parent.Id, category.Id);
@@ -70,13 +77,13 @@ namespace Core.Tests
         [TestMethod]
         public void GetObjectByIdWithoutAutoLoadAndWithoutParent()
         {
-            var parentCategory = new Category() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
-            var category = new Category() { Name = "Category", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
+            var parentCategory = new NewCategory() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
+            var parent =  _repository.InsertWithVersion<NewCategory, Category>(parentCategory);
+            var category = new NewCategory() { Name = "Category", Top = parent, CreatedOnUtc = DateTime.UtcNow };
 
-            _repository.Insert(parentCategory, true);
-            _repository.Insert(category, true);
-
-            var loadCategory = _repository.Get<Category>(category.Id, false);
+	        Assert.IsTrue(_repository.Insert(category));
+	        _repository.ClearCache();
+			var loadCategory = _repository.GetWithVersion<Category>(category.Id, false);
 
             Assert.IsNotNull(loadCategory);
             Assert.IsNotNull(loadCategory.Top);
@@ -90,10 +97,11 @@ namespace Core.Tests
         [TestMethod]
         public void GetProjectionObjectByIdWithoutAutoLoadAndWithoutParent()
         {
-            var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
+            var category = new NewCategory() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
 
-            _repository.Insert(category, true);
+            Assert.IsTrue(_repository.Insert(category));
 
+	        _repository.ClearCache();
             var loadCategory = _repository.Get<CategoryProjection>(category.Id, false);
 
             Assert.IsNotNull(loadCategory);
@@ -106,12 +114,14 @@ namespace Core.Tests
         [TestMethod]
         public void GetObjectByIdWithoutAutoLoadAndWithParent()
         {
-            var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
-            var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
-            _repository.Insert(category, true);
-            _repository.Insert<Product, Category>(product, true);
+            var category = new NewCategory() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
+            var parent = _repository.InsertWithVersion<NewCategory, Category>(category);
+            var product = new NewProduct(parent) { Name = "Product", FullName = new FullName() { Name = "Product", Category = category.Name } };
 
-            var loadProduct = _repository.Get<Product, Category>(product.Id, category.Id, false);
+			Assert.IsTrue(_repository.InsertWithParent<NewProduct, Category>(product));
+
+	        _repository.ClearCache();
+            var loadProduct = _repository.GetWithVersion<Product, Category>(product.Id, category.Id, false);
 
             Assert.IsNotNull(loadProduct);
             Assert.IsNotNull(loadProduct.Parent);
@@ -124,11 +134,12 @@ namespace Core.Tests
         [TestMethod]
         public void GetProjectionObjectByIdWithoutAutoLoadAndWithParent()
         {
-            var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
-            var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
-            _repository.Insert(category, true);
-            _repository.Insert<Product, Category>(product, true);
+            var category = new NewCategory() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
+	        var parent = _repository.InsertWithVersion<NewCategory, Category>(category);
+			var product = new NewProduct(parent) { Name = "Product", FullName = new FullName() { Name = "Product", Category = category.Name } };
+            _repository.InsertWithParent<NewProduct, Category>(product);
 
+	        _repository.ClearCache();
             var loadProduct = _repository.Get<ProductProjection, Category>(product.Id, category.Id, false);
 
             Assert.IsNotNull(loadProduct);
@@ -142,13 +153,14 @@ namespace Core.Tests
         [TestMethod]
         public void GetObjectByIdWithAutoLoadAndWithoutParent()
         {
-            var parentCategory = new Category() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
-            var category = new Category() { Name = "Category", Top = parentCategory };
+            var parentCategory = new NewCategory() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
+	        var parent = _repository.InsertWithVersion<NewCategory, Category>(parentCategory);
+            var category = new NewCategory() { Name = "Category", Top = parent };
 
-            _repository.Insert(parentCategory, true);
-            _repository.Insert(category, true);
+            _repository.Insert(category);
 
-            var loadCategory = _repository.Get<Category>(category.Id, true);
+	        _repository.ClearCache();
+            var loadCategory = _repository.GetWithVersion<Category>(category.Id, true);
 
             Assert.IsNotNull(loadCategory);
             Assert.IsNotNull(loadCategory.Top);
@@ -162,10 +174,11 @@ namespace Core.Tests
         [TestMethod]
         public void GetProjectionObjectByIdWithAutoLoadAndWithoutParent()
         {
-            var category = new Category() { Name = "Category" };
+            var category = new NewCategory() { Name = "Category" };
 
-            _repository.Insert(category, true);
+            _repository.Insert(category);
 
+	        _repository.ClearCache();
             var loadCategory = _repository.Get<CategoryProjection>(category.Id, true);
 
             Assert.IsNotNull(loadCategory);
@@ -178,13 +191,14 @@ namespace Core.Tests
         [TestMethod]
         public void GetObjectByIdWithAutoLoadAndWithParent()
         {
-            var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
-            var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
+            var category = new NewCategory() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
+	        var parent = _repository.InsertWithVersion<NewCategory, Category>(category);
+            var product = new NewProduct(parent) { Name = "Product", FullName = new FullName() { Name = "Product", Category = category.Name } };
 
-            _repository.Insert(category, true);
-            _repository.Insert<Product, Category>(product, true);
+            _repository.InsertWithParent<NewProduct, Category>(product);
 
-            var loadProduct = _repository.Get<Product, Category>(product.Id, category.Id, true);
+	        _repository.ClearCache();
+            var loadProduct = _repository.GetWithVersion<Product, Category>(product.Id, category.Id, true);
 
             Assert.IsNotNull(loadProduct);
             Assert.IsNotNull(loadProduct.Parent);
@@ -197,13 +211,14 @@ namespace Core.Tests
         [TestMethod]
         public void GetProjectionObjectByIdWithAutoLoadAndWithParent()
         {
-            var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
-            var product = new Product() { Name = "Product", Parent = category, FullName = new FullName() { Name = "Product", Category = category.Name } };
+	        var category = new NewCategory() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
+	        var parent = _repository.InsertWithVersion<NewCategory, Category>(category);
+	        var product = new NewProduct(parent) { Name = "Product", FullName = new FullName() { Name = "Product", Category = category.Name } };
 
-            _repository.Insert(category, true);
-            _repository.Insert<Product, Category>(product, true);
+	        _repository.InsertWithParent<NewProduct, Category>(product);
 
-            var loadProduct = _repository.Get<ProductProjection, Category>(product.Id, category.Id, true);
+	        _repository.ClearCache();
+			var loadProduct = _repository.Get<ProductProjection, Category>(product.Id, category.Id, true);
 
             Assert.IsNotNull(loadProduct);
             Assert.IsNotNull(loadProduct.Parent);
@@ -214,16 +229,18 @@ namespace Core.Tests
         [TestMethod]
         public void UpdateObjectSimply()
         {
-            var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category, true);
-            category.Name = "New Category";
-            _repository.Update(category, true);
+            var category = new NewCategory() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
+            var c = _repository.InsertWithVersion<NewCategory, Category>(category);
+            c.Name = "New Category";
+            _repository.UpdateWithVersion(c);
 
-            var loadCategory = _repository.Get<Category>(category.Id, true);
+	        _repository.ClearCache();
+            var loadCategory = _repository.GetWithVersion<Category>(category.Id, true);
 
             Assert.IsNotNull(loadCategory);
-            Assert.AreEqual(loadCategory.Version, category.Version);
-            Assert.AreEqual(loadCategory.Name, "New Category");
+            Assert.AreEqual(loadCategory.Version, c.Version);
+            Assert.AreEqual(loadCategory.Version, 2);
+			Assert.AreEqual(loadCategory.Name, "New Category");
         }
 
         //[TestMethod]
@@ -257,364 +274,389 @@ namespace Core.Tests
         [TestMethod]
         public void UpdateObjectByQueryFuncSet()
         {
-            var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category, true);
-            _repository.Update<Category>(q => q.Ids(x => x.Values(category.Id)), u => u.Set(x => x.Name, "New Category"), true);
+            var category = new NewCategory() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
+            _repository.Insert(category);
+            _repository.Update<Category>(q => q.Ids(x => x.Values(category.Id)), u => u.Set(x => x.Name, "New Category"));
 
-            var loadCategory = _repository.Get<Category>(category.Id, true);
+	        _repository.ClearCache();
+            var loadCategory = _repository.GetWithVersion<Category>(category.Id, true);
 
             Assert.IsNotNull(loadCategory);
             Assert.AreEqual(loadCategory.Name, "New Category");
+            Assert.AreEqual(loadCategory.Version, 2);
         }
 
-        [TestMethod]
-        public void UpdateObjectByQueryFuncUnset()
-        {
-            var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category, true);
-            _repository.Update<Category>(q => q.Ids(x => x.Values(category.Id)), u => u.Unset(x => x.Name), true);
+		[TestMethod]
+		public void UpdateObjectByQueryFuncUnset()
+		{
+			var category1 = new NewCategory() { Name = "Category 1", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category1);
+			var category2 = new NewCategory() { Name = "Category 2", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category2);
 
-            var loadCategory = _repository.Get<Category>(category.Id, true);
+			Assert.AreEqual(2, _repository.Update<Category>(q => q.Ids(x => x.Values(category1.Id, category2.Id)), u => u.Unset(x => x.Name)));
 
-            Assert.IsNotNull(loadCategory);
-            Assert.IsNull(loadCategory.Name);
-        }
+	        _repository.ClearCache();
+			var loadCategory1 = _repository.GetWithVersion<Category>(category1.Id, true);
+			var loadCategory2 = _repository.GetWithVersion<Category>(category2.Id, true);
 
-        [TestMethod]
-        public void RemoveObject()
-        {
-            var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category, true);
-            _repository.Remove(category);
-            var loadCategory = _repository.Get<Category>(category.Id, true);
-            Assert.IsNull(loadCategory);
-        }
+			Assert.IsNotNull(loadCategory1);
+			Assert.IsNull(loadCategory1.Name);
+			Assert.AreEqual(2, loadCategory1.Version);
+			Assert.IsNotNull(loadCategory2);
+			Assert.IsNull(loadCategory2.Name);
+			Assert.AreEqual(2, loadCategory2.Version);
+		}
 
-        // Ограничил такое поведение на уровне компиляции (Id - internal set)
-        //[TestMethod]
-        //public void RemoveObjectByInvalidId()
-        //{
-        //    var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
-        //    category.Id = "NewId";
-        // category.Version = 1;
-        //    Assert.ThrowsException<VersionException>(() => _repository.Remove(category));
-        //}
+		[TestMethod]
+		public void RemoveObject()
+		{
+			var category = new NewCategory() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
+			var c = _repository.InsertWithVersion<NewCategory, Category>(category);
+			_repository.RemoveWithVersion(c);
 
-        [TestMethod]
-        public void RemoveObjectByQuery()
-        {
-            var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category, true);
-            _repository.Remove<Category>(q => q.Ids(x => x.Values(category.Id)));
-            var loadCategory = _repository.Get<Category>(category.Id, true);
-            Assert.IsNull(loadCategory);
-        }
+	        _repository.ClearCache();
+			var loadCategory = _repository.GetWithVersion<Category>(category.Id, true);
+			Assert.IsNull(loadCategory);
+		}
 
-        [TestMethod]
-        public void SearchSimpleCategory()
-        {
-            var category1 = new Category() { Name = "Test Category1", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category1, true);
-            var category2 = new Category() { Name = "Test Category2", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category2, true);
-            var category3 = new Category() { Name = "Test Category3", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category3, true);
-            var category4 = new Category() { Name = "Test Category4", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category4, true);
-            var category5 = new Category() { Name = "Test Category", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category5, true);
+		// Ограничил такое поведение на уровне компиляции (Id - internal set)
+		//[TestMethod]
+		//public void RemoveObjectByInvalidId()
+		//{
+		//    var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
+		//    category.Id = "NewId";
+		// category.Version = 1;
+		//    Assert.ThrowsException<VersionException>(() => _repository.Remove(category));
+		//}
 
-            var categories = _repository.Filter<Category, Category>(q => q.Match(x => x.Field(c => c.Name).Query("category")));
+		[TestMethod]
+		public void RemoveObjectByQuery()
+		{
+			var category = new NewCategory() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category);
+			_repository.Remove<Category>(q => q.Ids(x => x.Values(category.Id)));
 
-            Assert.AreEqual(categories.Count, 1);
-            Assert.IsTrue(categories.Any(c => c.Name.Equals("Test Category")));
-        }
+			var loadCategory = _repository.GetWithVersion<Category>(category.Id, true);
+			Assert.IsNull(loadCategory);
+		}
 
-        [TestMethod]
-        public void SearchSimpleCategoryProjection()
-        {
-            var category1 = new Category() { Name = "Test Category1", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category1, true);
-            var category2 = new Category() { Name = "Test Category2", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category2, true);
-            var category3 = new Category() { Name = "Test Category3", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category3, true);
-            var category4 = new Category() { Name = "Test Category4", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category4, true);
-            var category5 = new Category() { Name = "Test Category", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category5, true);
+		[TestMethod]
+		public void SearchSimpleCategory()
+		{
+			var category1 = new NewCategory() { Name = "Test Category1", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category1);
+			var category2 = new NewCategory() { Name = "Test Category2", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category2);
+			var category3 = new NewCategory() { Name = "Test Category3", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category3);
+			var category4 = new NewCategory() { Name = "Test Category4", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category4);
+			var category5 = new NewCategory() { Name = "Test Category", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category5);
 
-            var categories = _repository.Filter<Category, CategoryProjection>(q => q.Match(x => x.Field(c => c.Name).Query("category")));
+			var categories = _repository.Filter<Category, Category>(q => q.Match(x => x.Field(c => c.Name).Query("category")));
 
-            Assert.AreEqual(categories.Count, 1);
-            Assert.IsTrue(categories.Any(c => c.Name.Equals("Test Category")));
-        }
+			Assert.AreEqual(categories.Count, 1);
+			Assert.IsTrue(categories.Any(c => c.Name.Equals("Test Category")));
+		}
 
-        [TestMethod]
-        public void SearchCategoryByRelatedWithoutLimitationAndWithoutLoad()
-        {
-            var parentCategory = new Category() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(parentCategory, true);
-            var childCategory1 = new Category() { Name = "Child Category1", CreatedOnUtc = DateTime.UtcNow, Top = parentCategory };
-            _repository.Insert(childCategory1, true);
-            var childCategory2 = new Category() { Name = "Child Category2", CreatedOnUtc = DateTime.UtcNow, Top = parentCategory };
-            _repository.Insert(childCategory2, true);
-            var childCategory3 = new Category() { Name = "Child Category3", CreatedOnUtc = DateTime.UtcNow, Top = parentCategory };
-            _repository.Insert(childCategory3, true);
-            var category1 = new Category() { Name = "Category1", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category1, true);
-            var category2 = new Category() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category2, true);
+		[TestMethod]
+		public void SearchSimpleCategoryProjection()
+		{
+			var category1 = new NewCategory() { Name = "Test Category1", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category1);
+			var category2 = new NewCategory() { Name = "Test Category2", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category2);
+			var category3 = new NewCategory() { Name = "Test Category3", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category3);
+			var category4 = new NewCategory() { Name = "Test Category4", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category4);
+			var category5 = new NewCategory() { Name = "Test Category", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category5);
 
-            var childCategories = _repository.Filter<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), sort => sort.Descending(c => c.CreatedOnUtc), 0, 0, false);
+			var categories = _repository.Filter<Category, CategoryProjection>(q => q.Match(x => x.Field(c => c.Name).Query("category")));
 
-            Assert.AreEqual(childCategories.Count, 3);
-            Assert.IsFalse(childCategories.Any(c => c.Name.Equals("Category1")));
-            Assert.IsFalse(childCategories.Any(c => c.Name.Equals("Category2")));
-            Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category1")));
-            Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category2")));
-            Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category3")));
-            Assert.AreEqual(childCategories.FirstOrDefault().Name, "Child Category3");
-            Assert.IsNull(childCategories.FirstOrDefault().Top.Name);
-        }
+			Assert.AreEqual(categories.Count, 1);
+			Assert.IsTrue(categories.Any(c => c.Name.Equals("Test Category")));
+		}
 
-        [TestMethod]
-        public void SearchCategoryByRelatedWithLimitationAndWithoutLoad()
-        {
-            var parentCategory = new Category() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(parentCategory, true);
-            var childCategory1 = new Category() { Name = "Child Category1", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(childCategory1, true);
-            var childCategory2 = new Category() { Name = "Child Category2", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(childCategory2, true);
-            var childCategory3 = new Category() { Name = "Child Category3", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(childCategory3, true);
-            var category1 = new Category() { Name = "Category1", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category1, true);
-            var category2 = new Category() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category2, true);
+		[TestMethod]
+		public void SearchCategoryByRelatedWithoutLimitationAndWithoutLoad()
+		{
+			var parentCategory = new NewCategory() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
+			var parent = _repository.InsertWithVersion<NewCategory, Category>(parentCategory);
+			var childCategory1 = new NewCategory() { Name = "Child Category1", CreatedOnUtc = DateTime.UtcNow, Top = parent };
+			_repository.Insert(childCategory1);
+			var childCategory2 = new NewCategory() { Name = "Child Category2", CreatedOnUtc = DateTime.UtcNow, Top = parent };
+			_repository.Insert(childCategory2);
+			var childCategory3 = new NewCategory() { Name = "Child Category3", CreatedOnUtc = DateTime.UtcNow, Top = parent };
+			_repository.Insert(childCategory3);
+			var category1 = new NewCategory() { Name = "Category1", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category1);
+			var category2 = new NewCategory() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category2);
 
-            var childCategories = _repository.Filter<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), sort => sort.Ascending(c => c.CreatedOnUtc), 1, 1, false);
+	        _repository.ClearCache();
+			var childCategories = _repository.Filter<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), sort => sort.Descending(c => c.CreatedOnUtc), 0, 0, false);
 
-            Assert.AreEqual(childCategories.Count, 1);
-            Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category2")));
-            Assert.AreEqual(childCategories.FirstOrDefault().Top.Id, parentCategory.Id);
-            Assert.IsNull(childCategories.FirstOrDefault().Top.Name);
-        }
+			Assert.AreEqual(childCategories.Count, 3);
+			Assert.IsFalse(childCategories.Any(c => c.Name.Equals("Category1")));
+			Assert.IsFalse(childCategories.Any(c => c.Name.Equals("Category2")));
+			Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category1")));
+			Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category2")));
+			Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category3")));
+			Assert.AreEqual(childCategories.FirstOrDefault().Name, "Child Category3");
+			Assert.IsNull(childCategories.FirstOrDefault().Top.Name);
+		}
 
-        [TestMethod]
-        public void SearchCategoryByRelatedWithLimitationAndWithLoad()
-        {
-            var parentCategory = new Category() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(parentCategory, true);
-            var childCategory1 = new Category() { Name = "Child Category1", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(childCategory1, true);
-            var childCategory2 = new Category() { Name = "Child Category2", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(childCategory2, true);
-            var childCategory3 = new Category() { Name = "Child Category3", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(childCategory3, true);
-            var category1 = new Category() { Name = "Category1", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category1, true);
-            var category2 = new Category() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category2, true);
+		[TestMethod]
+		public void SearchCategoryByRelatedWithLimitationAndWithoutLoad()
+		{
+			var parentCategory = new NewCategory() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
+			var parent = _repository.InsertWithVersion<NewCategory, Category>(parentCategory);
+			var childCategory1 = new NewCategory() { Name = "Child Category1", CreatedOnUtc = DateTime.UtcNow, Top = parent };
+			_repository.Insert(childCategory1);
+			var childCategory2 = new NewCategory() { Name = "Child Category2", CreatedOnUtc = DateTime.UtcNow, Top = parent };
+			_repository.Insert(childCategory2);
+			var childCategory3 = new NewCategory() { Name = "Child Category3", CreatedOnUtc = DateTime.UtcNow, Top = parent };
+			_repository.Insert(childCategory3);
+			var category1 = new NewCategory() { Name = "Category1", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category1);
+			var category2 = new NewCategory() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category2);
 
-            var childCategories = _repository.Filter<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), sort => sort.Ascending(c => c.CreatedOnUtc), 1, 1, true);
+			_repository.ClearCache();
 
-            Assert.AreEqual(childCategories.Count, 1);
-            Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category2")));
-            Assert.IsNotNull(childCategories.FirstOrDefault().Top);
-        }
+			var childCategories = _repository.Filter<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), sort => sort.Ascending(c => c.CreatedOnUtc), 1, 1, false);
 
-        [TestMethod]
-        public void SearchCategoryByParentWithLambdaAndWithoutLoad()
-        {
-            var parentCategory = new Category() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(parentCategory, true);
-            var childCategory1 = new Category() { Name = "Child Category1", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(childCategory1, true);
-            var childCategory2 = new Category() { Name = "Child Category2", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(childCategory2, true);
-            var childCategory3 = new Category() { Name = "Child Category3", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(childCategory3, true);
-            var category1 = new Category() { Name = "Category1", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category1, true);
-            var category2 = new Category() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category2, true);
+			Assert.AreEqual(childCategories.Count, 1);
+			Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category2")));
+			Assert.AreEqual(childCategories.FirstOrDefault().Top.Id, parentCategory.Id);
+			Assert.IsNull(childCategories.FirstOrDefault().Top.Name);
+		}
 
-            var childCategories = _repository.Search<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), sort => sort.Descending(c => c.CreatedOnUtc), 1, 2, false);
+		[TestMethod]
+		public void SearchCategoryByRelatedWithLimitationAndWithLoad()
+		{
+			var parentCategory = new NewCategory() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
+			var parent = _repository.InsertWithVersion<NewCategory, Category>(parentCategory);
+			var childCategory1 = new NewCategory() { Name = "Child Category1", CreatedOnUtc = DateTime.UtcNow, Top = parent };
+			_repository.Insert(childCategory1);
+			var childCategory2 = new NewCategory() { Name = "Child Category2", CreatedOnUtc = DateTime.UtcNow, Top = parent };
+			_repository.Insert(childCategory2);
+			var childCategory3 = new NewCategory() { Name = "Child Category3", CreatedOnUtc = DateTime.UtcNow, Top = parent };
+			_repository.Insert(childCategory3);
+			var category1 = new NewCategory() { Name = "Category1", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category1);
+			var category2 = new NewCategory() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category2);
 
-            Assert.AreEqual(childCategories.Count, 1);
-            Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category1")));
-            Assert.AreEqual(childCategories.FirstOrDefault().Top.Id, parentCategory.Id);
-            Assert.IsNull(childCategories.FirstOrDefault().Top.Name);
-        }
+			_repository.ClearCache();
 
-        [TestMethod]
-        public void SearchCategoryByParentWithLambdaAndWithLoad()
-        {
-            var parentCategory = new Category() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(parentCategory, true);
-            var childCategory1 = new Category() { Name = "Child Category1", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(childCategory1, true);
-            var childCategory2 = new Category() { Name = "Child Category2", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(childCategory2, true);
-            var childCategory3 = new Category() { Name = "Child Category3", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(childCategory3, true);
-            var category1 = new Category() { Name = "Category1", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category1, true);
-            var category2 = new Category() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category2, true);
+			var childCategories = _repository.Filter<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), sort => sort.Ascending(c => c.CreatedOnUtc), 1, 1, true);
 
-            var childCategories = _repository.Search<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), sort => sort.Descending(c => c.CreatedOnUtc), 1, 2, true);
+			Assert.AreEqual(childCategories.Count, 1);
+			Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category2")));
+			Assert.IsNotNull(childCategories.FirstOrDefault().Top);
+		}
 
-            Assert.AreEqual(childCategories.Count, 1);
-            Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category1")));
-            Assert.IsNotNull(childCategories.FirstOrDefault().Top);
-        }
+		[TestMethod]
+		public void SearchCategoryByParentWithLambdaAndWithoutLoad()
+		{
+			var parentCategory = new NewCategory() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
+			var parent = _repository.InsertWithVersion<NewCategory, Category>(parentCategory);
+			var childCategory1 = new NewCategory() { Name = "Child Category1", CreatedOnUtc = DateTime.UtcNow, Top = parent };
+			_repository.Insert(childCategory1);
+			var childCategory2 = new NewCategory() { Name = "Child Category2", CreatedOnUtc = DateTime.UtcNow, Top = parent };
+			_repository.Insert(childCategory2);
+			var childCategory3 = new NewCategory() { Name = "Child Category3", CreatedOnUtc = DateTime.UtcNow, Top = parent };
+			_repository.Insert(childCategory3);
+			var category1 = new NewCategory() { Name = "Category1", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category1);
+			var category2 = new NewCategory() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category2);
+
+			_repository.ClearCache();
+
+			var childCategories = _repository.Search<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), sort => sort.Descending(c => c.CreatedOnUtc), 1, 2, false);
+
+			Assert.AreEqual(childCategories.Count, 1);
+			Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category1")));
+			Assert.AreEqual(childCategories.FirstOrDefault().Top.Id, parentCategory.Id);
+			Assert.IsNull(childCategories.FirstOrDefault().Top.Name);
+		}
+
+		[TestMethod]
+		public void SearchCategoryByParentWithLambdaAndWithLoad()
+		{
+			var parentCategory = new NewCategory() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
+			var parent = _repository.InsertWithVersion<NewCategory, Category>(parentCategory);
+			var childCategory1 = new NewCategory() { Name = "Child Category1", CreatedOnUtc = DateTime.UtcNow, Top = parent };
+			_repository.Insert(childCategory1);
+			var childCategory2 = new NewCategory() { Name = "Child Category2", CreatedOnUtc = DateTime.UtcNow, Top = parent };
+			_repository.Insert(childCategory2);
+			var childCategory3 = new NewCategory() { Name = "Child Category3", CreatedOnUtc = DateTime.UtcNow, Top = parent };
+			_repository.Insert(childCategory3);
+			var category1 = new NewCategory() { Name = "Category1", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category1);
+			var category2 = new NewCategory() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category2);
+
+			_repository.ClearCache();
+			var childCategories = _repository.Search<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), sort => sort.Descending(c => c.CreatedOnUtc), 1, 2, true);
+
+			Assert.AreEqual(childCategories.Count, 1);
+			Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category1")));
+			Assert.IsNotNull(childCategories.FirstOrDefault().Top);
+		}
 
 
-        [TestMethod]
-        public void SearchCategoryByParentWithPagingAndWithoutLoad()
-        {
-            var parentCategory = new Category() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(parentCategory, true);
-            var childCategory1 = new Category() { Name = "Child Category1", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(childCategory1, true);
-            var childCategory2 = new Category() { Name = "Child Category2", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(childCategory2, true);
-            var childCategory3 = new Category() { Name = "Child Category3", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(childCategory3, true);
-            var category1 = new Category() { Name = "Category1", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category1, true);
-            var category2 = new Category() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category2, true);
+		[TestMethod]
+		public void SearchCategoryByParentWithPagingAndWithoutLoad()
+		{
+			var parentCategory = new NewCategory() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
+			var parent = _repository.InsertWithVersion<NewCategory, Category>(parentCategory);
+			var childCategory1 = new NewCategory() { Name = "Child Category1", CreatedOnUtc = DateTime.UtcNow, Top = parent };
+			_repository.Insert(childCategory1);
+			var childCategory2 = new NewCategory() { Name = "Child Category2", CreatedOnUtc = DateTime.UtcNow, Top = parent };
+			_repository.Insert(childCategory2);
+			var childCategory3 = new NewCategory() { Name = "Child Category3", CreatedOnUtc = DateTime.UtcNow, Top = parent };
+			_repository.Insert(childCategory3);
+			var category1 = new NewCategory() { Name = "Category1", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category1);
+			var category2 = new NewCategory() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category2);
 
-            var childCategories = _repository.FilterPager<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 0, 1, sort => sort.Descending(c => c.CreatedOnUtc), false);
+			_repository.ClearCache();
 
-            Assert.AreEqual(childCategories.Total, 3);
-            Assert.AreEqual(childCategories.Limit, 1);
-            Assert.AreEqual(childCategories.Page, 1);
-            Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category3")));
-            Assert.IsNull(childCategories.FirstOrDefault().Top.Name);
-        }
+			var childCategories = _repository.FilterPager<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 0, 1, sort => sort.Descending(c => c.CreatedOnUtc), false);
 
-        [TestMethod]
-        public void SearchCategoryByParentWithPagingAndWithLoad()
-        {
-            var parentCategory = new Category() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(parentCategory, true);
-            var childCategory1 = new Category() { Name = "Child Category1", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(childCategory1, true);
-            var childCategory2 = new Category() { Name = "Child Category2", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(childCategory2, true);
-            var childCategory3 = new Category() { Name = "Child Category3", Top = parentCategory, CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(childCategory3, true);
-            var category1 = new Category() { Name = "Category1", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category1, true);
-            var category2 = new Category() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(category2, true);
+			Assert.AreEqual(childCategories.Total, 3);
+			Assert.AreEqual(childCategories.Limit, 1);
+			Assert.AreEqual(childCategories.Page, 1);
+			Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category3")));
+			Assert.IsNull(childCategories.FirstOrDefault().Top.Name);
+		}
 
-            var childCategories = _repository.FilterPager<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 1, 2, sort => sort.Descending(c => c.CreatedOnUtc), true);
+		[TestMethod]
+		public void SearchCategoryByParentWithPagingAndWithLoad()
+		{
+			var parentCategory = new NewCategory() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
+			var parent = _repository.InsertWithVersion<NewCategory, Category>(parentCategory);
+			var childCategory1 = new NewCategory() { Name = "Child Category1", CreatedOnUtc = DateTime.UtcNow, Top = parent };
+			_repository.Insert(childCategory1);
+			var childCategory2 = new NewCategory() { Name = "Child Category2", CreatedOnUtc = DateTime.UtcNow, Top = parent };
+			_repository.Insert(childCategory2);
+			var childCategory3 = new NewCategory() { Name = "Child Category3", CreatedOnUtc = DateTime.UtcNow, Top = parent };
+			_repository.Insert(childCategory3);
+			var category1 = new NewCategory() { Name = "Category1", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category1);
+			var category2 = new NewCategory() { Name = "Category2", CreatedOnUtc = DateTime.UtcNow };
+			_repository.Insert(category2);
 
-            Assert.AreEqual(childCategories.Total, 3);
-            Assert.AreEqual(childCategories.Limit, 2);
-            Assert.AreEqual(childCategories.Page, 1);
-            Assert.AreEqual(childCategories.Count, 2);
-            Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category3")));
-            Assert.IsNotNull(childCategories.FirstOrDefault().Top);
-            Assert.IsNotNull(childCategories.FirstOrDefault().Top.Name);
-        }
+			_repository.ClearCache();
 
-        [TestMethod]
-        public void InsertIntoAnotherIndex()
-        {
-            var producer = new Producer { Name = "Producer1" };
-            _repository.Insert(producer, true);
+			var childCategories = _repository.FilterPager<Category, Category>(q => q.Match(c => c.Field(f => f.Top).Query(parentCategory.Id)), 1, 2, sort => sort.Descending(c => c.CreatedOnUtc), true);
 
-            var loaded = _repository.Get<Producer>(producer.Id);
+			Assert.AreEqual(childCategories.Total, 3);
+			Assert.AreEqual(childCategories.Limit, 2);
+			Assert.AreEqual(childCategories.Page, 1);
+			Assert.AreEqual(childCategories.Count, 2);
+			Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category3")));
+			Assert.IsNotNull(childCategories.FirstOrDefault().Top);
+			Assert.IsNotNull(childCategories.FirstOrDefault().Top.Name);
+		}
 
-            Assert.AreEqual(loaded.Name, producer.Name);
-        }
+		[TestMethod]
+		public void InsertIntoAnotherIndex()
+		{
+			var producer = new NewProducer { Name = "Producer1" };
+			_repository.Insert(producer);
 
-        [TestMethod]
-        public void InsertIntoAnotherIndexWithJoin()
-        {
-            var producer = new Producer { Name = "Producer1" };
-            _repository.Insert(producer, true);
+			var loaded = _repository.GetWithVersion<Producer>(producer.Id);
 
-            var category = new Category { Name = "Category1" };
-            _repository.Insert(category, true);
+			Assert.AreEqual(loaded.Name, producer.Name);
+		}
 
-            var product = new Product { Name = "Product1", Producer = producer, Parent = category };
-            _repository.Insert<Product, Category>(product, true);
+		[TestMethod]
+		public void InsertIntoAnotherIndexWithJoin()
+		{
+			var producer = new NewProducer { Name = "Producer1" };
+			var p = _repository.InsertWithVersion<NewProducer, Producer>(producer);
 
-            var loaded = _repository.Get<Product, Category>(product.Id, category.Id, true);
+			var category = new NewCategory { Name = "Category1" };
+			var c = _repository.InsertWithVersion<NewCategory, Category>(category);
 
-            Assert.AreEqual(loaded.Name, product.Name);
-            Assert.AreEqual(loaded.Producer.Id, product.Producer.Id);
-            Assert.AreEqual(loaded.Producer.Name, product.Producer.Name);
-            Assert.AreEqual(loaded.Parent.Id, product.Parent.Id);
-            Assert.AreEqual(loaded.Parent.Name, product.Parent.Name);
-        }
+			var product = new NewProduct(c) { Name = "Product1", Producer = p };
+			_repository.InsertWithParent<NewProduct, Category>(product);
 
-        [TestMethod]
-        public void UpdateProjection()
-        {
-            // 1. Добавить новую проекцию с 1 private set полем и несколькими с public set
-            // 2. Вставить в базу полную проекцию включая поля, которые не указаны в новой проекции
-            // 3. Достать по Id новую проекцию (у проекции для этого должен быть IGetProjection)
-            // 4. Обновить
-            // 5. Достать полную проекцию и проверить, что обновляемые поля обновлены, а другие остались нетронутыми
+			_repository.ClearCache();
+			var loaded = _repository.GetWithVersion<Product, Category>(product.Id, category.Id, true);
 
-            var user = new User { Login = "user1", Email = "user1@user1.ru", Password = "123", Salt = "111" };
-            _repository.Insert(user, true);
+			Assert.AreEqual(loaded.Name, product.Name);
+			Assert.AreEqual(loaded.Producer.Id, product.Producer.Id);
+			Assert.AreEqual(loaded.Producer.Name, product.Producer.Name);
+			Assert.AreEqual(loaded.Parent.Id, product.Parent.Id);
+			Assert.AreEqual(loaded.Parent.Name, product.Parent.Name);
+		}
 
-            var loaded = _repository.Get<UserUpdateProjection>(user.Id, true);
-            loaded.Email = "new@user1.ru";
-            loaded.Password = "newPass";
+		[TestMethod]
+		public void UpdateProjection()
+		{
+			// 1. Добавить новую проекцию с 1 private set полем и несколькими с public set
+			// 2. Вставить в базу полную проекцию включая поля, которые не указаны в новой проекции
+			// 3. Достать по Id новую проекцию (у проекции для этого должен быть IGetProjection)
+			// 4. Обновить
+			// 5. Достать полную проекцию и проверить, что обновляемые поля обновлены, а другие остались нетронутыми
 
-            _repository.Update(loaded, true);
+			var user = new NewUser { Login = "user1", Email = "user1@user1.ru", Password = "123", Salt = "111" };
+			_repository.Insert(user);
 
-            var loadedFullUser = _repository.Get<User>(user.Id, true);
+			var loaded = _repository.GetWithVersion<UserUpdateProjection>(user.Id, true);
+			loaded.Email = "new@user1.ru";
+			loaded.Password = "newPass";
 
-            Assert.AreEqual("user1", loadedFullUser.Login);
-            Assert.AreEqual("new@user1.ru", loadedFullUser.Email);
-            Assert.AreEqual("newPass", loadedFullUser.Password);
-            Assert.AreEqual("111", loadedFullUser.Salt);
-        }
+			_repository.UpdateWithVersion(loaded);
 
-        [TestMethod]
-        public void HtmlStripTest()
-        {
+			var loadedFullUser = _repository.Get<User>(user.Id, true);
 
-        }
+			Assert.AreEqual("user1", loadedFullUser.Login);
+			Assert.AreEqual("new@user1.ru", loadedFullUser.Email);
+			Assert.AreEqual("newPass", loadedFullUser.Password);
+			Assert.AreEqual("111", loadedFullUser.Salt);
+		}
 
-        [TestMethod]
-        public void AutocompleteTest()
-        {
-            var category = new Category { Name = "Category1" };
-            _repository.Insert(category, true);
+		//     [TestMethod]
+		//     public void HtmlStripTest()
+		//     {
 
-            var product = new Product { Name = "Product1", Title = "ProductA", Parent = category };
-            _repository.Insert<Product, Category>(product, true);
+		//     }
 
-            product = new Product { Name = "Product2", Title = "ProductA1", Parent = category };
-            _repository.Insert<Product, Category>(product, true);
+		[TestMethod]
+		public void AutocompleteTest()
+		{
+			var category = new NewCategory { Name = "Category1" };
+			var c = _repository.InsertWithVersion<NewCategory, Category>(category);
 
-	        product = new Product { Name = "Product3", Title = "ProductB", Parent = category };
-	        _repository.Insert<Product, Category>(product, true);
+			var product = new NewProduct(c) { Name = "Product1", Title = "ProductA" };
+			_repository.InsertWithParent<NewProduct, Category>(product);
 
-			var products =
-                _repository.CompletionSuggest<Product, Product>(s => s.Field(p => p.Title).Prefix("pr"));
+			product = new NewProduct(c) { Name = "Product2", Title = "ProductA1" };
+			_repository.InsertWithParent<NewProduct, Category>(product);
 
-            Assert.IsTrue(products.Any());
+			product = new NewProduct(c) { Name = "Product3", Title = "ProductB" };
+			_repository.InsertWithParent<NewProduct, Category>(product);
 
-            products =
-                _repository.CompletionSuggest<Product, Product>(s => s.Field(p => p.Title).Prefix("productA"));
+			var products = _repository.CompletionSuggest<Product, Product>(s => s.Field(p => p.Title).Prefix("pr"));
 
-            Assert.IsTrue(products.Any());
-            Assert.AreEqual(products.Count, 2);
-            // Есть уже анализатор, но лучше покурить это: https://www.red-gate.com/simple-talk/dotnet/net-development/how-to-build-a-search-page-with-elasticsearch-and-net/
-        }
-    }
+			Assert.IsTrue(products.Any());
+
+			products = _repository.CompletionSuggest<Product, Product>(s => s.Field(p => p.Title).Prefix("productA"));
+
+			Assert.IsTrue(products.Any());
+			Assert.AreEqual(products.Count, 2);
+			// Есть уже анализатор, но лучше покурить это: https://www.red-gate.com/simple-talk/dotnet/net-development/how-to-build-a-search-page-with-elasticsearch-and-net/
+		}
+	}
 }

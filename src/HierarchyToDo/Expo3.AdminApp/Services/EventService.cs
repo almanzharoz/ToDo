@@ -24,7 +24,7 @@ namespace Expo3.AdminApp.Services
 
 		/// <exception cref="AddEntityException"></exception>
 		public void AddEvent(string name, string caption, EventDateTime dateTime, Address address, EEventType type,
-			Category category, bool refresh = false)
+			BaseCategoryProjection category, bool refresh = false)
 			=> Insert(new EventProjection(Get<BaseUserProjection>(User.Id).HasNotNullArg("owner"))
 				{
 					Name = name,
@@ -45,7 +45,7 @@ namespace Expo3.AdminApp.Services
 
 		///<exception cref="UpdateEntityException"></exception>
 		public void UpdateEvent(string id, string name, string caption,
-			EventDateTime dateTime, Address address, EEventType type, bool refresh = false)
+			EventDateTime dateTime, Address address, EEventType type, int version)
 			=> Update(GetEvent(id).HasNotNullArg("event"), x =>
 				{
 					x.Name = name;
@@ -54,7 +54,7 @@ namespace Expo3.AdminApp.Services
 					x.Address = address;
 					x.Type = type;
 					return x;
-				}, false)
+				}, version, false)
 				.ThrowIfNot<UpdateEntityException>();
 
 		public IReadOnlyCollection<EventProjection> SearchByName(string query)
@@ -64,23 +64,22 @@ namespace Expo3.AdminApp.Services
 					.Query(query)));
 
 		public bool SetCategoryToEvent(string eventId, string categoryId)
-			=> Update(GetEvent(eventId).HasNotNullArg("event"), x =>
-			{
-				x.Category = new Category {Name = Get<CategoryProjection>(categoryId).Name};
-				return x;
-			});
+			=> GetEvent(eventId)
+				.HasNotNullArg("event")
+				.Convert(e =>
+					Update(e, x => x.Set(p => p.Category, Get<BaseCategoryProjection>(categoryId)), e.Version));
 
 
 		//TODO: сделать, чтобы работало
-		public bool RegisterNewVisitorToEvent(string eventId, string email, string phoneNumber, string name) 
-			=> RegisterNewVisitorToEvent(eventId, new Visitor {Email = email, Name = name, PhoneNumber = phoneNumber});
+		//public bool RegisterNewVisitorToEvent(string eventId, string email, string phoneNumber, string name) 
+		//	=> RegisterNewVisitorToEvent(eventId, new Visitor {Email = email, Name = name, PhoneNumber = phoneNumber});
 
-		public bool RegisterNewVisitorToEvent(string id, Visitor visitor)
-			=> Update(Get<EventAddVisitorProjection>(id), x =>
-			{
-				x.Visitors.Add(visitor);
-				return x;
-			});
+		//public bool RegisterNewVisitorToEvent(string id, Visitor visitor)
+		//	=> Update(Get<EventAddVisitorProjection>(id), x =>
+		//	{
+		//		x.Visitors.Add(visitor);
+		//		return x;
+		//	});
 
 	}
 }

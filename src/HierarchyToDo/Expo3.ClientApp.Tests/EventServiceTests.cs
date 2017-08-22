@@ -64,7 +64,7 @@ namespace Expo3.ClientApp.Tests
         public void SearchByDate()
         {
             var dateTimeNow = DateTime.UtcNow;
-            _testsEventService.AddEvent("Event 1", new EventDateTime() { StartDateTime = dateTimeNow, FinishDateTime = dateTimeNow.AddDays(1) }, new Address() { City = "Yekaterinburg" }, EEventType.Concert,
+            _testsEventService.AddEvent("Event 1", new EventDateTime() { Start = dateTimeNow, Finish = dateTimeNow.AddDays(1) }, new Address() { City = "Yekaterinburg" }, EEventType.Concert,
                 _testsCaterogyService.AddCategory("Category 1"), 0);
 
             var events = _service.SearchEvents(startDateTime: dateTimeNow.AddDays(-1), endDateTime: dateTimeNow.AddDays(1));
@@ -84,7 +84,7 @@ namespace Expo3.ClientApp.Tests
         public void SearchByText()
         {
             var dateTimeNow = DateTime.UtcNow;
-            _testsEventService.AddEvent("Event 1", new EventDateTime() { StartDateTime = dateTimeNow, FinishDateTime = dateTimeNow.AddDays(1) }, new Address() { City = "Yekaterinburg" }, EEventType.Concert,
+            _testsEventService.AddEvent("Event 1", new EventDateTime() { Start = dateTimeNow, Finish = dateTimeNow.AddDays(1) }, new Address() { City = "Yekaterinburg" }, EEventType.Concert,
                 _testsCaterogyService.AddCategory("Category 1"), 0);
 
             var events = _service.SearchEvents("Event 1");
@@ -100,7 +100,7 @@ namespace Expo3.ClientApp.Tests
         public void SearchByType()
         {
             var dateTimeNow = DateTime.UtcNow;
-            _testsEventService.AddEvent("Event 1", new EventDateTime() { StartDateTime = dateTimeNow, FinishDateTime = dateTimeNow.AddDays(1) }, new Address() { City = "Yekaterinburg" }, EEventType.Concert,
+            _testsEventService.AddEvent("Event 1", new EventDateTime() { Start = dateTimeNow, Finish = dateTimeNow.AddDays(1) }, new Address() { City = "Yekaterinburg" }, EEventType.Concert,
                 _testsCaterogyService.AddCategory("Category 1"), 0);
 
             var events = _service.SearchEvents(types: new List<EEventType>() { EEventType.Concert });
@@ -116,7 +116,7 @@ namespace Expo3.ClientApp.Tests
         public void SearchByCity()
         {
             var dateTimeNow = DateTime.UtcNow;
-            _testsEventService.AddEvent("Event 1", new EventDateTime() { StartDateTime = dateTimeNow, FinishDateTime = dateTimeNow.AddDays(1) }, new Address() { City = "Yekaterinburg" }, EEventType.Concert,
+            _testsEventService.AddEvent("Event 1", new EventDateTime() { Start = dateTimeNow, Finish = dateTimeNow.AddDays(1) }, new Address() { City = "Yekaterinburg" }, EEventType.Concert,
                 _testsCaterogyService.AddCategory("Category 1"), 0);
 
             var events = _service.SearchEvents(city: "Yekaterinburg");
@@ -133,7 +133,7 @@ namespace Expo3.ClientApp.Tests
         {
             var dateTimeNow = DateTime.UtcNow;
             var categoryId = _testsCaterogyService.AddCategory("Category 1");
-            _testsEventService.AddEvent("Event 1", new EventDateTime() { StartDateTime = dateTimeNow, FinishDateTime = dateTimeNow.AddDays(1) }, new Address() { City = "Yekaterinburg" }, EEventType.Concert,
+            _testsEventService.AddEvent("Event 1", new EventDateTime() { Start = dateTimeNow, Finish = dateTimeNow.AddDays(1) }, new Address() { City = "Yekaterinburg" }, EEventType.Concert,
                 categoryId, 0);
 
             var events = _service.SearchEvents(categories: new List<string>() { categoryId });
@@ -151,7 +151,7 @@ namespace Expo3.ClientApp.Tests
         {
             var dateTimeNow = DateTime.UtcNow;
             var categoryId = _testsCaterogyService.AddCategory("Category 1");
-            _testsEventService.AddEvent("Event 1", new EventDateTime() { StartDateTime = dateTimeNow, FinishDateTime = dateTimeNow.AddDays(1) }, new Address() { City = "Yekaterinburg" }, EEventType.Concert,
+            _testsEventService.AddEvent("Event 1", new EventDateTime() { Start = dateTimeNow, Finish = dateTimeNow.AddDays(1) }, new Address() { City = "Yekaterinburg" }, EEventType.Concert,
                 categoryId, 0);
 
             var events = _service.SearchEvents(maxPrice: 5);
@@ -168,9 +168,9 @@ namespace Expo3.ClientApp.Tests
         {
             var dateTimeNow = DateTime.UtcNow;
             var categoryId = _testsCaterogyService.AddCategory("Category 1");
-            _testsEventService.AddEvent("Event 1", new EventDateTime() { StartDateTime = dateTimeNow, FinishDateTime = dateTimeNow.AddDays(1) }, new Address() { City = "Yekaterinburg" }, EEventType.Concert,
+            _testsEventService.AddEvent("Event 1", new EventDateTime() { Start = dateTimeNow, Finish = dateTimeNow.AddDays(1) }, new Address() { City = "Yekaterinburg" }, EEventType.Concert,
                 categoryId, 0);
-            _testsEventService.AddEvent("Event 2", new EventDateTime() { StartDateTime = dateTimeNow, FinishDateTime = dateTimeNow.AddDays(1) }, new Address() { City = "Moscow" }, EEventType.Concert,
+            _testsEventService.AddEvent("Event 2", new EventDateTime() { Start = dateTimeNow, Finish = dateTimeNow.AddDays(1) }, new Address() { City = "Moscow" }, EEventType.Concert,
                 categoryId, 0);
 
             var cities = _service.GetAllCities().Where(c=>!string.IsNullOrEmpty(c)).ToList();

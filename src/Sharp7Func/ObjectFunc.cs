@@ -125,6 +125,21 @@ namespace SharpFuncExt
 			return arg;
 		}
 
+		public static TArg Is<TArg, T, TIs>(this TArg arg, Action<TArg> func)
+		{
+			// TODO: Можно кешировать
+			if (typeof(TIs).GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo()))
+				func(arg);
+			return arg;
+		}
+
+		public static TResult Is<TArg, T, TResult>(this TArg arg, Func<TArg, TResult> funcIfTrue,
+			Func<TArg, TResult> funcIfFalse)
+			=> arg is T ? funcIfTrue(arg) : funcIfFalse(arg);
+
+		public static TResult Is<TArg, T, TResult>(this TArg arg, Func<TArg, TResult> funcIfTrue)
+			=> arg is T ? funcIfTrue(arg) : default(TResult);
+
 		public static TResult As<T, TResult>(this T arg) where TResult : class, T => arg as TResult;
 
 		public static ValueTuple<T, T1> Extend<T, T1>(this T arg, Func<T, T1> func) => new ValueTuple<T, T1>(arg, func(arg));

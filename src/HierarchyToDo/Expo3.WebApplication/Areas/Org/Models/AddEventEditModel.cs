@@ -10,6 +10,8 @@ namespace Expo3.WebApplication.Areas.Org.Models
 	public class AddEventEditModel
 	{
 		public string Id { get; set; }
+		public int Version { get; set; }
+
 		[Required(ErrorMessage = "Name is required")]
 		public string Name { get; set; }
 
@@ -36,8 +38,7 @@ namespace Expo3.WebApplication.Areas.Org.Models
 		[DataType(DataType.Currency)]
 		public string Price { get; set; }
 
-		//public TicketPrice[] Prices { get; set; }
-		public EventPage Page { get; set; }
+		public string Html { get; set; }
 
 		public AddEventEditModel()
 		{
@@ -54,7 +55,7 @@ namespace Expo3.WebApplication.Areas.Org.Models
 			Address = eventProjection.Address.AddressString;
 			Type = eventProjection.Type;
 			Price = eventProjection.Prices[0].Price.ToString().TrimEnd('\u20bd'); //TODO
-			Page = eventProjection.Page;
+			Html = eventProjection.Page.Html;
 		}
 	}
 }
