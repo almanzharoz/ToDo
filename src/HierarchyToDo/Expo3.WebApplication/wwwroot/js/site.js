@@ -2,14 +2,21 @@
     var page = 0;
     var size = 10;
     var allLoaded = false;
-    var loadEvents = function (pageIndex, pageSize) {
-        if (allLoaded)
+    var loading = false;
+    var loadEvents = function () {
+        if (allLoaded || loading)
             return;
+        loading = true;
         var categories = [];
         $(".class-category").each(function () {
             if ($(this).prop("checked"))
                 categories.push($(this).val());
         });
+        var loadingContainer = $("<tr><td colspan='3'>Загружаю события...</td></tr>");
+        if (page == 0)
+            $("#listContainer tbody").html("");
+        $("#listContainer tbody").append(loadingContainer);
+
         Events.loadEvents($("#txtSearchText").val(),
             $("#startDate").val(),
             $("#endDate").val(),
@@ -18,8 +25,8 @@
             $("#chkExhibition").prop("checked"),
             $("#chkExcursion").prop("checked"),
             $("#chkAllCategories").prop("checked") ? [] : categories,
-            pageIndex,
-            pageSize,
+            page,
+            size,
             $("#maxPrice").val()).done(function (events) {
                 if (events.length < size)
                     allLoaded = true;
@@ -37,12 +44,14 @@
                 } else
                     $("#listContainer tbody").html("<tr><td colspan='3'>Событий не найдено</td></tr>");
                 page++;
-            }).fail(function () { $("#listContainer tbody").html("<tr><td colspan='3' class='text-danger'>При выполнении запроса произошла ошибка</td></tr>"); });
+            loadingContainer.remove();
+        }).fail(function () { $("#listContainer tbody").html("<tr><td colspan='3' class='text-danger'>При выполнении запроса произошла ошибка</td></tr>"); }).always(function () { loading = false; });
     };
     $("#btnLoad").click(function () {
         allLoaded = false;
+        page = 0;
         $("#listContainer tbody").html("");
-        loadEvents(0, size);
+        loadEvents();
     });
     $('#startDate').datetimepicker({
         format: "DD.MM.YYYY HH:mm"
@@ -61,4 +70,9 @@
         }
     });
     $("#btnLoad").click();
+    $(window).scroll(function () {
+        if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+            loadEvents();
+        }
+    });
 }
