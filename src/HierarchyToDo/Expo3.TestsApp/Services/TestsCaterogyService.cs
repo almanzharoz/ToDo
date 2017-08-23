@@ -11,11 +11,13 @@ namespace Expo3.TestsApp.Services
 {
 	public class TestsCaterogyService : BaseExpo3Service
 	{
-		public TestsCaterogyService(ILoggerFactory loggerFactory, Expo3ElasticConnection settings, ElasticScopeFactory<Expo3ElasticConnection> factory, UserName user) : base(loggerFactory, settings, factory, user)
+		public TestsCaterogyService(ILoggerFactory loggerFactory, Expo3ElasticConnection settings,
+			ElasticScopeFactory<Expo3ElasticConnection> factory, UserName user)
+			: base(loggerFactory, settings, factory, user)
 		{
 		}
-        
-		public string AddCategory(string name)
-			=> new NewCategoryProjection { Name = name }.Fluent(Insert).Id;
+
+		public string Add(string name, string url = null)
+			=> new NewCategory(url, name.Trim()).Fluent(x => Insert(x, true)).Id;
 	}
 }

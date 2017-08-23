@@ -9,6 +9,7 @@ using Expo3.Model.Models;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Nest;
+using SharpFuncExt;
 
 namespace Expo3.AdminApp.Services
 {
@@ -21,12 +22,12 @@ namespace Expo3.AdminApp.Services
 		}
 
 		///<exception cref="EntityAlreadyExistsException"></exception>
-		public bool AddUser(string email, string password, string name, EUserRole[] roles, bool refresh = false)
+		public string AddUser(string email, string password, string name, EUserRole[] roles)
 		{
 			if (FilterCount<UserProjection>(q => q.Term(x => x.Email.ToLowerInvariant(), email.ToLowerInvariant())) != 0)
 				throw new EntityAlreadyExistsException();
 
-			return Insert(new NewUserProjection(email, name, password) {Roles = roles}, refresh);
+			return new NewUserProjection(email, name, password) { Roles = roles }.Fluent(x => Insert(x, true)).Id;
 		}
 
 		public bool EditUser(string id, string email, string name, EUserRole[] roles)

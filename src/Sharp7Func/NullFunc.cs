@@ -16,6 +16,13 @@ namespace SharpFuncExt
 			return ifNotNull(arg);
 		}
 
+		public static T IfNull<T>(this T arg, Func<T> ifNull)
+		{
+			if (arg.IsNull())
+				return ifNull();
+			return arg;
+		}
+
 		public static TResult IfNotNull<T, TResult>(this T arg, Func<T, TResult> ifNotNull, Func<TResult> ifNull)
 		{
 			if (arg.NotNull())

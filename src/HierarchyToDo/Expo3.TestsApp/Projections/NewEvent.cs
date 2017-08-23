@@ -6,7 +6,7 @@ using Nest;
 
 namespace Expo3.TestsApp.Projections
 {
-	internal class NewEventProjection : BaseEntity, IProjection<Event>, IInsertProjection
+	internal class NewEvent : BaseNewEntity, IProjection<Event>
 	{
 		[Keyword]
 		public BaseCategoryProjection Category { get; set; }
@@ -19,8 +19,8 @@ namespace Expo3.TestsApp.Projections
 		public TicketPrice[] Prices { get; set; }
 		public EventPage Page { get; set; }
 
-		public NewEventProjection() { }
-		public NewEventProjection(BaseUserProjection owner) // for new event
+		public NewEvent() { }
+		public NewEvent(BaseUserProjection owner) // for new event
 		{
 			Owner = owner;
 		}

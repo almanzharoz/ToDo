@@ -95,6 +95,8 @@ namespace Expo3.WebApplication
 		        AutomaticChallenge = true
 	        });
 
+	        app.UseMiddleware<NormalizeUrlMiddleware>();
+
 			app.UseMvc(routes =>
             {
 	            routes.MapRoute(name: "org",

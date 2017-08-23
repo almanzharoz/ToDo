@@ -15,24 +15,22 @@ namespace Expo3.TestsApp.Services
 		{
 		}
 
-		public string AddUser(string name)
-			=> new NewUserProjection {Name = name}.Fluent(Insert).Id;
-
 		public string AddEvent(string name, EventDateTime dateTime, Address address, EEventType type, string categoryId, decimal price)
 		{
 			var category = Get<BaseCategoryProjection>(categoryId.HasNotNullArg(nameof(categoryId))).HasNotNullArg("category");
 
-			return new NewEventProjection(Get<BaseUserProjection>(User.Id).HasNotNullArg("owner"))
+			return new NewEvent(Get<BaseUserProjection>(User.Id).HasNotNullArg("owner"))
 				{
 					Name = name,
 					DateTime = dateTime,
 					Address = address,
 					Type = type,
 					Category = category,
-					Page = new EventPage() {Address = address, Category = category.Name, Caption = name, Date = dateTime.ToString()},
-                    Prices = new TicketPrice[1] {new TicketPrice(){Description = "description price",Name = "price", Price = new Price(){Rubles = 0}}}
+					Page = new EventPage() {Address = address, Category = category.Name, Caption = name, Date = dateTime.ToString(), Html = "<p>Html text</p>"},
+					Prices = new TicketPrice[1]
+						{new TicketPrice() {Description = "description price", Name = "price", Price = new Price() {Rubles = 0}}}
 				}
-				.Fluent(Insert)
+				.Fluent(x => Insert(x, true))
 				.Id;
 		}
 	}

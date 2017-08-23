@@ -32,7 +32,7 @@ namespace Expo3.AdminApp.Projections
 		}
 	}
 
-	public class UserUpdateProjection : BaseEntity, IProjection<User>, IGetProjection, IUpdateProjection
+	internal class UserUpdateProjection : BaseEntity, IProjection<User>, IGetProjection, IUpdateProjection
 	{
 		[JsonProperty]
 		public string Email { get; private set; }
@@ -48,7 +48,7 @@ namespace Expo3.AdminApp.Projections
 		/// <summary>
 		/// Метод не для админки. Добавил как пример использования. Надо его в LoginApp добавить.
 		/// </summary>
-		internal UserUpdateProjection ChangePassword(string oldPassword, string newPassword)
+		public UserUpdateProjection ChangePassword(string oldPassword, string newPassword)
 		{
 			if (oldPassword != Password)
 				throw new Exception("OldPassword");
@@ -56,9 +56,9 @@ namespace Expo3.AdminApp.Projections
 			return this;
 		}
 
-		internal UserUpdateProjection ChangeUser(string email, string name, EUserRole[] roles)
+		public UserUpdateProjection ChangeUser(string email, string name, EUserRole[] roles)
 		{
-			Email = name.HasNotNullArg(nameof(name)).Trim().ToLowerInvariant();
+			Email = email.HasNotNullArg(nameof(name)).Trim().ToLowerInvariant();
 			Roles = roles.HasNotNullArg(nameof(roles));
 			Name = name.HasNotNullArg(nameof(name)).Trim();
 			return this;

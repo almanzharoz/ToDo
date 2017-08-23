@@ -14,7 +14,7 @@ namespace Expo3.AdminApp.Projections
 		[JsonProperty]
 		public string Name { get; private set; }
 
-		public CategoryProjection Rename(string name, string url)
+		internal CategoryProjection Rename(string name, string url)
 		{
 			Url = url.IfNull(CommonHelper.UriTranslit);
 			Name = name;
@@ -22,7 +22,7 @@ namespace Expo3.AdminApp.Projections
 		}
 	}
 
-	public class NewCategory : BaseNewEntity, IProjection<Category>
+	internal class NewCategory : BaseNewEntity, IProjection<Category>
 	{
 		public string Url { get; }
 		public string Name { get; }

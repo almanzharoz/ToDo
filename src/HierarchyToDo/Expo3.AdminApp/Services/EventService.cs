@@ -24,11 +24,11 @@ namespace Expo3.AdminApp.Services
 		public BaseCategoryProjection GetCategory(string id) => Get<BaseCategoryProjection>(id);
 
 		///<exception cref="RemoveEntityException"></exception>
-		public void RemoveEvent(string id, int version)
+		public bool RemoveEvent(string id, int version)
 			=> Remove<EventProjection>(id, version, true)
 				.ThrowIfNot<RemoveEntityException>();
 
-		public IReadOnlyCollection<EventProjection> SearchByName(string query)
+		public IReadOnlyCollection<EventProjection> SearchByName(string query) // TODO: Переделать на поиск по другому полю, т.к. Name везде Keyword
 			=> Search<Event, EventProjection>(q => q
 				.Match(m => m
 					.Field(x => x.Name)
