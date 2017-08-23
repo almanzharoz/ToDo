@@ -20,7 +20,10 @@ namespace Core.ElasticSearch.Domain
 		public int Version { get; internal set; }
 	}
 
-	public abstract class BaseNewEntity : IInsertProjection
+	/// <summary>
+	/// Используется для добавления новых документов. Такие объекты никогда не попадают в RequestContainer.
+	/// </summary>
+	public abstract class BaseNewEntity
 	{
 		[JsonProperty]
 		[JsonIgnore]

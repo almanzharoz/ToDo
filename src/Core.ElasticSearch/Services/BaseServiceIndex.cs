@@ -21,6 +21,17 @@ namespace Core.ElasticSearch
 				r => r.Created,
 				RepositoryLoggingEvents.ES_INSERT);
 
+		protected Task<bool> InsertAsync<T>(T entity, bool refresh) where T : BaseNewEntity, IProjection
+			=> TryAsync(
+				c => c.IndexAsync(entity, s => s
+						.Index(_mapping.GetIndexName<T>())
+						.Type(_mapping.GetTypeName<T>())
+						.IfNotNull(entity.Id, x => x.OpType(OpType.Create))
+						.If(refresh, x => x.Refresh(Refresh.True)))
+					.Fluent(x => entity.Id = x.Id),
+				r => r.Created,
+				RepositoryLoggingEvents.ES_INSERT);
+
 		/// <summary>
 		/// Для тестов.
 		/// </summary>
@@ -147,7 +158,7 @@ namespace Core.ElasticSearch
 				$"Remove (Id: {entity.Id}, Parent: {entity.Parent}, Version: {entity.Version})");
 
 		protected bool Remove<T>(string id, bool refresh)
-			where T : BaseEntity, IProjection, IRemoveProjection
+			where T : class, IProjection, IRemoveProjection
 			=> Try(
 				c => c.Delete(DocumentPath<T>.Id(id.HasNotNullArg(nameof(id))), x => x
 					.Index(_mapping.GetIndexName<T>())

@@ -1,20 +1,13 @@
 ﻿using Core.ElasticSearch.Domain;
 using Expo3.Model.Embed;
+using Expo3.Model.Interfaces;
 using Nest;
 using Newtonsoft.Json;
 
 namespace Expo3.Model.Models
 
 {
-	public class BaseUserProjection : BaseEntity, IProjection<User>, IGetProjection
-	{
-		[JsonProperty]
-		public string Name { get; private set; }
-		[JsonProperty]
-		public EUserRole[] Roles { get; private set; }
-	}
-
-	public class User : BaseEntityWithVersion, IModel
+	public class User : BaseEntityWithVersion, IModel, IWithName
     {
         [Keyword]
         public string Email { get; set; }
@@ -27,6 +20,14 @@ namespace Expo3.Model.Models
         [Keyword]
         public EUserRole[] Roles { get; set; }
     }
+
+	public class BaseUserProjection : BaseEntity, IProjection<User>, IGetProjection, IWithName
+	{
+		[JsonProperty]
+		public string Name { get; private set; }
+		[JsonProperty]
+		public EUserRole[] Roles { get; private set; }
+	}
 
 	public class UserName
 	{

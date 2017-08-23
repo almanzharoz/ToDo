@@ -14,20 +14,17 @@ namespace Expo3.AdminApp
 		{
 			return services
 				.AddService<EventService, Expo3ElasticConnection>()
-				.AddService<UsersService, Expo3ElasticConnection>();
+				.AddService<UserService, Expo3ElasticConnection>();
 		}
 
 		public static IServiceProvider UseExpo3AdminApp(this IServiceProvider services)
 		{
 			return services.UseExpo3Projections(p => p
 				.AddProjection<EventProjection, Event>()
-				.AddProjection<EventRemoveProjection, Event>()
-				.AddProjection<EventAddVisitorProjection, Event>()
 				
-				.AddProjection<UserInsertProjection, User>()
+				.AddProjection<NewUserProjection, User>()
 				.AddProjection<UserUpdateProjection, User>()
-				.AddProjection<UserSearchProjection, User>()
-				.AddProjection<UserRemoveProjection, User>());
+				.AddProjection<UserProjection, User>());
 		}
 	}
 }

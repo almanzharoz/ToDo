@@ -19,43 +19,14 @@ namespace Expo3.AdminApp.Services
 		{
 		}
 
-		public EventProjection GetEvent(string id)
-			=> Get<EventProjection>(id.HasNotNullArg("event id"), f => UserQuery<EventProjection>(null));
+		public EventProjection GetEvent(string id) => GetWithVersion<EventProjection>(id);
 
-		/// <exception cref="AddEntityException"></exception>
-		public void AddEvent(string name, string caption, EventDateTime dateTime, Address address, EEventType type,
-			BaseCategoryProjection category, bool refresh = false)
-			=> Insert(new EventProjection(Get<BaseUserProjection>(User.Id).HasNotNullArg("owner"))
-				{
-					Name = name,
-					Caption = caption,
-					DateTime = dateTime,
-					Address = address,
-					Type = type,
-					Category = category
-				}, refresh)
-				.ThrowIfNot<AddEntityException>();
+		public BaseCategoryProjection GetCategory(string id) => Get<BaseCategoryProjection>(id);
 
 		///<exception cref="RemoveEntityException"></exception>
 		public void RemoveEvent(string id, int version)
-			=> Remove(
-					Get<EventRemoveProjection>(id.HasNotNullArg("event id"), f => UserQuery<EventProjection>(null))
-						.HasNotNullArg("event"), version)
+			=> Remove<EventProjection>(id, version, true)
 				.ThrowIfNot<RemoveEntityException>();
-
-		///<exception cref="UpdateEntityException"></exception>
-		public void UpdateEvent(string id, string name, string caption,
-			EventDateTime dateTime, Address address, EEventType type, int version)
-			=> Update(GetEvent(id).HasNotNullArg("event"), x =>
-				{
-					x.Name = name;
-					x.Caption = caption;
-					x.DateTime = dateTime;
-					x.Address = address;
-					x.Type = type;
-					return x;
-				}, version, false)
-				.ThrowIfNot<UpdateEntityException>();
 
 		public IReadOnlyCollection<EventProjection> SearchByName(string query)
 			=> Search<Event, EventProjection>(q => q
@@ -63,23 +34,10 @@ namespace Expo3.AdminApp.Services
 					.Field(x => x.Name)
 					.Query(query)));
 
-		public bool SetCategoryToEvent(string eventId, string categoryId)
-			=> GetEvent(eventId)
-				.HasNotNullArg("event")
-				.Convert(e =>
-					Update(e, x => x.Set(p => p.Category, Get<BaseCategoryProjection>(categoryId)), e.Version));
-
-
-		//TODO: сделать, чтобы работало
-		//public bool RegisterNewVisitorToEvent(string eventId, string email, string phoneNumber, string name) 
-		//	=> RegisterNewVisitorToEvent(eventId, new Visitor {Email = email, Name = name, PhoneNumber = phoneNumber});
-
-		//public bool RegisterNewVisitorToEvent(string id, Visitor visitor)
-		//	=> Update(Get<EventAddVisitorProjection>(id), x =>
-		//	{
-		//		x.Visitors.Add(visitor);
-		//		return x;
-		//	});
-
+		public bool SetCategoryToEvent(string eventId, string categoryId, int version)
+			=> Update<EventProjection>(eventId, version,
+				u => u.ChangeCategory(
+					GetCategory(categoryId.HasNotNullArg("new category id")).HasNotNullArg("new category")),
+				true);
 	}
 }

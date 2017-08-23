@@ -9,37 +9,28 @@ using Newtonsoft.Json;
 
 namespace Expo3.AdminApp.Projections
 {
-	public class EventProjection : BaseEntityWithVersion, IProjection<Event>, IGetProjection, ISearchProjection,
-		IInsertProjection, IUpdateProjection, IWithName, IWithOwner
+	public class EventProjection : BaseEntityWithVersion, IProjection<Event>, IGetProjection, ISearchProjection, IRemoveProjection, IUpdateProjection, IWithName, IWithOwner
 	{
-		public EventProjection()
-		{
-		}
-
-		public EventProjection(BaseUserProjection owner) // for new event
-		{
-			Owner = owner;
-		}
-
-		public BaseCategoryProjection Category { get; set; }
-		public string Caption { get; set; }
-		public EventDateTime DateTime { get; set; }
-		public Address Address { get; set; }
-		public EEventType Type { get; set; }
-		public string Name { get; set; }
-		public Visitor[] Visitors { get; set; }
+		[Keyword]
+		[JsonProperty]
+		public BaseCategoryProjection Category { get; private set; }
+		[JsonProperty]
+		public string Name { get; private set; }
+		[JsonProperty]
+		public EventDateTime DateTime { get; private set; }
+		[JsonProperty]
+		public Address Address { get; private set; }
+		[JsonProperty]
+		public EEventType Type { get; private set; }
 
 		[Keyword]
 		[JsonProperty]
 		public BaseUserProjection Owner { get; private set; }
-	}
 
-	public class EventRemoveProjection : BaseEntityWithVersion, IProjection<Event>, IRemoveProjection, IGetProjection
-	{
-	}
-
-	public class EventAddVisitorProjection : BaseEntityWithVersion, IProjection<Event>, IGetProjection, IUpdateProjection
-	{
-		public Visitor[] Visitors { get; set; }
+		internal EventProjection ChangeCategory(BaseCategoryProjection newCategory)
+		{
+			Category = newCategory;
+			return this;
+		}
 	}
 }

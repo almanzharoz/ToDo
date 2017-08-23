@@ -7,13 +7,6 @@ namespace Core.ElasticSearch.Domain
 	}
 
 	/// <summary>
-	/// Использование проекции для вставки
-	/// </summary>
-	public interface IInsertProjection : IEntity
-	{
-
-	}
-	/// <summary>
 	/// Использование проекции для обновления
 	/// </summary>
 	public interface IUpdateProjection : IEntity
