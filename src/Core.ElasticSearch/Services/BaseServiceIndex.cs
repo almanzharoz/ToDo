@@ -15,6 +15,7 @@ namespace Core.ElasticSearch
 				c => c.Index(entity, s => s
 						.Index(_mapping.GetIndexName<T>())
 						.Type(_mapping.GetTypeName<T>())
+						.IfNotNull(entity.Id, x => x.OpType(OpType.Create))
 						.If(refresh, x => x.Refresh(Refresh.True)))
 					.Fluent(x => entity.Id = x.Id),
 				r => r.Created,
@@ -33,6 +34,7 @@ namespace Core.ElasticSearch
 				c => c.Index(entity, s => s
 						.Index(_mapping.GetIndexName<T>())
 						.Type(_mapping.GetTypeName<T>())
+						.IfNotNull(entity.Id, x => x.OpType(OpType.Create))
 						.Refresh(Refresh.True))
 					.Fluent(x => entity.Id = x.Id),
 				r => r.Created ? Get<T>(entity.Id) : null,
@@ -51,6 +53,7 @@ namespace Core.ElasticSearch
 				c => c.Index(entity, s => s
 						.Index(_mapping.GetIndexName<T>())
 						.Type(_mapping.GetTypeName<T>())
+						.IfNotNull(entity.Id, x => x.OpType(OpType.Create))
 						.Refresh(Refresh.True))
 					.Fluent(x => entity.Id = x.Id),
 				r => r.Created ? GetWithVersion<T>(entity.Id) : null,
@@ -69,6 +72,7 @@ namespace Core.ElasticSearch
 						.Index(_mapping.GetIndexName<T>())
 						.Type(_mapping.GetTypeName<T>())
 						.Parent(entity.Parent.HasNotNullArg(x => x.Id, "parent").Id)
+						.IfNotNull(entity.Id, x => x.OpType(OpType.Create))
 						.If(refresh, a => a.Refresh(Refresh.True)))
 					.Fluent(x => entity.Id = x.Id),
 				r => r.Created,

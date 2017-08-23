@@ -28,6 +28,10 @@ namespace Core.ElasticSearch.Domain
 
 		protected BaseNewEntity() { }
 
+		/// <summary>
+		/// Используется, если хотим использовать свой Id при вставке
+		/// </summary>
+		/// <param name="id"></param>
 		protected BaseNewEntity(string id)
 		{
 			Id = id;

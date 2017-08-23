@@ -47,20 +47,52 @@ namespace Core.Tests
 			Assert.AreEqual(parent.Id, parentCategory.Id);
 			Assert.AreEqual(parent.Version, 1);
 			var childCategory = new NewCategory() { Name = "Child Category", Top = parent, CreatedOnUtc = DateTime.UtcNow };
-            _repository.Insert(childCategory);
+            Assert.IsTrue(_repository.Insert(childCategory));
             Assert.IsNotNull(childCategory.Id);
         }
 
-		//TODO: Такое использование неприемлено и не компилируется
-        //[TestMethod]
-        //public void AddObjectWithInvalidParentAndWithoutRelated()
-        //{
-        //    var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
-        //    var product = new Product() { Name = "Product", Parent = category };
-        //    Assert.ThrowsException<QueryException>(() => _repository.Insert<Product, Category>(product, true));
-        //}
+	    [TestMethod]
+	    public void AddObjectWithCustomId()
+	    {
+		    var category1 = new NewCategory("my_id1") { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
+		    var c1 = _repository.InsertWithVersion<NewCategory, Category>(category1);
+		    Assert.IsNotNull(c1);
+		    Assert.AreEqual(c1.Id, "my_id1");
+		    Assert.AreEqual(c1.Id, category1.Id);
+			Assert.AreEqual(c1.Version, 1);
 
-        [TestMethod]
+		    var category2 = new NewCategory("my_id2") { Name = "Child Category", CreatedOnUtc = DateTime.UtcNow };
+		    var c2 = _repository.InsertWithVersion<NewCategory, Category>(category2);
+		    Assert.IsNotNull(c2);
+		    Assert.AreEqual(c2.Id, "my_id2");
+		    Assert.AreEqual(c2.Id, category2.Id);
+		    Assert.AreEqual(c2.Version, 1);
+	    }
+
+	    [TestMethod]
+	    public void AddObjectWithCustomIdWithError()
+	    {
+		    var category1 = new NewCategory("my_id1") { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
+		    var c1 = _repository.InsertWithVersion<NewCategory, Category>(category1);
+		    Assert.IsNotNull(c1);
+		    Assert.AreEqual(c1.Id, "my_id1");
+		    Assert.AreEqual(c1.Id, category1.Id);
+		    Assert.AreEqual(c1.Version, 1);
+
+		    var category2 = new NewCategory("my_id1") { Name = "Child Category", CreatedOnUtc = DateTime.UtcNow };
+		    Assert.ThrowsException<VersionException>(()=>_repository.Insert(category2));
+	    }
+
+		//TODO: Такое использование неприемлено и не компилируется
+		//[TestMethod]
+		//public void AddObjectWithInvalidParentAndWithoutRelated()
+		//{
+		//    var category = new Category() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
+		//    var product = new Product() { Name = "Product", Parent = category };
+		//    Assert.ThrowsException<QueryException>(() => _repository.Insert<Product, Category>(product, true));
+		//}
+
+		[TestMethod]
         public void AddObjectWithValidParentAndWithoutRelated()
         {
             var category = new NewCategory() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };

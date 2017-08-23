@@ -97,7 +97,6 @@ namespace Core.ElasticSearch
         {
             try
             {
-                Debug.WriteLine(func(_client).DebugInformation);
                 var sw = new Stopwatch();
                 return result(_client.Stopwatch(sw, x => func(_client)).Fluent(x => Debug.WriteLine("Try: " + sw.ElapsedMilliseconds))
                     .LogDebug(_logger, operationText ?? eventId.Name)
