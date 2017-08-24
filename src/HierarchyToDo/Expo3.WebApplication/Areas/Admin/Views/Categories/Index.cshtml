@@ -1,4 +1,4 @@
-@model IReadOnlyCollection<Expo3.AdminApp.Projections.CategoryProjection>
+@model Expo3.WebApplication.Areas.Admin.Models.AddCategoryListModel
 @{
     ViewData["Title"] = "Index";
 }
@@ -9,13 +9,30 @@
     <thead>
     <tr>
         <th>Name</th>
+        <th>Actions</th>
     </tr>
     </thead>
     
     <tbody>
-    @foreach (var categoryProjection in Model)
+    @foreach (var categoryProjection in Model.ExistingCategories)
     {
         <tr>@categoryProjection.Name</tr>
+        <tr>@Html.ActionLink("Remove", "Remove", new { id = categoryProjection.Id})</tr>
     }
     </tbody>
 </table>
+
+<br /><br />
+
+<form asp-action="Add" asp-controller="Categories" asp-area="admin" method="post" class="form-horizontal">
+    <div class="validation" asp-validation-summary="ModelOnly"></div>
+    <div class="container">
+        <div class="form-group">
+            <input type="text" class="form-control" asp-for="NewCategory" placeholder="Name"/>
+            <span asp-validation-for="NewCategory"></span>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Add" class="btn" />
+        </div>
+    </div>
+</form>

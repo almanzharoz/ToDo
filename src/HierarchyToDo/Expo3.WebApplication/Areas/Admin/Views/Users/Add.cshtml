@@ -1,0 +1,28 @@
+﻿@using Expo3.Model.Embed
+@model Expo3.WebApplication.Areas.Admin.Models.AddUserModel
+
+<div class="modal-content">
+    <div class="modal-header">
+        <button class="close" data-dismiss="modal" area-hidden="true">X</button>
+        <h4>Add new user</h4>
+    </div>
+    <div class="modal-body">
+        <form asp-action="Add" asp-controller="Users" method="post" class="form-horizontal">
+            <div class="container">
+                <input type="text" asp-for="Name" placeholder="Name" class="form-control"/>
+                <span asp-validation-for="Name"></span>
+            </div>
+            <div class="container">
+                <input type="text" asp-for="Email" placeholder="Email" class="form-control"/>
+                <span asp-validation-for="Email"></span>
+            </div>
+            <div class="container">
+                <input type="text" asp-for="Password" placeholder="Password" class="form-control" />
+                <span asp-validation-for="Password"></span>
+            </div>
+            <div class="container">
+                @Html.ListBox("Roles", Html.GetEnumSelectList<EUserRole>(), new {@class = "form-control"})
+            </div>
+        </form>
+    </div>
+</div>
