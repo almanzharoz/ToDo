@@ -13,10 +13,9 @@ namespace Expo3.WebApplication.Controllers
 {
     public class EventController : BaseController<EventService>
     {
-        private readonly CategoryService _categoryService;
-        public EventController(EventService service, CategoryService categoryService) : base(service)
+
+        public EventController(EventService service) : base(service)
         {
-            _categoryService = categoryService;
         }
 
         public IActionResult Index()
@@ -31,13 +30,15 @@ namespace Expo3.WebApplication.Controllers
             model.StartDate = new DateTime(nowTime.Year, nowTime.Month, 1);
             model.EndDate = new DateTime(nowTime.Year, nowTime.Month + 1, 1).AddDays(-1);
             model.Cities = _service.GetAllCities().ToList();
-            model.Categories = _categoryService.SearchCategories().Where(c => c != null && !string.IsNullOrEmpty(c.Name)).Select(c => new SelectListItem() { Value = c.Id, Text = c.Name }).ToList();
+            model.Categories = _service.GetCategories().Select(c => new SelectListItem() { Value = c.Id, Text = c.Name }).ToList();
             return View(model);
         }
 
         public IActionResult Event(string id)
         {
-            var model = _service.GetEventPageById(id).IfNotNullOrDefault(m => new EventPageModel() { Caption = m.Name, Date = m.DateTime.ToString(), Html = m.Page.Html, Title = m.Page.Title });
+	        var model = _service.GetEventByUrl(id);
+				//.IfNotNullOrDefault(m => new EventPageModel() { Caption = m.Name, Date = m.DateTime.ToString(), Html = m.Page.Html, Title = m.Page.Title });
+				// здесь не нужна ViewMode, т.к. EventPage итак выполняет эту роль
             if (model == null)
                 return NotFound();
             return View(model);

@@ -19,9 +19,8 @@ namespace Expo3.TestsApp.Services
 		{
 			var category = Get<BaseCategoryProjection>(categoryId.HasNotNullArg(nameof(categoryId))).HasNotNullArg("category");
 
-			return new NewEvent(Get<BaseUserProjection>(User.Id).HasNotNullArg("owner"))
+			return new NewEvent(Get<BaseUserProjection>(User.Id).HasNotNullArg("owner"), name)
 				{
-					Name = name,
 					DateTime = dateTime,
 					Address = address,
 					Type = type,

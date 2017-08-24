@@ -10,8 +10,6 @@ namespace Expo3.Model
 	/// </summary>
 	public struct EventPage
 	{
-		[Keyword]
-		public string UrlName { get; set; }
 		/// <summary>
 		/// Внутренний HTML страницы мероприятия
 		/// </summary>

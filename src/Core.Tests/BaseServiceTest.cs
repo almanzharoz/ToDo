@@ -690,5 +690,19 @@ namespace Core.Tests
 			Assert.AreEqual(products.Count, 2);
 			// Есть уже анализатор, но лучше покурить это: https://www.red-gate.com/simple-talk/dotnet/net-development/how-to-build-a-search-page-with-elasticsearch-and-net/
 		}
+
+		//[TestMethod]
+	 //   public void NestedTest()
+	 //   {
+		//	var category = new NewCategory { Name = "Category1" };
+		//    var c = _repository.InsertWithVersion<NewCategory, Category>(category);
+
+		//    var product1 = new NewProduct(c) { Name = "Product1", Title = "ProductA", FullName = new FullName(){Category = c.Name, Name = "Product1", Producer = "Producer1"}};
+		//    _repository.InsertWithParent<NewProduct, Category>(product1);
+		//    var product2 = new NewProduct(c) { Name = "Product2", Title = "ProductB", FullName = new FullName() { Category = c.Name, Name = "Product2", Producer = "Producer1" } };
+		//    _repository.InsertWithParent<NewProduct, Category>(product2);
+
+		//	var result = _repository.FilterNested<Product, FullNameNested>(q => q.Bool(b => b.Filter(f => f.Term(t => t.Field(p => p.Name).Value("Product1")))), p=>p.FullName);
+	 //   }
 	}
 }
