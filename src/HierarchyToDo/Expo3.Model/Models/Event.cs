@@ -14,6 +14,8 @@ namespace Expo3.Model.Models
 		[Keyword]
 		public Category Category { get; set; }
 		[Keyword]
+		public string Url { get; set; }
+		[Keyword]
 		public string Name { get; set; }
 		[Keyword]
 		public User Owner { get; set; }

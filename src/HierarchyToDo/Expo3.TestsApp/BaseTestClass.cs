@@ -48,8 +48,8 @@ namespace Expo3.TestsApp
 
 		}
 
-		protected string AddEvent(string categoryId, string name)
-			=> _eventService.AddEvent(name, new EventDateTime(), new Address(), EEventType.Concert, categoryId, 0);
+		protected string AddEvent(string categoryId, string name, EventDateTime date=default(EventDateTime), Address address=default(Address), EEventType type= EEventType.None, decimal price=0)
+			=> _eventService.AddEvent(name, date, address, type, categoryId, price);
 
 		protected string AddCategory(string name)
 			=> _categoryService.Add(name);

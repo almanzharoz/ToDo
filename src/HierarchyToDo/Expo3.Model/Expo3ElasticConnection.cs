@@ -9,7 +9,7 @@ namespace Expo3.Model
 		{
 		}
 
-		public string EventIndexName = "event_index";
-		public string UserIndexName = "user_index";
+		public virtual string EventIndexName => "event_index";
+		public virtual string UserIndexName => "user_index";
 	}
 }

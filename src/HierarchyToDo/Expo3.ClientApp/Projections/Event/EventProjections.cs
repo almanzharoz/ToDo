@@ -7,21 +7,17 @@ using Newtonsoft.Json;
 
 namespace Expo3.ClientApp.Projections.Event
 {
-	public class EventProjection : BaseEntityWithVersion, IProjection<Model.Models.Event>, IGetProjection, ISearchProjection
+	public class EventProjection : BaseEntity, IProjection<Model.Models.Event>, IGetProjection, ISearchProjection
 	{
+		[JsonProperty]
+		public string Url{ get; private set; }
+
 		[JsonProperty]
 		public string Name { get; private set; }
 
 		[Keyword]
 		[JsonProperty]
 		public BaseCategoryProjection Category { get; private set; }
-
-
-		[JsonProperty]
-		public EventDateTime DateTime { get; private set; }
-
-		[JsonProperty]
-		public Address Address { get; private set; }
 
 		[JsonProperty]
 		public EEventType Type { get; private set; }
@@ -33,12 +29,19 @@ namespace Expo3.ClientApp.Projections.Event
 		public EventPage Page { get; private set; }
 	}
 
-	public class EventSearchProjection : BaseEntityWithVersion, IProjection<Model.Models.Event>, IGetProjection, ISearchProjection
+	public class EventCellProjection : BaseEntity, IProjection<Model.Models.Event>, ISearchProjection
 	{
 		[JsonProperty]
-		public string Name { get; private set; }
-
-        [JsonProperty]
-        public EventDateTime DateTime { get; private set; }
+		public EventPageCell Page { get; private set; }
     }
+
+	public struct EventPageCell
+	{
+		public string Url { get; set; }
+		public string Caption { get; set; }
+		public string Cover { get; set; }
+
+		public string Date { get; set; }
+		public string Category { get; set; }
+	}
 }

@@ -20,25 +20,25 @@ namespace Expo3.ClientApp.Services
         {
         }
 
-        public EventProjection GetEventById(string id)
-            => Get<EventProjection>(id.HasNotNullArg("event id"));
+		public EventProjection GetEventByUrl(string url)
+			=> Filter<EventProjection>(f => f.Term(p => p.Url, url.HasNotNullArg("event id"))).SingleOrDefault();
 
-        public IReadOnlyCollection<EventSearchProjection> SearchByName(string query)
-            => Search<Event, EventSearchProjection>(q => q
-                .Match(m => m
-                    .Field(x => x.Name)
-                    .Query(query)));
+	    public IReadOnlyCollection<CategoryProjection> GetCategories()
+		    => Filter<CategoryProjection>(null, s => s.Ascending(p => p.Name));
 
-        public IReadOnlyCollection<EventSearchProjection> FilterEventsByNameAndCity(string query, string city)
-            => Search<Event, EventSearchProjection>(q => q
-                .Bool(b => b
-                    .Must(Query<Event>.Match(m => m.Field(x => x.Name).Query(query)) &&
-                          Query<Event>.Match(m => m.Field(x => x.Address.City).Query(city)))));
+		//public IReadOnlyCollection<EventSearchProjection> SearchByName(string query)
+		//    => Search<Event, EventSearchProjection>(q => q
+		//        .Match(m => m
+		//            .Field(x => x.Name)
+		//            .Query(query)));
 
-        public EventProjection GetEventPageById(string id)
-            => Get<EventProjection>(id.HasNotNullArg("event id"));
+		//public IReadOnlyCollection<EventSearchProjection> FilterEventsByNameAndCity(string query, string city)
+		//    => Search<Event, EventSearchProjection>(q => q
+		//        .Bool(b => b
+		//            .Must(Query<Event>.Match(m => m.Field(x => x.Name).Query(query)) &&
+		//                  Query<Event>.Match(m => m.Field(x => x.Address.City).Query(city)))));
 
-        public Pager<EventSearchProjection> SearchEvents(string query=null, string city=null, List<string> categories=null, List<EEventType> types=null, DateTime? startDateTime=null, DateTime? endDateTime=null, decimal? maxPrice=null, int pageSize = 9999, int pageIndex=0)
+		public Pager<EventCellProjection> SearchEvents(string query=null, string city=null, List<string> categories=null, List<EEventType> types=null, DateTime? startDateTime=null, DateTime? endDateTime=null, decimal? maxPrice=null, int pageSize = 9999, int pageIndex=0)
         {
             List<QueryContainer> qc = new List<QueryContainer>();
             if (!string.IsNullOrEmpty(query))
@@ -71,7 +71,7 @@ namespace Expo3.ClientApp.Services
             {
                 qf.Add(Query<Event>.Range(m => m.Field(x => x.Prices.First().Price).LessThanOrEquals((double)maxPrice.Value)));
             }
-            return SearchPager<Event, EventSearchProjection>(q => q
+            return SearchPager<Event, EventCellProjection>(q => q
                 .Bool(b => b
                     .Must(qc.ToArray()).Filter(qf.ToArray())), pageIndex, pageSize, null, false);
         }
@@ -94,7 +94,9 @@ namespace Expo3.ClientApp.Services
         //		}, false);
 
         //TODO сделать агргегацию посредством эластика+кеширование
+		// скорее всего сделаем справочник городов
         public IReadOnlyCollection<string> GetAllCities()
-            => Search<Event, EventAddressProjections>(q => q).Select(a => a.Address.City).Distinct().OrderBy(c => c).ToArray();
+            => Filter<Event, EventAddressProjections>(q => q).Select(a => a.Address.City).Distinct().OrderBy(c => c).ToArray();
+
     }
 }
