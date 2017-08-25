@@ -1,14 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Expo3.ClientApp.Services;
-using Expo3.Model;
 using Expo3.Model.Embed;
-using Expo3.Model.Models;
 using Expo3.TestsApp;
-using Expo3.TestsApp.Projections;
-using Expo3.TestsApp.Services;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Expo3.ClientApp.Tests

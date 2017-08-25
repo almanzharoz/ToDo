@@ -1,4 +1,6 @@
 ﻿using System;
+using Core.ElasticSearch;
+using Core.ElasticSearch.Mapping;
 using Expo3.Model;
 using Expo3.Model.Embed;
 using Expo3.Model.Models;
@@ -12,16 +14,18 @@ namespace Expo3.TestsApp
 	{
 		protected TService Service { get; private set; }
 
-		private readonly Func<IServiceCollection, IServiceCollection> _addAppFunc;
-		private readonly Func<IServiceProvider, IServiceProvider> _useAppFunc;
+		private readonly Func<ServiceRegistration<Expo3ElasticConnection>, ServiceRegistration<Expo3ElasticConnection>> _servicesRegistration;
+		private readonly Func<IElasticProjections<Expo3ElasticConnection>, IElasticProjections<Expo3ElasticConnection>> _useAppFunc;
 		private readonly EUserRole[] _roles;
 		private TestsEventService _eventService;
 		private TestsCaterogyService _categoryService;
 
-		protected BaseTestClass(Func<IServiceCollection, IServiceCollection> addAppFunc,
-			Func<IServiceProvider, IServiceProvider> useAppFunc, EUserRole[] roles)
+		protected BaseTestClass(
+			Func<ServiceRegistration<Expo3ElasticConnection>, ServiceRegistration<Expo3ElasticConnection>> servicesRegistration,
+			Func<IElasticProjections<Expo3ElasticConnection>, IElasticProjections<Expo3ElasticConnection>> useAppFunc,
+			EUserRole[] roles)
 		{
-			_addAppFunc = addAppFunc;
+			_servicesRegistration = servicesRegistration;
 			_useAppFunc = useAppFunc;
 			_roles = roles;
 		}
@@ -29,17 +33,14 @@ namespace Expo3.TestsApp
 		public virtual void Setup()
 		{
 			var serviceProvider = new ServiceCollection()
-				.AddExpo3Model(new Uri("http://localhost:9200/"))
-				.AddExpo3TestsApp()
-				.AddExpo3TestedApp(_addAppFunc)
+				.AddExpo3Model(new Uri("http://localhost:9200/"), s => _servicesRegistration(s
+					.AddExpo3TestsApp()))
 				.AddSingleton(x => new UserName(x.GetService<TestsUserService>().AddUser("user@mail.ru", "123", "user", _roles)))
 				.AddLogging()
 				.BuildServiceProvider();
 
 			serviceProvider
-				.UseExpo3Model(true)
-				.UseExpo3TestsApp()
-				.UseExpo3TestedApp(_useAppFunc);
+				.UseExpo3Model(s => _useAppFunc(s.UseExpo3TestsApp()), true);
 
 			Service = serviceProvider.GetService<TService>();
 

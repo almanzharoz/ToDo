@@ -21,11 +21,9 @@ namespace Expo3.LoginApp.Services
         {
         }
 
-        public LoginUserProjection TryLogin(string email, string password)
-            => Filter<User, UserProjection>(q => q.Term(x => x.Email, email), null, 1)
-                .FirstOrDefault()
-                .If(user => user != null && HashPasswordHelper.GetHash(password, Base64UrlTextEncoder.Decode(user.Salt)) == user.Password,
-                    user => new LoginUserProjection(user), user => null);
+	    public UserProjection TryLogin(string email, string password)
+		    => Filter<User, UserProjection>(q => q.Term(x => x.Email, email), null, 1)
+			    .FirstOrDefault(x => x.CheckPassword(password));
 
         public UserRegistrationResult Register(string email, string name, string password)
         {
@@ -44,33 +42,15 @@ namespace Expo3.LoginApp.Services
             if (FilterCount<UserProjection>(q => q.Term(x => x.Email, email.ToLowerInvariant())) > 0)
                 return UserRegistrationResult.EmailAlreadyExists;
 
-            var salt = HashPasswordHelper.GenerateSalt();
-
-            return Insert(new RegisterUserProjection
-            {
-                Email = email.ToLowerInvariant(),
-                Name = name.Trim(),
-                Password = HashPasswordHelper.GetHash(password, salt),
-                Salt = Base64UrlTextEncoder.Encode(salt),
-                Roles = new [] {EUserRole.User, EUserRole.Organizer}
-            }) ? UserRegistrationResult.Ok : UserRegistrationResult.UnknownError;
+	        return Insert(new RegisterUserProjection(email, name, password, new[] {EUserRole.User, EUserRole.Organizer}), true)
+		        ? UserRegistrationResult.Ok
+		        : UserRegistrationResult.UnknownError;
         }
 
-        public bool ChangePassword(string email, string oldPassword, string newPassword)
-        {
-            var user = TryLogin(email, oldPassword);
-            oldPassword = null;
-            if (user == null) return false;
+	    public bool ChangePassword(string email, string oldPassword, string newPassword)
+		    => TryLogin(email, oldPassword)
+			    .IfNotNullOrDefault(
+				    user => Update<UpdatePasswordProjection>(user.Id, x => x.ChangePassword(/*oldPassword, */newPassword), true));
 
-            var salt = HashPasswordHelper.GenerateSalt();
-            var hashedPassword = HashPasswordHelper.GetHash(newPassword, salt);
-            newPassword = null;
-
-            var userUpdate = Get<UpdatePasswordProjection>(user.Id);
-            userUpdate.Password = hashedPassword;
-            userUpdate.Salt = Base64UrlTextEncoder.Encode(salt);
-
-            return Update(userUpdate);
-        }
-    }
+	}
 }

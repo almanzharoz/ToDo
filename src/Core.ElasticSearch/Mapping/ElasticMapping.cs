@@ -18,14 +18,14 @@ namespace Core.ElasticSearch.Mapping
 	{
 		IElasticMapping<TSettings> AddMapping<T>(Func<TSettings, string> indexName) where T : class, IModel;
 
+		IElasticMapping<TSettings> AddStruct<T>() where T : struct;
+
 		string GetIndexName<T>() where T : IEntity;
 		string GetTypeName<T>() where T : IEntity;
 	}
 
 	public interface IElasticProjections<TSettings> where TSettings : BaseElasticConnection
 	{
-		IElasticMapping<TSettings> AddStruct<T>() where T : struct;
-
 		IElasticMapping<TSettings> AddProjection<T, TMapping>()
 			where T : class, IProjection, IProjection<TMapping>, new()
 			where TMapping : class, IModel;

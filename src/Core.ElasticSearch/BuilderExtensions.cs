@@ -9,26 +9,15 @@ namespace Core.ElasticSearch
 {
 	public static class BuilderExtensions
 	{
-		public static IServiceCollection AddElastic<TConnection>(this IServiceCollection services, TConnection settings)
+		public static IServiceCollection AddElastic<TConnection>(this IServiceCollection services, TConnection settings, Action<ServiceRegistration<TConnection>> servicesRegistration)
 			where TConnection : BaseElasticConnection
 		{
 			services
 				.AddSingleton<TConnection>(settings)
 				.AddSingleton<ElasticMapping<TConnection>>()
 				.AddScoped<ElasticScopeFactory<TConnection>>();
-			return services;
-		}
-
-		public static IServiceCollection AddElastic<TConnection>(this IServiceCollection services)
-			where TConnection : BaseElasticConnection, new()
-			=> AddElastic<TConnection>(services, new TConnection());
-		
-
-		public static IServiceCollection AddService<T, TConnection>(this IServiceCollection services)
-			where T : BaseService<TConnection>
-			where TConnection : BaseElasticConnection
-		{
-			services.AddScoped<T>();
+			if (servicesRegistration != null)
+				servicesRegistration(new ServiceRegistration<TConnection>(services));
 			return services;
 		}
 
@@ -43,22 +32,13 @@ namespace Core.ElasticSearch
 			return services;
 		}
 
-		public static IServiceProvider UseElasticForTests<TConnection>(this IServiceProvider services, Action<IElasticMapping<TConnection>> mappingFactory)
-			where TConnection : BaseElasticConnection
-
-		{
-			var mapping = services.GetService<ElasticMapping<TConnection>>();
-			mappingFactory(mapping);
-			mapping.Drop();
-			mapping.Build(null);
-			return services;
-		}
-
-		public static IServiceProvider UseElastic<TConnection>(this IServiceProvider services, Action<IElasticMapping<TConnection>> mappingFactory, bool forTest)
+		public static IServiceProvider UseElastic<TConnection>(this IServiceProvider services, Action<IElasticMapping<TConnection>> mappingFactory, Func<IElasticProjections<TConnection>, IElasticProjections<TConnection>> projectionsRegistration, bool forTest)
 			where TConnection : BaseElasticConnection
 		{
 			var mapping = services.GetService<ElasticMapping<TConnection>>();
 			mappingFactory(mapping);
+			if (projectionsRegistration != null)
+				projectionsRegistration(mapping);
 			if (forTest)
 				mapping.Drop();
 			mapping.Build(null);
@@ -74,15 +54,6 @@ namespace Core.ElasticSearch
 			if (forTest)
 				mapping.Drop();
 			mapping.Build(initFunc, services.GetService<TService>());
-			return services;
-		}
-
-		public static IServiceProvider UseElasticProjections<TConnection>(this IServiceProvider services, Action<IElasticProjections<TConnection>> projectionsFactory)
-			where TConnection : BaseElasticConnection
-
-		{
-			var mapping = services.GetService<ElasticMapping<TConnection>>();
-			projectionsFactory(mapping);
 			return services;
 		}
 	}

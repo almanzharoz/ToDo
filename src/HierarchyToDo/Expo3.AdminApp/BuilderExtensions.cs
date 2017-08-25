@@ -1,5 +1,6 @@
 ﻿using System;
 using Core.ElasticSearch;
+using Core.ElasticSearch.Mapping;
 using Expo3.AdminApp.Projections;
 using Expo3.AdminApp.Services;
 using Expo3.Model;
@@ -10,21 +11,21 @@ namespace Expo3.AdminApp
 {
 	public static class BuilderExtensions
 	{
-		public static IServiceCollection AddExpo3AdminApp(this IServiceCollection services)
+		public static ServiceRegistration<Expo3ElasticConnection> AddExpo3AdminApp(this ServiceRegistration<Expo3ElasticConnection> serviceRegistration)
 		{
-			return services
-				.AddService<EventService, Expo3ElasticConnection>()
-				.AddService<UserService, Expo3ElasticConnection>();
+			return serviceRegistration
+				.AddService<EventService>()
+				.AddService<UserService>();
 		}
 
-		public static IServiceProvider UseExpo3AdminApp(this IServiceProvider services)
+		public static IElasticProjections<Expo3ElasticConnection> UseExpo3AdminApp(this IElasticProjections<Expo3ElasticConnection> services)
 		{
-			return services.UseExpo3Projections(p => p
+			return services
 				.AddProjection<EventProjection, Event>()
 				
 				.AddProjection<NewUserProjection, User>()
 				.AddProjection<UserUpdateProjection, User>()
-				.AddProjection<UserProjection, User>());
+				.AddProjection<UserProjection, User>();
 		}
 	}
 }

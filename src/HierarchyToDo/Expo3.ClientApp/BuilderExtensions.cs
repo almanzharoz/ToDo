@@ -1,5 +1,6 @@
 ﻿using System;
 using Core.ElasticSearch;
+using Core.ElasticSearch.Mapping;
 using Expo3.ClientApp.Projections;
 using Expo3.ClientApp.Projections.Event;
 using Expo3.ClientApp.Services;
@@ -12,19 +13,19 @@ namespace Expo3.ClientApp
 {
     public static class BuilderExtensions
     {
-        public static IServiceCollection AddExpo3ClientApp(this IServiceCollection services)
-        {
-            return services
-                .AddService<EventService, Expo3ElasticConnection>();
+        public static ServiceRegistration<Expo3ElasticConnection> AddExpo3ClientApp(this ServiceRegistration<Expo3ElasticConnection> serviceRegistration)
+		{
+            return serviceRegistration
+				.AddService<EventService>();
         }
 
-        public static IServiceProvider UseExpo3ClientApp(this IServiceProvider services)
+        public static IElasticProjections<Expo3ElasticConnection> UseExpo3ClientApp(this IElasticProjections<Expo3ElasticConnection> services)
         {
-            return services.UseExpo3Projections(x => x
+            return services
                 .AddProjection<EventProjection, Event>()
                 .AddProjection<EventCellProjection, Event>()
                 .AddProjection<EventAddressProjections, Event>()
-                .AddProjection<EventPageProjection, Event>());
+                .AddProjection<EventPageProjection, Event>();
 
         }
     }

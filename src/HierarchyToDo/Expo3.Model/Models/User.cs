@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 namespace Expo3.Model.Models
 
 {
-	public class User : BaseEntityWithVersion, IModel, IWithName
+	public class User : BaseEntity, IModel, IWithName
     {
         [Keyword]
         public string Email { get; set; }

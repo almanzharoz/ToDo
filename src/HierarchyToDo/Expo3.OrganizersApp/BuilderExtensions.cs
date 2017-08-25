@@ -1,5 +1,6 @@
 ﻿using System;
 using Core.ElasticSearch;
+using Core.ElasticSearch.Mapping;
 using Expo3.Model;
 using Expo3.Model.Models;
 using Expo3.OrganizersApp.Projections;
@@ -10,17 +11,17 @@ namespace Expo3.OrganizersApp
 {
 	public static class BuilderExtensions
 	{
-		public static IServiceCollection AddExpo3OrganizerApp(this IServiceCollection services)
+		public static ServiceRegistration<Expo3ElasticConnection> AddExpo3OrganizerApp(this ServiceRegistration<Expo3ElasticConnection> serviceRegistration)
 		{
-			return services
-				.AddService<EventService, Expo3ElasticConnection>();
+			return serviceRegistration
+				.AddService<EventService>();
 		}
 
-		public static IServiceProvider UseExpo3OrganizerApp(this IServiceProvider services)
+		public static IElasticProjections<Expo3ElasticConnection> UseExpo3OrganizerApp(this IElasticProjections<Expo3ElasticConnection> services)
 		{
-			return services.UseExpo3Projections(p => p
+			return services
 				.AddProjection<EventProjection, Event>()
-				.AddProjection<EventRemoveProjection, Event>());
+				.AddProjection<EventRemoveProjection, Event>();
 		}
 	}
 }

@@ -9,19 +9,11 @@ namespace Expo3.Model
 {
     public static class BuilderExtensions
     {
-	    public static IServiceCollection AddExpo3Model(this IServiceCollection services, Uri connectionString)
-			=> services.AddElastic(new Expo3ElasticConnection(connectionString));
+	    public static IServiceCollection AddExpo3Model(this IServiceCollection services, Uri connectionString, Action<ServiceRegistration<Expo3ElasticConnection>> servicesRegistration)
+			=> services.AddElastic(new Expo3ElasticConnection(connectionString), servicesRegistration);
 
-	    public static IServiceProvider UseExpo3Model(this IServiceProvider services, bool forTest)
-		    => services.UseElastic<Expo3ElasticConnection>(AddMapping, forTest);
-
-	    public static IServiceProvider UseExpo3Model<TService>(this IServiceProvider services, bool forTest, Action<TService> init)
-			where TService : BaseService<Expo3ElasticConnection>
-		    => services.UseElastic<Expo3ElasticConnection, TService>(AddMapping, forTest, init);
-
-		public static IServiceProvider UseExpo3Projections(this IServiceProvider services,
-		    Action<IElasticProjections<Expo3ElasticConnection>> projectionsFactory)
-		    => services.UseElasticProjections(projectionsFactory);
+	    public static IServiceProvider UseExpo3Model(this IServiceProvider services, Func<IElasticProjections<Expo3ElasticConnection>, IElasticProjections<Expo3ElasticConnection>> projectionsRegistration, bool forTest = false)
+		    => services.UseElastic<Expo3ElasticConnection>(AddMapping, projectionsRegistration, forTest);
 
 	    private static void AddMapping(IElasticMapping<Expo3ElasticConnection> m)
 		    => m

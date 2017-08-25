@@ -16,7 +16,7 @@ namespace Core.ElasticSearch.Domain
 		public T Parent { get; internal set; }
 	}
 
-	public abstract class BaseNewEntityWithParent<T> : BaseEntity, IWithParent<T>, IProjection
+	public abstract class BaseNewEntityWithParent<T> : BaseNewEntity, IWithParent<T>, IProjection
 		where T : IProjection
 	{
 		[JsonIgnore]

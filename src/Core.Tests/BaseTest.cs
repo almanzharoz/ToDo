@@ -15,30 +15,30 @@ namespace Core.Tests
         [TestInitialize]
         public void Setup()
         {
-            var serviceProvider = new ServiceCollection()
-                .AddLogging()
-                .AddElastic<ElasticConnection>()
-                    .AddService<TestService, ElasticConnection>()
-                .BuildServiceProvider();
+	        var serviceProvider = new ServiceCollection()
+		        .AddLogging()
+		        .AddElastic(new ElasticConnection(), s => s
+			        .AddService<TestService>())
+		        .BuildServiceProvider();
 
-            serviceProvider.UseElasticForTests<ElasticConnection>(map => map
+	        serviceProvider.UseElastic<ElasticConnection>(map => map
 
-                .AddMapping<Producer>(x => x.SecondIndex)
-                .AddMapping<Category>(x => x.FirstIndex)
-                .AddMapping<Product>(x => x.FirstIndex)
-                .AddMapping<User>(x => x.FirstIndex)
+		        .AddMapping<Producer>(x => x.SecondIndex)
+		        .AddMapping<Category>(x => x.FirstIndex)
+		        .AddMapping<Product>(x => x.FirstIndex)
+		        .AddMapping<User>(x => x.FirstIndex), s => s
 
-                .AddProjection<Producer, Producer>()
-                .AddProjection<NewProducer, Producer>()
-                .AddProjection<Category, Category>()
-                .AddProjection<NewCategory, Category>()
-				.AddProjection<CategoryProjection, Category>()
-                .AddProjection<ProductProjection, Product, Category>()
-                .AddProjection<Product, Product, Category>()
-                .AddProjection<NewProduct, Product, Category>()
-                .AddProjection<User, User>()
-                .AddProjection<NewUser, User>()
-                .AddProjection<UserUpdateProjection, User>());
+		        .AddProjection<Producer, Producer>()
+		        .AddProjection<NewProducer, Producer>()
+		        .AddProjection<Category, Category>()
+		        .AddProjection<NewCategory, Category>()
+		        .AddProjection<CategoryProjection, Category>()
+		        .AddProjection<ProductProjection, Product, Category>()
+		        .AddProjection<Product, Product, Category>()
+		        .AddProjection<NewProduct, Product, Category>()
+		        .AddProjection<User, User>()
+		        .AddProjection<NewUser, User>()
+		        .AddProjection<UserUpdateProjection, User>(), true);
 
             _repository = serviceProvider.GetService<TestService>();
         }
