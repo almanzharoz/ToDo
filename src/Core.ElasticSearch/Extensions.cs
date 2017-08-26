@@ -17,7 +17,7 @@ namespace Core.ElasticSearch
 		public static string[] GetFields(this Type type, string lastName = null)
 		{
 			var fields = new List<string>();
-			foreach (var property in type.GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.Instance).Where(x => x.Name != "Id" && x.Name != "Version" && x.Name != "Parent"))
+			foreach (var property in type.GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).Where(x => x.Name != "Id" && x.Name != "Version" && x.Name != "Parent"))
 			{
 				if (property.PropertyType.HasBaseType<IEntity>() && property.GetCustomAttribute<KeywordAttribute>() == null)
 					fields.AddRange(GetFields(property.PropertyType, String.Join(".", new[] { lastName, property.Name.ToLower() }.Where(x => x != null))));
@@ -28,7 +28,7 @@ namespace Core.ElasticSearch
 		}
 
 		public static PropertyInfo[] GetProperties(this Type type) =>
-			type.GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.Instance)
+			type.GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
 				.Where(x => x.Name != "Id" && x.Name != "Version" && x.Name != "Parent")
 				.ToArray();
 	}

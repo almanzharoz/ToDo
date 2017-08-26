@@ -118,6 +118,26 @@ namespace Core.ElasticSearch
 						RepositoryLoggingEvents.ES_GET,
 						$"Get with query (Id: {id})"));
 
+		protected TProjection GetWithVersion<T, TProjection>(string id,
+			Func<QueryContainerDescriptor<T>, QueryContainer> query,
+			bool load = true)
+			where TProjection : BaseEntityWithVersion, IProjection<T>, IGetProjection
+			where T : class, IModel
+			=> _mapping.GetProjectionItem<TProjection>()
+				.Convert(
+					projection => Try(
+						c => c.Search<T, TProjection>(x => x
+							.Index(projection.MappingItem.IndexName)
+							.Type(projection.MappingItem.TypeName)
+							.Query(q => q.Bool(b => b.Filter(Query<T>.Ids(i => i.Values(id.HasNotNullArg("id"))) &&
+							                                 query(new QueryContainerDescriptor<T>()))))
+							.Take(1)
+							.Version()
+							.Source(s => s.Includes(f => f.Fields(projection.Fields)))),
+						r => r.Documents.FirstOrDefault().If(load, Load),
+						RepositoryLoggingEvents.ES_GET,
+						$"Get with query (Id: {id})"));
+
 		protected T Get<T, TParent>(string id, string parent, Func<QueryContainerDescriptor<T>, QueryContainer> query, bool load = true)
 			where T : class, IProjection, IGetProjection, IWithParent<TParent>
 			where TParent : class, IProjection
