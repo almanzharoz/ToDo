@@ -28,7 +28,8 @@ namespace Expo3.AdminApp
 				.AddProjection<UserUpdateProjection, User>()
 				.AddProjection<UserProjection, User>()
 				
-				.AddProjection<CategoryProjection, Category>();
+				.AddProjection<CategoryProjection, Category>()
+				.AddProjection<NewCategory, Category>();
 		}
 	}
 }

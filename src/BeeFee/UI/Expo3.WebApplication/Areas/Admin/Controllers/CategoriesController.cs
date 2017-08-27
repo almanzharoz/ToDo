@@ -22,7 +22,7 @@ namespace Expo3.WebApplication.Areas.Admin.Controllers
 	    [HttpPost]
 	    public IActionResult Add(AddCategoryListModel addCategoryListModel)
 	    {
-		    _service.Add(addCategoryListModel.NewCategory, addCategoryListModel.NewCategory);
+		    _service.Add(addCategoryListModel.Name, addCategoryListModel.Url);
 		    return RedirectToAction("Index");
 	    }
 

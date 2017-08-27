@@ -16,7 +16,7 @@ namespace Expo3.AdminApp.Projections
 
 		internal CategoryProjection Rename(string name, string url)
 		{
-			Url = url.IfNull(CommonHelper.UriTranslit);
+			Url = url.IfNull(name, CommonHelper.UriTranslit);
 			Name = name;
 			return this;
 		}
@@ -31,7 +31,7 @@ namespace Expo3.AdminApp.Projections
 
 		public NewCategory(string url, string name)
 		{
-			Url = url.IfNull(CommonHelper.UriTranslit);
+			Url = url.IfNull(name, CommonHelper.UriTranslit);
 			Name = name;
 		}
 

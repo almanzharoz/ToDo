@@ -7,9 +7,10 @@ namespace Expo3.WebApplication.Areas.Admin.Models
 {
 	public class AddCategoryListModel
 	{
-		public IReadOnlyCollection<CategoryProjection> ExistingCategories { get; set; }
+		public IReadOnlyCollection<CategoryProjection> ExistingCategories { get; }
 		[Required]
-		public string NewCategory { get; set; }
+		public string Name { get; set; }
+		public string Url { get; set; }
 
 		public AddCategoryListModel()
 		{

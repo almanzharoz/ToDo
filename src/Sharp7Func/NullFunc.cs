@@ -71,10 +71,10 @@ namespace SharpFuncExt
 			return default(TResult);
 		}
 
-		public static T IfNull<T, TResult>(this T arg, Func<T, TResult> func)
+		public static T IfNull<T, TValue>(this T arg, TValue value, Func<TValue, T> func)
 		{
 			if (arg.IsNull())
-				func(arg);
+				return func(value);
 			return arg;
 		}
 
