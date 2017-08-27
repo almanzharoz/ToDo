@@ -25,7 +25,7 @@ namespace Expo3.OrganizerApp.Services
 		/// <exception cref="AddEntityException"></exception>
 		// TODO: добавить проверку пользователя
 		public void AddEvent(string name, EventDateTime dateTime, Address address, EEventType type,
-			Category category, TicketPrice[] prices, string html)
+			Category category, TicketPrice[] prices, string caption, string html)
 			=> Insert(new NewEvent(Get<BaseUserProjection>(User.Id).HasNotNullArg("owner"))
 				{
 					Name = name.Trim(),
@@ -34,7 +34,7 @@ namespace Expo3.OrganizerApp.Services
 					//Type = type,
 					//Category = category,
 					//Prices = prices,
-					//Page = new EventPage { Address = address, Caption = name.Trim(), Category = category.Name, Date = dateTime.ToString(), Title = name.Trim(), Html = html}
+					//Page = new EventPage { Address = address, Caption = caption, Category = category.Name, Date = dateTime.ToString(), Title = name.Trim(), Html = html}
 				}, true)
 				.ThrowIfNot<AddEntityException>();
 
@@ -45,11 +45,14 @@ namespace Expo3.OrganizerApp.Services
 
 		///<exception cref="UpdateEntityException"></exception>
 		public void UpdateEvent(string id, string name, EventDateTime dateTime, Address address, EEventType type,
-			string categoryId, TicketPrice[] prices, string html, int version)
+			string categoryId, TicketPrice[] prices, string caption, string html, int version)
 			=> Update<EventProjection>(id, version, x => x.Change(name, dateTime, address, type, Get<BaseCategoryProjection>(categoryId.HasNotNullArg("category")), prices, html), true)
 				.ThrowIfNot<UpdateEntityException>();
 
 		public IReadOnlyCollection<EventProjection> GetMyEvents() 
 			=> Filter<Event, EventProjection>(q => UserQuery<EventProjection>(null));
+
+		public IReadOnlyCollection<CategoryProjection> GetCategories()
+			=> Filter<CategoryProjection>(null, s => s.Ascending(p => p.Name));
 	}
 }

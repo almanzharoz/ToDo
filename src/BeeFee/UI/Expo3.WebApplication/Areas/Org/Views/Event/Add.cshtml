@@ -1,4 +1,4 @@
-@using Expo3.Model.Embed
+﻿@using Expo3.Model.Embed
 @model Expo3.WebApplication.Areas.Org.Models.AddEventEditModel
 @{
     ViewData["Title"] = "Add";
@@ -15,9 +15,29 @@
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
 
-        <div class="form-group">
+        @*<div class="form-group">
             <input type="text" class="form-control" asp-for="Category.Name" placeholder="Category"/>
             <span asp-validation-for="Category"></span>
+        </div>*@
+        
+        <div class="form-group">
+            <label>Выберите категорию:</label>
+            @if (Model.LoadedCategories.Count > 0)
+            {
+                <label class="checkbox-inline">
+                    <input type="checkbox" id="chkAllCategories" checked /> Все категории
+                </label>
+                foreach (var category in Model.LoadedCategories)
+                {
+                    <label class="checkbox-inline">
+                        <input type="checkbox" class="class-category" value="@category.Value" /> @category.Text
+                    </label>
+                }
+            }
+            else
+            {
+                <span class="text-danger">Доступных категорий не найдено</span>
+            }
         </div>
 
         <div class="form-group">
@@ -66,9 +86,14 @@
             <input type="text" class="form-control" placeholder="Price" asp-for="Price" />
             <span asp-validation-for="Price"></span>
         </div>
+        
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Caption" asp-for="Caption"/>
+            <span asp-validation-for="Caption"></span>
+        </div>
 
         <div class="form-group">
-            <textarea class="form-control" rows="10" placeholder="HTML here" asp-for="Page.Html"></textarea>
+            <textarea class="form-control" rows="10" placeholder="HTML here" asp-for="Html"></textarea>
         </div>
 
         <div class="form-group">

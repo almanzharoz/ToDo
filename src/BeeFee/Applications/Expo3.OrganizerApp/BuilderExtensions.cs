@@ -19,7 +19,10 @@ namespace Expo3.OrganizerApp
 		public static IElasticProjections<Expo3ElasticConnection> UseExpo3OrganizerApp(this IElasticProjections<Expo3ElasticConnection> services)
 		{
 			return services
-				.AddProjection<EventProjection, Event>();
+				.AddProjection<EventProjection, Event>()
+				.AddProjection<NewEvent, Event>()
+				
+				.AddProjection<CategoryProjection, Category>();
 		}
 	}
 }

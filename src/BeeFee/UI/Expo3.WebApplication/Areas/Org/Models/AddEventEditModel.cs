@@ -1,14 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Expo3.Model;
 using Expo3.Model.Embed;
 using Expo3.Model.Models;
 using Expo3.OrganizerApp.Projections;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Expo3.WebApplication.Areas.Org.Models
 {
 	public class AddEventEditModel
 	{
+		public List<SelectListItem> LoadedCategories { get; set; }
+
 		public string Id { get; set; }
 		public int Version { get; set; }
 
@@ -38,6 +42,8 @@ namespace Expo3.WebApplication.Areas.Org.Models
 		[DataType(DataType.Currency)]
 		public string Price { get; set; }
 
+		public string Caption { get; set; }
+
 		public string Html { get; set; }
 
 		public AddEventEditModel()
@@ -55,6 +61,7 @@ namespace Expo3.WebApplication.Areas.Org.Models
 			Address = eventProjection.Address.AddressString;
 			Type = eventProjection.Type;
 			Price = eventProjection.Prices[0].Price.ToString().TrimEnd('\u20bd'); //TODO
+			Caption = eventProjection.Page.Caption;
 			Html = eventProjection.Page.Html;
 		}
 	}

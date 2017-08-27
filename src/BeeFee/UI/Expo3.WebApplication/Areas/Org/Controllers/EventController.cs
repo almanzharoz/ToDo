@@ -1,18 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
-using Expo3.Model;
 using Expo3.Model.Embed;
-using Expo3.Model.Models;
 using Expo3.OrganizerApp.Services;
 using Expo3.WebApplication.Areas.Org.Models;
 using Expo3.WebApplication.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SharpFuncExt;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Expo3.WebApplication.Areas.Org.Controllers
 {
@@ -31,9 +25,14 @@ namespace Expo3.WebApplication.Areas.Org.Controllers
 
 		[HttpGet]
 	    public IActionResult Add()
-	    {
-		    return View(new AddEventEditModel() {StartDateTime = DateTime.Now, FinishDateTime = DateTime.Now.AddDays(1)});
-	    }
+		{
+			return View(new AddEventEditModel
+			{
+				StartDateTime = DateTime.Now,
+				FinishDateTime = DateTime.Now.AddDays(1),
+				LoadedCategories = _service.GetCategories().Select(c => new SelectListItem { Value = c.Id, Text = c.Name }).ToList()
+			});
+		}
 
 	    [HttpPost]
 	    public IActionResult Add(AddEventEditModel addEventEditModel)
@@ -47,6 +46,7 @@ namespace Expo3.WebApplication.Areas.Org.Controllers
 				    addEventEditModel.Type,
 					null, //TODO: работа с категориями
 					new[] {new TicketPrice {Price = new Price(addEventEditModel.Price)} }, 
+					addEventEditModel.Caption,
 				    addEventEditModel.Html);
 			    return RedirectToAction("Index");
 		    }
@@ -72,7 +72,8 @@ namespace Expo3.WebApplication.Areas.Org.Controllers
 				    new Address {City = addEventEditModel.City, AddressString = addEventEditModel.Address},
 				    addEventEditModel.Type,
 				    null, //TODO: работа с категориями
-				    new[] {new TicketPrice() {Price = new Price(addEventEditModel.Price)}},
+				    new[] {new TicketPrice {Price = new Price(addEventEditModel.Price)}},
+					addEventEditModel.Caption,
 				    addEventEditModel.Html, addEventEditModel.Version);
 			    return RedirectToAction("Index");
 		    }

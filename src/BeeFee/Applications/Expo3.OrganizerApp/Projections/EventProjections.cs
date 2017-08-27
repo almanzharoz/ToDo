@@ -48,7 +48,7 @@ namespace Expo3.OrganizerApp.Projections
 		}
 	}
 
-	public class NewEvent : BaseNewEntity, IProjection, IWithName, IWithOwner
+	public class NewEvent : BaseNewEntity, IProjection<Event>, IWithName, IWithOwner
 	{
 		public string Name { get; set; }
 
