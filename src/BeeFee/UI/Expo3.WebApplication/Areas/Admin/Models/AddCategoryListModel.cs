@@ -11,6 +11,10 @@ namespace Expo3.WebApplication.Areas.Admin.Models
 		[Required]
 		public string NewCategory { get; set; }
 
+		public AddCategoryListModel()
+		{
+		}
+
 		public AddCategoryListModel(IReadOnlyCollection<CategoryProjection> existingCategories)
 		{
 			ExistingCategories = existingCategories;

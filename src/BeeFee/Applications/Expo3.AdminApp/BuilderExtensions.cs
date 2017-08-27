@@ -15,7 +15,8 @@ namespace Expo3.AdminApp
 		{
 			return serviceRegistration
 				.AddService<EventService>()
-				.AddService<UserService>();
+				.AddService<UserService>()
+				.AddService<CategoryService>();
 		}
 
 		public static IElasticProjections<Expo3ElasticConnection> UseExpo3AdminApp(this IElasticProjections<Expo3ElasticConnection> services)
@@ -25,7 +26,9 @@ namespace Expo3.AdminApp
 				
 				.AddProjection<NewUserProjection, User>()
 				.AddProjection<UserUpdateProjection, User>()
-				.AddProjection<UserProjection, User>();
+				.AddProjection<UserProjection, User>()
+				
+				.AddProjection<CategoryProjection, Category>();
 		}
 	}
 }

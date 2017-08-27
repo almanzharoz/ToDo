@@ -25,7 +25,9 @@ namespace Expo3.ClientApp
                 .AddProjection<EventProjection, Event>()
                 .AddProjection<EventCellProjection, Event>()
                 .AddProjection<EventAddressProjections, Event>()
-                .AddProjection<EventPageProjection, Event>();
+                .AddProjection<EventPageProjection, Event>()
+				
+				.AddProjection<CategoryProjection, Category>();
 
         }
     }

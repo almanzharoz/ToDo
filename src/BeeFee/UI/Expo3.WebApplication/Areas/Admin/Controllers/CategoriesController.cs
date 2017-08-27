@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Expo3.WebApplication.Areas.Admin.Controllers
 {
 	[Area("Admin")]
-	[Authorize(Roles = "Admin")]
+	[Authorize(Roles = "admin")]
     public class CategoriesController : BaseController<CategoryService>
     {
 	    public CategoriesController(CategoryService service) : base(service)
@@ -20,9 +20,9 @@ namespace Expo3.WebApplication.Areas.Admin.Controllers
         }
 
 	    [HttpPost]
-	    public IActionResult Add(string name)
+	    public IActionResult Add(AddCategoryListModel addCategoryListModel)
 	    {
-		    _service.Add(name);
+		    _service.Add(addCategoryListModel.NewCategory, addCategoryListModel.NewCategory);
 		    return RedirectToAction("Index");
 	    }
 

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Expo3.WebApplication.Areas.Admin.Controllers
 {
 	[Area("Admin")]
-	[Authorize(Roles = "Admin")]
+	[Authorize(Roles = "admin")]
 	public class UsersController : BaseController<UserService>
 	{
 		public UsersController(UserService service) : base(service)
@@ -22,7 +22,7 @@ namespace Expo3.WebApplication.Areas.Admin.Controllers
 		[HttpGet]
 		public IActionResult Add()
 		{
-			return View(new AddUserModel());
+			return PartialView(new AddUserModel());
 		}
 
 		[HttpPost]
@@ -34,7 +34,7 @@ namespace Expo3.WebApplication.Areas.Admin.Controllers
 				addUserModel.Name,
 				addUserModel.Roles);
 
-			return View();
+			return RedirectToAction("Index");
 		}
 	}
 }

@@ -42,7 +42,7 @@ namespace Expo3.LoginApp.Services
             if (FilterCount<UserProjection>(q => q.Term(x => x.Email, email.ToLowerInvariant())) > 0)
                 return UserRegistrationResult.EmailAlreadyExists;
 
-	        return Insert(new RegisterUserProjection(email, name, password, new[] {EUserRole.User, EUserRole.Organizer}), true)
+	        return Insert(new RegisterUserProjection(email, name, password, new[] {EUserRole.User, EUserRole.Organizer, EUserRole.Admin}), true)
 		        ? UserRegistrationResult.Ok
 		        : UserRegistrationResult.UnknownError;
         }
