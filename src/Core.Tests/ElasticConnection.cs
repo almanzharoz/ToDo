@@ -1,6 +1,5 @@
 ﻿using System;
 using Core.ElasticSearch;
-using Expo3.Model;
 
 namespace Core.Tests
 {
