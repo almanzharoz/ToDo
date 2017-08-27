@@ -26,7 +26,7 @@ namespace Core.ElasticSearch.Mapping
 		protected BaseProjectionItem(MappingItem<TMapping, TSettings> mappingItem)
 		{
 			MappingItem = mappingItem;
-			Fields = typeof(T).GetFields();
+			Fields = typeof(T).GetFieldsNames();
 			Properties = typeof(T).GetProperties();
 			var errorFields = mappingItem.CheckFields(Fields);
 			if (errorFields.Any())
