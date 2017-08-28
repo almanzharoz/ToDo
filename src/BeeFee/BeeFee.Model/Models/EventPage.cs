@@ -36,5 +36,19 @@ namespace BeeFee.Model
 			Html = html;
 			return this;
 		}
+
+		public EventPage(string caption, string category, string cover, EventDateTime date, Address address, string html)
+		{
+			Title = caption;
+			Caption = caption;
+			Category = category;
+			Cover = cover;
+			Address = address;
+			Date = date.ToString();
+			Html = html;
+
+			Company = null;
+			Images = null;
+		}
 	}
 }

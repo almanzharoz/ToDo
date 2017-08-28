@@ -60,6 +60,10 @@ namespace BeeFee.OrganizerApp.Projections
 
 		public EEventType Type { get; }
 
+		public Address Address { get; }
+
+		public EventPage Page { get; }
+
 		[Keyword]
 		public BaseCategoryProjection Category { get; }
 
@@ -70,13 +74,15 @@ namespace BeeFee.OrganizerApp.Projections
 
 		private readonly ThrowCollection _throws = new ThrowCollection();
 
-		public NewEvent(BaseUserProjection owner, BaseCategoryProjection category, string name, EEventType type, EventDateTime dateTime)
+		public NewEvent(BaseUserProjection owner, BaseCategoryProjection category, string name, EEventType type, EventDateTime dateTime, Address address, string html)
 		{
 			Owner = owner.HasNotNullEntity(_throws, nameof(owner));
 			Category = category.HasNotNullEntity(_throws, nameof(category));
 			Name = name.HasNotNullArg(_throws, nameof(name));
 			DateTime = dateTime;
 			Type = type;
+			Address = address;
+			Page = new EventPage(name, category.Name, null, dateTime, address, html);
 			_throws.Throw();
 		}
 	}

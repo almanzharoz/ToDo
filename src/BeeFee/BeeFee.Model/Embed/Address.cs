@@ -3,8 +3,14 @@ namespace BeeFee.Model.Embed
 {
     public struct Address
     {
-        public string City { get; set; }
-        public string AddressString { get; set; }
+        public string City { get; }
+        public string AddressString { get; }
         //public GeoCoordinate Coordinates { get; set; }
+
+	    public Address(string city, string address)
+	    {
+		    City = city;
+		    AddressString = address;
+	    }
     }
 }

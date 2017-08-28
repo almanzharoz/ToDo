@@ -43,7 +43,7 @@ namespace BeeFee.WebApplication.Areas.Org.Controllers
 				    model.Name,
 				    model.Type,
 				    new EventDateTime(model.StartDateTime, model.FinishDateTime),
-				    new Address {City = model.City, AddressString = model.Address},
+				    new Address(model.City, model.Address),
 				    new[] {new TicketPrice {Price = new Price(model.Price)}},
 				    model.Html);
 			    return RedirectToAction("Index");

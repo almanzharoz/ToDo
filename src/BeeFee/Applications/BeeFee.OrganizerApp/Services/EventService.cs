@@ -27,7 +27,7 @@ namespace BeeFee.OrganizerApp.Services
 		// TODO: добавить проверку пользователя
 		public void AddEvent(string categoryId, string name, EEventType type, EventDateTime dateTime, Address address,
 			TicketPrice[] prices, string html)
-			=> Insert(new NewEvent(Get<BaseUserProjection>(User.Id), Get<BaseCategoryProjection>(categoryId), name, type, dateTime), true)
+			=> Insert(new NewEvent(Get<BaseUserProjection>(User.Id), Get<BaseCategoryProjection>(categoryId), name, type, dateTime, address, html), true)
 				.ThrowIfNot<AddEntityException>();
 
 		///<exception cref="RemoveEntityException"></exception>
