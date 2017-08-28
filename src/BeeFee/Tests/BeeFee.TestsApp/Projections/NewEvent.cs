@@ -3,6 +3,7 @@ using BeeFee.Model;
 using BeeFee.Model.Embed;
 using BeeFee.Model.Helpers;
 using BeeFee.Model.Models;
+using BeeFee.Model.Projections;
 using Nest;
 
 namespace BeeFee.TestsApp.Projections

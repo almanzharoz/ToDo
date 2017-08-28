@@ -3,6 +3,7 @@ using BeeFee.Model;
 using BeeFee.Model.Embed;
 using BeeFee.Model.Exceptions;
 using BeeFee.Model.Models;
+using BeeFee.Model.Projections;
 using BeeFee.TestsApp.Projections;
 using Microsoft.Extensions.Logging;
 using SharpFuncExt;
@@ -25,7 +26,7 @@ namespace BeeFee.TestsApp.Services
 					Address = address,
 					Type = type,
 					Category = category,
-					Page = new EventPage() {Address = address, Category = category.Name, Caption = name, Date = dateTime.ToString(), Html = "<p>Html text</p>"},
+					Page = new EventPage(name, category.Name, "", dateTime, address, "<p>Html text</p>"),
 					Prices = new TicketPrice[1]
 						{new TicketPrice() {Description = "description price", Name = "price", Price = new Price() {Rubles = 0}}}
 				}
