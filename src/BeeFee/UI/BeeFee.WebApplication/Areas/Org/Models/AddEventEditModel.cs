@@ -1,20 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using BeeFee.Model.Embed;
 using BeeFee.Model.Models;
+using BeeFee.Model.Projections;
 using BeeFee.OrganizerApp.Projections;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BeeFee.WebApplication.Areas.Org.Models
 {
 	public class AddEventEditModel
 	{
-		public string Id { get; set; }
-		public int Version { get; set; }
-
 		[Required(ErrorMessage = "Name is required")]
 		public string Name { get; set; }
 
-		public BaseCategoryProjection Category { get; set; }
+		public string CategoryId { get; set; }
 
 		[Required(ErrorMessage = "Start date is required")]
 		[DataType(DataType.DateTime)]
@@ -39,22 +40,17 @@ namespace BeeFee.WebApplication.Areas.Org.Models
 
 		public string Html { get; set; }
 
-		public AddEventEditModel()
-		{
-		}
+		public IList<SelectListItem> Categories { get; private set; }
 
-		public AddEventEditModel(EventProjection eventProjection)
+		public AddEventEditModel() { } // For binder
+
+		public AddEventEditModel(IReadOnlyCollection<CategoryProjection> categories)
+			=> Init(categories);
+
+		public AddEventEditModel Init(IReadOnlyCollection<CategoryProjection> categories)
 		{
-			Id = eventProjection.Id;
-			Name = eventProjection.Name;
-			Category = eventProjection.Category;
-			StartDateTime = eventProjection.DateTime.Start;
-			FinishDateTime = eventProjection.DateTime.Finish;
-			City = eventProjection.Address.City;
-			Address = eventProjection.Address.AddressString;
-			Type = eventProjection.Type;
-			Price = eventProjection.Prices[0].Price.ToString().TrimEnd('\u20bd'); //TODO
-			Html = eventProjection.Page.Html;
+			Categories = categories.Select(x => new SelectListItem(){Text = x.Name, Value = x.Id}).ToList();
+			return this;
 		}
 	}
 }

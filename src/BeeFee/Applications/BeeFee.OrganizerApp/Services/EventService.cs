@@ -6,6 +6,7 @@ using BeeFee.Model;
 using BeeFee.Model.Embed;
 using BeeFee.Model.Exceptions;
 using BeeFee.Model.Models;
+using BeeFee.Model.Projections;
 using BeeFee.OrganizerApp.Projections;
 using Microsoft.Extensions.Logging;
 using SharpFuncExt;
@@ -24,18 +25,9 @@ namespace BeeFee.OrganizerApp.Services
 
 		/// <exception cref="AddEntityException"></exception>
 		// TODO: добавить проверку пользователя
-		public void AddEvent(string name, EventDateTime dateTime, Address address, EEventType type,
-			Category category, TicketPrice[] prices, string html)
-			=> Insert(new NewEvent(Get<BaseUserProjection>(User.Id).HasNotNullArg("owner"))
-				{
-					Name = name.Trim(),
-					//DateTime = dateTime,
-					//Address = address,
-					//Type = type,
-					//Category = category,
-					//Prices = prices,
-					//Page = new EventPage { Address = address, Caption = name.Trim(), Category = category.Name, Date = dateTime.ToString(), Title = name.Trim(), Html = html}
-				}, true)
+		public void AddEvent(string categoryId, string name, EEventType type, EventDateTime dateTime, Address address,
+			TicketPrice[] prices, string html)
+			=> Insert(new NewEvent(Get<BaseUserProjection>(User.Id), Get<BaseCategoryProjection>(categoryId), name, type, dateTime), true)
 				.ThrowIfNot<AddEntityException>();
 
 		///<exception cref="RemoveEntityException"></exception>

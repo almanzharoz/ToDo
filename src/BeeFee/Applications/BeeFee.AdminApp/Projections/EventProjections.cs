@@ -1,9 +1,9 @@
 ﻿using System;
 using Core.ElasticSearch.Domain;
-using BeeFee.Model;
 using BeeFee.Model.Embed;
 using BeeFee.Model.Interfaces;
 using BeeFee.Model.Models;
+using BeeFee.Model.Projections;
 using Nest;
 using Newtonsoft.Json;
 

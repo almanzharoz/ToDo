@@ -19,7 +19,8 @@ namespace BeeFee.OrganizerApp
 		public static IElasticProjections<BeefeeElasticConnection> UseBeefeeOrganizerApp(this IElasticProjections<BeefeeElasticConnection> services)
 		{
 			return services
-				.AddProjection<EventProjection, Event>();
+				.AddProjection<EventProjection, Event>()
+				.AddProjection<NewEvent, Event>();
 		}
 	}
 }

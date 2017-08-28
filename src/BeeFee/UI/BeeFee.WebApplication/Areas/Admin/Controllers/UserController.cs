@@ -3,6 +3,7 @@ using BeeFee.WebApplication.Areas.Admin.Models;
 using BeeFee.WebApplication.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using CategoryService = BeeFee.Model.Services.CategoryService;
 
 namespace BeeFee.WebApplication.Areas.Admin.Controllers
 {
@@ -10,7 +11,7 @@ namespace BeeFee.WebApplication.Areas.Admin.Controllers
 	[Authorize(Roles = "admin")]
 	public class UsersController : BaseController<UserService>
 	{
-		public UsersController(UserService service) : base(service)
+		public UsersController(UserService service, CategoryService categoryService) : base(service, categoryService)
 		{
 		}
 
@@ -36,5 +37,6 @@ namespace BeeFee.WebApplication.Areas.Admin.Controllers
 
 			return RedirectToAction("Index");
 		}
+
 	}
 }

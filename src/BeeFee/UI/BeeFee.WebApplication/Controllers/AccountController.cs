@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using BeeFee.LoginApp.Services;
 using BeeFee.Model.Embed;
+using BeeFee.Model.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using BeeFee.WebApplication.Models;
@@ -14,11 +15,11 @@ namespace BeeFee.WebApplication.Controllers
 {
     public class AccountController : BaseController<AuthorizationService>
     {
-        public AccountController(AuthorizationService service) : base(service)
-        {
-        }
+	    public AccountController(AuthorizationService service, CategoryService categoryService) : base(service, categoryService)
+	    {
+	    }
 
-        [HttpGet]
+		[HttpGet]
         public IActionResult Login(string returnUrl = null)
         {
             return View(new LoginViewModel() { ReturnUrl = returnUrl });

@@ -141,6 +141,13 @@ namespace SharpFuncExt
 			return arg;
 		}
 
+		public static T ThrowIfNull<T, TValue1, TValue2, TValue3, TException>(this T arg, Expression<Func<T, TValue1>> expression1, Expression<Func<T, TValue2>> expression2, Expression<Func<T, TValue3>> expression3, Func<TException> func) where TException : Exception
+		{
+			if (arg.IsNull(expression1, expression2, expression3))
+				throw func();
+			return arg;
+		}
+
 		public static bool IsNull<T>(this T arg) => EqualityComparer<T>.Default.Equals(arg, default(T));
 		public static bool NotNull<T>(this T arg) => !EqualityComparer<T>.Default.Equals(arg, default(T));
 
@@ -153,6 +160,12 @@ namespace SharpFuncExt
 			=> EqualityComparer<T>.Default.Equals(arg, default(T))
 				|| EqualityComparer<TValue1>.Default.Equals(expression1.Compile()(arg), default(TValue1))
 				|| EqualityComparer<TValue2>.Default.Equals(expression2.Compile()(arg), default(TValue2));
+
+		public static bool IsNull<T, TValue1, TValue2, TValue3>(this T arg, Expression<Func<T, TValue1>> expression1, Expression<Func<T, TValue2>> expression2, Expression<Func<T, TValue3>> expression3)
+			=> EqualityComparer<T>.Default.Equals(arg, default(T))
+				|| EqualityComparer<TValue1>.Default.Equals(expression1.Compile()(arg), default(TValue1))
+				|| EqualityComparer<TValue2>.Default.Equals(expression2.Compile()(arg), default(TValue2))
+				|| EqualityComparer<TValue3>.Default.Equals(expression3.Compile()(arg), default(TValue3));
 
 		public static bool NotNull<T, TValue>(this T arg, Expression<Func<T, TValue>> expression)
 			=> !EqualityComparer<T>.Default.Equals(arg, default(T))

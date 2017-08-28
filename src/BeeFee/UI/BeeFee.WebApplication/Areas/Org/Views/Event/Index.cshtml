@@ -1,5 +1,5 @@
 ﻿@using System.Collections.Generic
-@model System.Collections.Generic.IReadOnlyCollection<BeeFee.OrganizersApp.Projections.EventProjection>
+@model System.Collections.Generic.IReadOnlyCollection<BeeFee.OrganizerApp.Projections.EventProjection>
 
 <h2>My events:</h2>
 
@@ -22,18 +22,16 @@
         @foreach (var eventProjection in Model)
         {
             <tr>
-                <th>@eventProjection.Name</th>
-                @*<th>@eventProjection.Category.Name</th>*@
-                <th>@eventProjection.Type.ToString()</th>
-                <th>@eventProjection.DateTime</th>
-                <th>@eventProjection.Address.City</th>
-                <th>@eventProjection.Address.AddressString</th>
-                <th>@eventProjection.Prices?[0].Price.ToString()</th>
-                <th>
-                    @Html.ActionLink("Edit", "Edit", new {id = eventProjection.Id})
-                    &nbsp;
-                    @Html.ActionLink("Remove", "Remove", new {id = eventProjection.Id, version = eventProjection.Version})
-                </th>
+                <td>@eventProjection.Name</td>
+                <td>@eventProjection.Category.Name</td>
+                <td>@eventProjection.Type.ToString()</td>
+                <td>@eventProjection.DateTime</td>
+                <td>@eventProjection.Address.City</td>
+                <td>@eventProjection.Address.AddressString</td>
+                <td>@eventProjection.Prices?[0].Price.ToString()</td>
+                <td>
+                    
+                </td>
             </tr>
         }
         </tbody>
@@ -47,4 +45,4 @@ else
     </div>
 }
 <br /><br />
-@Html.ActionLink("Add new event", "Add")
+<a asp-action="Add">Add</a>

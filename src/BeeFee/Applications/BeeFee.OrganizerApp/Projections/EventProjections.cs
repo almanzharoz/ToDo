@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Linq;
 using Core.ElasticSearch.Domain;
 using BeeFee.Model;
 using BeeFee.Model.Embed;
+using BeeFee.Model.Helpers;
 using BeeFee.Model.Interfaces;
 using BeeFee.Model.Models;
+using BeeFee.Model.Projections;
 using Nest;
 using Newtonsoft.Json;
+using SharpFuncExt;
 
 namespace BeeFee.OrganizerApp.Projections
 {
@@ -48,19 +52,32 @@ namespace BeeFee.OrganizerApp.Projections
 		}
 	}
 
-	public class NewEvent : BaseNewEntity, IProjection, IWithName, IWithOwner
+	internal class NewEvent : BaseNewEntity, IProjection<Event>, IWithName, IWithOwner
 	{
-		public string Name { get; set; }
+		public string Name { get; }
+
+		public EventDateTime DateTime { get; }
+
+		public EEventType Type { get; }
 
 		[Keyword]
-		[JsonProperty]
-		public BaseUserProjection Owner { get; private set; }
+		public BaseCategoryProjection Category { get; }
+
+		[Keyword]
+		public BaseUserProjection Owner { get; }
 
 		public NewEvent() { }
 
-		public NewEvent(BaseUserProjection owner)
+		private readonly ThrowCollection _throws = new ThrowCollection();
+
+		public NewEvent(BaseUserProjection owner, BaseCategoryProjection category, string name, EEventType type, EventDateTime dateTime)
 		{
-			Owner = owner;
+			Owner = owner.HasNotNullEntity(_throws, nameof(owner));
+			Category = category.HasNotNullEntity(_throws, nameof(category));
+			Name = name.HasNotNullArg(_throws, nameof(name));
+			DateTime = dateTime;
+			Type = type;
+			_throws.Throw();
 		}
 	}
 }

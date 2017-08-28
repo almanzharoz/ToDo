@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using BeeFee.Model.Embed;
 using BeeFee.ClientApp.Services;
+using BeeFee.Model.Projections;
+using BeeFee.Model.Services;
 using BeeFee.WebApplication.Models.Event;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -13,12 +15,11 @@ namespace BeeFee.WebApplication.Controllers
 {
     public class EventController : BaseController<EventService>
     {
+	    public EventController(EventService service, CategoryService categoryService) : base(service, categoryService)
+	    {
+	    }
 
-        public EventController(EventService service) : base(service)
-        {
-        }
-
-        public IActionResult Index()
+		public IActionResult Index()
         {
             return View();
         }
@@ -30,7 +31,7 @@ namespace BeeFee.WebApplication.Controllers
             model.StartDate = new DateTime(nowTime.Year, nowTime.Month, 1);
             model.EndDate = new DateTime(nowTime.Year, nowTime.Month + 1, 1).AddDays(-1);
             model.Cities = _service.GetAllCities().ToList();
-            model.Categories = _service.GetCategories().Select(c => new SelectListItem() { Value = c.Id, Text = c.Name }).ToList();
+            model.Categories = _categoryService.GetAllCategories<CategoryProjection>().Select(c => new SelectListItem() { Value = c.Id, Text = c.Name }).ToList();
             return View(model);
         }
 
@@ -57,5 +58,6 @@ namespace BeeFee.WebApplication.Controllers
             var events = _service.SearchEvents(request.Text, request.City, request.Categories, types, request.StartDate, request.EndDate, request.MaxPrice, request.PageSize, request.PageIndex);
             return Json(new { events = events });
         }
+
     }
 }

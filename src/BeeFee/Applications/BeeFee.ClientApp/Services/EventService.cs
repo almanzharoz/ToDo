@@ -20,10 +20,7 @@ namespace BeeFee.ClientApp.Services
         }
 
 		public EventProjection GetEventByUrl(string url)
-			=> Filter<EventProjection>(f => f.Term(p => p.Url, url.HasNotNullArg("event id"))).SingleOrDefault();
-
-	    public IReadOnlyCollection<CategoryProjection> GetCategories()
-		    => Filter<CategoryProjection>(null, s => s.Ascending(p => p.Name));
+			=> Filter<EventProjection>(f => f.Term(p => p.Url, url.HasNotNullArg("event url"))).SingleOrDefault();
 
 		//public IReadOnlyCollection<EventSearchProjection> SearchByName(string query)
 		//    => Search<Event, EventSearchProjection>(q => q

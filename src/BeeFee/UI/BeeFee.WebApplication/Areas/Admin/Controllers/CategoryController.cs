@@ -10,7 +10,7 @@ namespace BeeFee.WebApplication.Areas.Admin.Controllers
 	[Authorize(Roles = "admin")]
     public class CategoryController : BaseController<CategoryService>
     {
-	    public CategoryController(CategoryService service) : base(service)
+	    public CategoryController(CategoryService service, Model.Services.CategoryService categoryService) : base(service, categoryService)
 	    {
 	    }
 
