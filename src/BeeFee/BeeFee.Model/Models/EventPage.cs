@@ -2,6 +2,7 @@
 using BeeFee.Model.Embed;
 using BeeFee.Model.Models;
 using Nest;
+using Newtonsoft.Json;
 
 namespace BeeFee.Model
 {
@@ -13,23 +14,32 @@ namespace BeeFee.Model
 		/// <summary>
 		/// Внутренний HTML страницы мероприятия
 		/// </summary>
-		public string Html { get; set; }
+		[JsonProperty]
+		public string Html { get; private set; }
 		/// <summary>
 		/// Заголовок title страницы
 		/// </summary>
-		public string Title { get; set; }
-		public string Caption { get; set; }
-		public string Cover { get; set; }
+		[JsonProperty]
+		public string Title { get; private set; }
+		[JsonProperty]
+		public string Caption { get; private set; }
+		[JsonProperty]
+		public string Cover { get; private set; }
 		/// <summary>
 		/// Галерея
 		/// </summary>
+		[JsonProperty]
 		[Keyword(Index = false)]
-		public string[] Images { get; set; }
+		public string[] Images { get; private set; }
 
-		public Address Address { get; set; }
-		public string Date { get; set; }
-		public string Category { get; set; }
-		public string Company { get; set; }
+		[JsonProperty]
+		public Address Address { get; private set; }
+		[JsonProperty]
+		public string Date { get; private set; }
+		[JsonProperty]
+		public string Category { get; private set; }
+		[JsonProperty]
+		public string Company { get; private set; }
 
 		public EventPage SetHtml(string html)
 		{

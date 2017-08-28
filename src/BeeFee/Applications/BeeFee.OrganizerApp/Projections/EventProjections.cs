@@ -38,10 +38,11 @@ namespace BeeFee.OrganizerApp.Projections
 		[JsonProperty]
 		public BaseUserProjection Owner { get; private set; }
 
-		internal EventProjection Change(string name, EventDateTime dateTime, Address address, EEventType type,
+		internal EventProjection Change(string name, string url, EventDateTime dateTime, Address address, EEventType type,
 			BaseCategoryProjection category, TicketPrice[] prices, string html)
 		{
 			Name = name;
+			Url = url.IfNull(name, CommonHelper.UriTranslit);
 			DateTime = dateTime;
 			Address = address;
 			Type = type;
@@ -55,6 +56,7 @@ namespace BeeFee.OrganizerApp.Projections
 	internal class NewEvent : BaseNewEntity, IProjection<Event>, IWithName, IWithOwner
 	{
 		public string Name { get; }
+		public string Url { get; }
 
 		public EventDateTime DateTime { get; }
 
@@ -74,11 +76,12 @@ namespace BeeFee.OrganizerApp.Projections
 
 		private readonly ThrowCollection _throws = new ThrowCollection();
 
-		public NewEvent(BaseUserProjection owner, BaseCategoryProjection category, string name, EEventType type, EventDateTime dateTime, Address address, string html)
+		public NewEvent(BaseUserProjection owner, BaseCategoryProjection category, string name, string url, EEventType type, EventDateTime dateTime, Address address, string html)
 		{
 			Owner = owner.HasNotNullEntity(_throws, nameof(owner));
 			Category = category.HasNotNullEntity(_throws, nameof(category));
 			Name = name.HasNotNullArg(_throws, nameof(name));
+			Url = url.IfNull(name, CommonHelper.UriTranslit);
 			DateTime = dateTime;
 			Type = type;
 			Address = address;

@@ -1,10 +1,14 @@
 ﻿
+using Newtonsoft.Json;
+
 namespace BeeFee.Model.Embed
 {
     public struct Address
     {
-        public string City { get; }
-        public string AddressString { get; }
+		[JsonProperty]
+        public string City { get; private set; }
+		[JsonProperty]
+        public string AddressString { get; private set; }
         //public GeoCoordinate Coordinates { get; set; }
 
 	    public Address(string city, string address)

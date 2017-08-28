@@ -41,42 +41,51 @@ namespace BeeFee.WebApplication.Areas.Org.Controllers
 			    _service.AddEvent(
 				    model.CategoryId,
 				    model.Name,
+					model.Url,
 				    model.Type,
 				    new EventDateTime(model.StartDateTime, model.FinishDateTime),
 				    new Address(model.City, model.Address),
-				    new[] {new TicketPrice {Price = new Price(model.Price)}},
+				    //new[] {new TicketPrice {Price = new Price(model.Price)}},
+					null,
 				    model.Html);
 			    return RedirectToAction("Index");
 		    }
 		    return View(model.Init(_categoryService.GetAllCategories<CategoryProjection>()));
 	    }
 
-	    //[HttpGet]
-	    //public IActionResult Edit(string id)
-	    //{
-		   // return View(new EventEditModel(_service.GetEvent(id)));
-	    //}
+		[HttpGet]
+		public IActionResult Edit(string id)
+		{
+			var @event = _service.GetEvent(id);
+			if (@event == null)
+				return NotFound();
+			return View(new EventEditModel(@event, _categoryService.GetAllCategories<CategoryProjection>()));
+		}
 
-	    //[HttpPost]
-	    //public IActionResult Edit(AddEventEditModel addEventEditModel)
-	    //{
-		   // if (ModelState.IsValid)
-		   // {
-			  //  _service.UpdateEvent(
-				 //   addEventEditModel.Id,
-				 //   addEventEditModel.Name,
-				 //   new EventDateTime {Start = addEventEditModel.StartDateTime, Finish = addEventEditModel.FinishDateTime},
-				 //   new Address {City = addEventEditModel.City, AddressString = addEventEditModel.Address},
-				 //   addEventEditModel.Type,
-				 //   null, //TODO: работа с категориями
-				 //   new[] {new TicketPrice() {Price = new Price(addEventEditModel.Price)}},
-				 //   addEventEditModel.Html, addEventEditModel.Version);
-			  //  return RedirectToAction("Index");
-		   // }
-		   // return View(addEventEditModel);
-	    //}
+		[HttpPost]
+		public IActionResult Edit(EventEditModel model)
+		{
+			if (ModelState.IsValid)
+			{
+				_service.UpdateEvent(
+				 model.Id,
+				 model.Version,
+				 model.Name,
+				 model.Url,
+				 new EventDateTime(model.StartDateTime, model.FinishDateTime),
+				 new Address(model.City, model.Address),
+				 model.Type,
+				 model.CategoryId,
+				 //new[] { new TicketPrice() { Price = new Price(model.Price) } },
+				 null,
+				 model.Html);
+				return RedirectToAction("Index");
+			}
+			model.Init(_categoryService.GetAllCategories<CategoryProjection>());
+			return View(model);
+		}
 
-	    public IActionResult Remove(string id, int version)
+		public IActionResult Remove(string id, int version)
 	    {
 			_service.RemoveEvent(id, version);
 		    return RedirectToAction("Index");

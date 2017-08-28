@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using BeeFee.Model.Embed;
-using BeeFee.Model.Models;
 using BeeFee.Model.Projections;
 using BeeFee.OrganizerApp.Projections;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BeeFee.WebApplication.Areas.Org.Models
 {
-	public class AddEventEditModel
+	public class EventEditModel
 	{
+		public string Id { get; set; }
+		public int Version { get; set; }
+
 		[Required(ErrorMessage = "Name is required")]
 		public string Name { get; set; }
 
@@ -44,14 +46,27 @@ namespace BeeFee.WebApplication.Areas.Org.Models
 
 		public IList<SelectListItem> Categories { get; private set; }
 
-		public AddEventEditModel() { } // For binder
+		public EventEditModel() { } // For binder
 
-		public AddEventEditModel(IReadOnlyCollection<CategoryProjection> categories)
-			=> Init(categories);
-
-		public AddEventEditModel Init(IReadOnlyCollection<CategoryProjection> categories)
+		public EventEditModel(EventProjection @event, IReadOnlyCollection<CategoryProjection> categories)
 		{
-			Categories = categories.Select(x => new SelectListItem(){Text = x.Name, Value = x.Id}).ToList();
+			Init(categories);
+			Id = @event.Id;
+			Version = @event.Version;
+			Name = @event.Name;
+			Url = @event.Url;
+			Type = @event.Type;
+			CategoryId = @event.Category.Id;
+			StartDateTime = @event.DateTime.Start;
+			FinishDateTime = @event.DateTime.Finish;
+			City = @event.Address.City;
+			Address = @event.Address.AddressString;
+			Html= @event.Page.Html;
+		}
+
+		public EventEditModel Init(IReadOnlyCollection<CategoryProjection> categories)
+		{
+			Categories = categories.Select(x => new SelectListItem() { Text = x.Name, Value = x.Id }).ToList();
 			return this;
 		}
 	}

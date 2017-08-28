@@ -33,12 +33,12 @@
 			if (events.length > 0) {
 				$.each(events,
 					function (i, item) {
-						$("#listContainer tbody").append("<tr><td><a target='_blank' href='/event/event/" + item.id + "'>" +
-							item.title +
+						$("#listContainer tbody").append("<tr><td><a target='_blank' href='/event/event/" + item.url + "'>" +
+							item.page.caption +
 							"</a></td><td>" +
-							item.dateTimeString +
+							item.page.date+
 							"</td><td>" +
-							item.imageUrl +
+							item.page.cover+
 							"</td></tr>");
 					});
 			} else

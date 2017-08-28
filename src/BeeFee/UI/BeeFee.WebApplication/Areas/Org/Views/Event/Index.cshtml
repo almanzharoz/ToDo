@@ -1,4 +1,5 @@
 ﻿@using System.Collections.Generic
+@using System.Linq
 @model System.Collections.Generic.IReadOnlyCollection<BeeFee.OrganizerApp.Projections.EventProjection>
 
 <h2>My events:</h2>
@@ -9,7 +10,7 @@
         <thead>
         <tr>
             <th>Name</th>
-            @*<th>Category</th>*@
+            <th>Category</th>
             <th>Type</th>
             <th>Dates</th>
             <th>City</th>
@@ -19,18 +20,19 @@
         </tr>
         </thead>
         <tbody>
-        @foreach (var eventProjection in Model)
+        @foreach (var e in Model)
         {
             <tr>
-                <td>@eventProjection.Name</td>
-                <td>@eventProjection.Category.Name</td>
-                <td>@eventProjection.Type.ToString()</td>
-                <td>@eventProjection.DateTime</td>
-                <td>@eventProjection.Address.City</td>
-                <td>@eventProjection.Address.AddressString</td>
-                <td>@eventProjection.Prices?[0].Price.ToString()</td>
+                <td>@e.Name</td>
+                <td>@e.Category.Name</td>
+                <td>@e.Type.ToString()</td>
+                <td>@e.DateTime</td>
+                <td>@e.Address.City</td>
+                <td>@e.Address.AddressString</td>
+                <td>@(e.Prices?.FirstOrDefault().Price.ToString())</td>
                 <td>
-                    
+					<a asp-action="Edit" asp-route-id="@e.Id">Edit</a>
+	                <a asp-action="Remove" asp-route-id="@e.Id" asp-route-version="@e.Version">Remove</a>
                 </td>
             </tr>
         }
