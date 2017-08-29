@@ -4,8 +4,10 @@ using BeeFee.AdminApp.Projections;
 using BeeFee.Model;
 using BeeFee.Model.Helpers;
 using BeeFee.Model.Models;
+using BeeFee.Model.Projections;
 using Microsoft.Extensions.Logging;
 using SharpFuncExt;
+using CategoryProjection = BeeFee.AdminApp.Projections.CategoryProjection;
 
 namespace BeeFee.AdminApp.Services
 {

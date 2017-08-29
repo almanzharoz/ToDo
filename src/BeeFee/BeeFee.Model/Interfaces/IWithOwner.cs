@@ -1,4 +1,4 @@
-﻿using BeeFee.Model.Models;
+﻿using BeeFee.Model.Projections;
 
 namespace BeeFee.Model.Interfaces
 {

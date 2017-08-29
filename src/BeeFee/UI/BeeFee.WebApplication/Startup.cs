@@ -8,6 +8,7 @@ using BeeFee.ClientApp;
 using BeeFee.LoginApp;
 using BeeFee.Model;
 using BeeFee.Model.Models;
+using BeeFee.Model.Projections;
 using BeeFee.OrganizerApp;
 using BeeFee.WebApplication.Infrastructure.Binders;
 using Microsoft.AspNetCore.Builder;

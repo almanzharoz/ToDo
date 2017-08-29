@@ -6,6 +6,7 @@ using BeeFee.Model.Embed;
 using BeeFee.Model.Exceptions;
 using BeeFee.Model.Helpers;
 using BeeFee.Model.Models;
+using BeeFee.Model.Projections;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Nest;

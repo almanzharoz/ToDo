@@ -4,10 +4,9 @@ using Core.ElasticSearch;
 using BeeFee.LoginApp.Projections;
 using BeeFee.Model;
 using BeeFee.Model.Embed;
-using BeeFee.Model.Exceptions;
 using BeeFee.Model.Helpers;
 using BeeFee.Model.Models;
-using Microsoft.AspNetCore.WebUtilities;
+using BeeFee.Model.Projections;
 using Microsoft.Extensions.Logging;
 using SharpFuncExt;
 

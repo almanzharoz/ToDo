@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace BeeFee.Model.Embed
 {
     public struct TicketPrice

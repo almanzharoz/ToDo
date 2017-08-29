@@ -25,7 +25,6 @@ namespace BeeFee.Model
 			    // маппинг
 			    .AddMapping<User>(x => x.UserIndexName)
 			    .AddMapping<Event>(x => x.EventIndexName)
-			    .AddMapping<OwnerEvent>(x => x.EventIndexName)
 			    .AddMapping<Category>(x => x.EventIndexName)
 			    // внутренние документы
 			    .AddStruct<Price>()

@@ -6,6 +6,7 @@ using BeeFee.ClientApp.Projections;
 using BeeFee.Model;
 using BeeFee.Model.Embed;
 using BeeFee.Model.Models;
+using BeeFee.Model.Projections;
 using Microsoft.Extensions.Logging;
 using Nest;
 using SharpFuncExt;

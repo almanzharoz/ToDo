@@ -4,6 +4,7 @@ using Core.ElasticSearch.Mapping;
 using BeeFee.Model;
 using BeeFee.Model.Embed;
 using BeeFee.Model.Models;
+using BeeFee.Model.Projections;
 using BeeFee.TestsApp.Projections;
 using BeeFee.TestsApp.Services;
 using Microsoft.Extensions.DependencyInjection;

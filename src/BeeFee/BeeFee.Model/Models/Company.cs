@@ -1,5 +1,6 @@
 ﻿using Core.ElasticSearch.Domain;
 using BeeFee.Model.Embed;
+using BeeFee.Model.Projections;
 
 namespace BeeFee.Model.Models
 {

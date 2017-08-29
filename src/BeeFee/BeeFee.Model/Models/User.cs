@@ -20,27 +20,4 @@ namespace BeeFee.Model.Models
         [Keyword]
         public EUserRole[] Roles { get; set; }
     }
-
-	public class BaseUserProjection : BaseEntity, IProjection<User>, IGetProjection, IWithName
-	{
-		[JsonProperty]
-		public string Name { get; private set; }
-		[JsonProperty]
-		public EUserRole[] Roles { get; private set; }
-	}
-
-	public class UserName
-	{
-		public string Id { get; }
-
-		public UserName(string id)
-		{
-			Id = id;
-		}
-
-		public UserName(BaseUserProjection user)
-		{
-			Id = user.Id;
-		}
-	}
 }

@@ -3,6 +3,7 @@ using Core.ElasticSearch.Domain;
 using BeeFee.Model;
 using BeeFee.Model.Interfaces;
 using BeeFee.Model.Models;
+using BeeFee.Model.Projections;
 using Microsoft.Extensions.Logging;
 using Nest;
 using SharpFuncExt;

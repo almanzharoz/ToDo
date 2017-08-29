@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using BeeFee.Model.Models;
+using BeeFee.Model.Projections;
 using Core.ElasticSearch;
 using Core.ElasticSearch.Domain;
 using Microsoft.Extensions.Logging;
