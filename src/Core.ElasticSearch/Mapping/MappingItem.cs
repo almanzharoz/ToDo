@@ -24,7 +24,7 @@ namespace Core.ElasticSearch.Mapping
 		private readonly IEnumerable<string> _fields;
 		public MappingItem(TSettings settings, Func<TSettings, string> indexName)
 		{
-			_fields = typeof(T).GetFields();
+			_fields = typeof(T).GetFieldsNames();
 			TypeName = typeof(T).GetTypeInfo().GetCustomAttribute<ElasticsearchTypeAttribute>()?.Name ?? typeof(T).Name.ToLower();
 			IndexName = indexName(settings);
 		}

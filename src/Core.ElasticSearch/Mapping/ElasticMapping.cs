@@ -18,22 +18,22 @@ namespace Core.ElasticSearch.Mapping
 	{
 		IElasticMapping<TSettings> AddMapping<T>(Func<TSettings, string> indexName) where T : class, IModel;
 
-		IElasticMapping<TSettings> AddStruct<T>() where T : struct;
-
 		string GetIndexName<T>() where T : IEntity;
 		string GetTypeName<T>() where T : IEntity;
 	}
 
 	public interface IElasticProjections<TSettings> where TSettings : BaseElasticConnection
 	{
-		IElasticMapping<TSettings> AddProjection<T, TMapping>()
+		IElasticProjections<TSettings> AddProjection<T, TMapping>()
 			where T : class, IProjection, IProjection<TMapping>, new()
 			where TMapping : class, IModel;
 
-		IElasticMapping<TSettings> AddProjection<T, TMapping, TParent>()
+		IElasticProjections<TSettings> AddProjection<T, TMapping, TParent>()
 			where T : class, IProjection, IProjection<TMapping>, IWithParent<TParent>, new()
 			where TMapping : class, IModel, IWithParent<TParent>
 			where TParent : class, IProjection, new();
+
+		IElasticProjections<TSettings> AddStruct<T>() where T : struct;
 	}
 
 	internal class ElasticMapping<TSettings> : IElasticMapping<TSettings> where TSettings : BaseElasticConnection
@@ -76,7 +76,7 @@ namespace Core.ElasticSearch.Mapping
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
-		public IElasticMapping<TSettings> AddStruct<T>() where T : struct
+		public IElasticProjections<TSettings> AddStruct<T>() where T : struct
 		{
 			_converters.TryAdd(typeof(T), new ObjectJsonConverter<T>());
 			return this;
@@ -88,7 +88,7 @@ namespace Core.ElasticSearch.Mapping
 		/// <typeparam name="T"></typeparam>
 		/// <typeparam name="TMapping"></typeparam>
 		/// <returns></returns>
-		public IElasticMapping<TSettings> AddProjection<T, TMapping>()
+		public IElasticProjections<TSettings> AddProjection<T, TMapping>()
 			where T : class, IProjection, IProjection<TMapping>, new()
 			where TMapping : class, IModel
 		{
@@ -116,7 +116,7 @@ namespace Core.ElasticSearch.Mapping
 		/// <typeparam name="TMapping"></typeparam>
 		/// <typeparam name="TParent"></typeparam>
 		/// <returns></returns>
-		public IElasticMapping<TSettings> AddProjection<T, TMapping, TParent>()
+		public IElasticProjections<TSettings> AddProjection<T, TMapping, TParent>()
 			where T : class, IProjection, IProjection<TMapping>, IWithParent<TParent>, new()
 			where TMapping : class, IModel, IWithParent<TParent>
 			where TParent : class, IProjection, new()
