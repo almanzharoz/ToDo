@@ -22,7 +22,6 @@ namespace BeeFee.ClientApp
                 .AddProjection<EventProjection, Event>()
                 .AddProjection<EventCellProjection, Event>()
                 .AddProjection<EventAddressProjections, Event>()
-                .AddProjection<EventPageProjection, Event>()
 				
 				.AddProjection<CategoryProjection, Category>();
 

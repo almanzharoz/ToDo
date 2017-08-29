@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using BeeFee.Model.Embed;
 using BeeFee.ClientApp.Services;
 using BeeFee.Model.Projections;
@@ -9,7 +8,6 @@ using BeeFee.Model.Services;
 using BeeFee.WebApplication.Models.Event;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using SharpFuncExt;
 
 namespace BeeFee.WebApplication.Controllers
 {
@@ -38,8 +36,8 @@ namespace BeeFee.WebApplication.Controllers
         public IActionResult Event(string id)
         {
 	        var model = _service.GetEventByUrl(id);
-				//.IfNotNullOrDefault(m => new EventPageModel() { Caption = m.Name, Date = m.DateTime.ToString(), Html = m.Page.Html, Title = m.Page.Title });
-				// здесь не нужна ViewMode, т.к. EventPage итак выполняет эту роль
+			//.IfNotNullOrDefault(m => new EventPageModel() { Caption = m.Name, Date = m.DateTime.ToString(), Html = m.Page.Html, Title = m.Page.Title });
+			// здесь не нужна ViewMode, т.к. EventPage итак выполняет эту роль
             if (model == null)
                 return NotFound();
             return View(model);

@@ -41,10 +41,14 @@ namespace BeeFee.ClientApp.Projections
 
 	public struct EventPageCell
 	{
-		public string Caption { get; set; }
-		public string Cover { get; set; }
+		[JsonProperty]
+		public string Caption { get; private set; }
+		[JsonProperty]
+		public string Cover { get; private set; }
 
-		public string Date { get; set; }
-		public string Category { get; set; }
+		[JsonProperty]
+		public string Date { get; private set; }
+		[JsonProperty]
+		public string Category { get; private set; }
 	}
 }

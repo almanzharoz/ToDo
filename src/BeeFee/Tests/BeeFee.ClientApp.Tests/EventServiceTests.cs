@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using BeeFee.ClientApp.Services;
 using BeeFee.Model.Embed;
@@ -29,9 +30,9 @@ namespace BeeFee.ClientApp.Tests
 
             Assert.IsNotNull(eventId);
 
-            var @event = Service.GetEventByUrl("event-1");
+			var @event = Service.GetEventByUrl("event-1");
 
-            Assert.AreEqual(@event.Name, "Event 1");
+			Assert.AreEqual(@event.Name, "Event 1");
             Assert.AreEqual(@event.Category.Name, "Category 1");
         }
 

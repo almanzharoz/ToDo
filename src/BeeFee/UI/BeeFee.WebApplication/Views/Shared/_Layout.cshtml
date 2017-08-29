@@ -15,6 +15,7 @@
               asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
               asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+		<link rel="stylesheet" href="~/lib/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" />
     </environment>
 </head>
 <body>
@@ -33,7 +34,15 @@
                 <ul class="nav navbar-nav">
                     <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+	                <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+					@if (User.IsInRole("admin"))
+					{
+						<li><a asp-area="Admin" asp-controller="Category" asp-action="Index">Categories</a></li>
+					}
+	                @if (User.IsInRole("organizer"))
+	                {
+		                <li><a asp-area="Org" asp-controller="Event" asp-action="Index">My Events</a></li>
+	                }
                 </ul>
             </div>
         </div>
@@ -67,6 +76,8 @@
                 crossorigin="anonymous"
                 integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
         </script>
+	    <script src="~/lib/moment/min/moment.min.js"></script>
+	    <script src="~/lib/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
         <script src="~/js/site.min.js" asp-append-version="true"></script>
     </environment>
 

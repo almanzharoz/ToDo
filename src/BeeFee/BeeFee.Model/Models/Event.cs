@@ -21,9 +21,10 @@ namespace BeeFee.Model.Models
 		public User Owner { get; set; }
 		public EventDateTime DateTime { get; set; }
 		public Address Address { get; set; }
+		[Keyword]
 		public EEventType Type { get; set; }
 		public TicketPrice[] Prices { get; set; }
-		[Nested]
+
 		public EventPage Page { get; set; }
 	}
 }

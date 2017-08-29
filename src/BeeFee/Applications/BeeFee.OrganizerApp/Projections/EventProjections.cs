@@ -48,7 +48,7 @@ namespace BeeFee.OrganizerApp.Projections
 			Type = type;
 			Category = category;
 			Prices = prices;
-			Page = Page.SetHtml(html);
+			Page = Page.SetHtml(html).Change(name, category.Name, null, dateTime, address);
 			return this;
 		}
 	}

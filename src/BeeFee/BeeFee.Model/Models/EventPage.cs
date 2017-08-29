@@ -20,10 +20,12 @@ namespace BeeFee.Model
 		/// Заголовок title страницы
 		/// </summary>
 		[JsonProperty]
+		[Keyword(Index = false)]
 		public string Title { get; private set; }
 		[JsonProperty]
 		public string Caption { get; private set; }
 		[JsonProperty]
+		[Keyword(Index = false)]
 		public string Cover { get; private set; }
 		/// <summary>
 		/// Галерея
@@ -35,10 +37,13 @@ namespace BeeFee.Model
 		[JsonProperty]
 		public Address Address { get; private set; }
 		[JsonProperty]
+		[Keyword(Index = false)]
 		public string Date { get; private set; }
 		[JsonProperty]
+		[Keyword(Index = false)]
 		public string Category { get; private set; }
 		[JsonProperty]
+		[Keyword(Index = false)]
 		public string Company { get; private set; }
 
 		public EventPage SetHtml(string html)
@@ -59,6 +64,17 @@ namespace BeeFee.Model
 
 			Company = null;
 			Images = null;
+		}
+
+		public EventPage Change(string caption, string category, string cover, EventDateTime date, Address address)
+		{
+			Title = caption;
+			Caption = caption;
+			Category = category;
+			Cover = cover;
+			Address = address;
+			Date = date.ToString();
+			return this;
 		}
 	}
 }
