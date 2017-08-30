@@ -14,7 +14,10 @@ namespace Core.ElasticSearch
 	{
 		private readonly IServiceProvider _service;
 
-		internal ElasticClient<TConnection> Client { get; }
+		internal ElasticClient<TConnection> Client => _client;
+		
+		internal static ElasticClient<TConnection> _client;
+		internal static object _clientLocker = new object();
 		internal RequestContainer<TConnection> Container { get; }
 		internal ElasticMapping<TConnection> Mapping { get; }
 
@@ -23,7 +26,9 @@ namespace Core.ElasticSearch
 			_service = service;
 			Mapping = service.GetService<ElasticMapping<TConnection>>();
 			Container = new RequestContainer<TConnection>(Mapping);
-			Client = new ElasticClient<TConnection>(settings, Mapping, Container);
+			lock (_clientLocker)
+				if (_client == null)
+					_client = new ElasticClient<TConnection>(settings, Mapping, Container);
 		}
 
 		public T GetInternalService<T>() where T : BaseService<TConnection>

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using BeeFee.Model.Embed;
 using BeeFee.ClientApp.Services;
@@ -53,8 +54,11 @@ namespace BeeFee.WebApplication.Controllers
                 types.Add(EEventType.Excursion);
             if (request.LoadExhibition)
                 types.Add(EEventType.Exhibition);
+			var sw = new Stopwatch();
+			sw.Start();
             var events = _service.SearchEvents(request.Text, request.City, request.Categories, types, request.StartDate, request.EndDate, request.MaxPrice, request.PageSize, request.PageIndex);
-            return Json(new { events = events });
+			sw.Stop();
+            return Json(new { events = events, sw.ElapsedMilliseconds });
         }
 
     }
