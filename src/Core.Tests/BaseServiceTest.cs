@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using Core.ElasticQueryBuilder.Commands;
@@ -13,6 +15,7 @@ using Core.Tests.Projections;
 using Elasticsearch.Net;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Nest;
+using Newtonsoft.Json;
 using SharpFuncExt;
 
 namespace Core.Tests
@@ -792,5 +795,74 @@ namespace Core.Tests
 			Console.WriteLine(sw.ElapsedTicks);
 			Console.WriteLine(ElasticQueryBuilder.QueryFactory.Count);
 		}
+
+		[TestMethod]
+		public void TestDeseriaize()
+		{
+			var sw = new Stopwatch();
+			sw.Start();
+			for (var i = 0; i < 1000000; i++)
+			{
+				var n = new DeserializeProjection("sdgkhdsg", 23);
+			}
+			sw.Stop();
+			Debug.WriteLine(sw.ElapsedMilliseconds);
+
+			var type = typeof(DeserializeProjection);
+			var constructor = type.GetConstructors().First();
+			var j = 0;
+			var parameters = new[] { Expression.Parameter(typeof(string), "name"), Expression.Parameter(typeof(int), "value") };
+			var parameters2 = constructor.GetParameters().Select(x => Expression.Parameter(x.ParameterType, x.Name.ToLower())).ToArray();
+			var newexp = Expression.New(constructor, parameters2.Take(2).ToArray());
+
+			var c = Expression.Lambda<Func<string, int, DeserializeProjection>>(newexp, parameters2).Compile();
+			sw.Restart();
+			for (var i = 0; i < 1000000; i++)
+			{
+				//var n = c.DynamicInvoke("sdgdshsdh", 34);
+				var n = c("sdgdshsdh", 34);
+			}
+			sw.Stop();
+			Debug.WriteLine(sw.ElapsedMilliseconds);
+
+			var s = "{'name':'dfgkfjdh', 'value': 12}";
+			sw.Restart();
+			for (var i = 0; i < 1000000; i++)
+			{
+				using (var reader = new StringReader(s))
+				using (var jsonreader = new JsonTextReader(reader))
+				{
+					string name = null;
+					int value = 0;
+					while (jsonreader.Read())
+					{
+						if (jsonreader.TokenType == JsonToken.PropertyName && jsonreader.Value == "name")
+							name = jsonreader.ReadAsString();
+						if (jsonreader.TokenType == JsonToken.PropertyName && jsonreader.Value == "value")
+							value = jsonreader.ReadAsInt32().Value;
+					}
+					var n = c(name, value);
+				}
+			}
+			sw.Stop();
+			Debug.WriteLine(sw.ElapsedMilliseconds);
+
+			sw.Restart();
+			for (var i = 0; i < 1000000; i++)
+			{
+				var n = JsonConvert.DeserializeObject<DeserializeProjection>(s);
+			}
+			sw.Stop();
+			Debug.WriteLine(sw.ElapsedMilliseconds);
+		}
+
+		//[TestMethod]
+		//public void ESPerfomance()
+		//{
+		//	for (var i = 0; i < 1000000; i++)
+		//	{
+		//		_repository.Insert(new CategoryProjection() { CreatedOnUtc = DateTime.Now, Name = Guid.NewGuid().ToString() }, false);
+		//	}
+		//}
 	}
 }
