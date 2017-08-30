@@ -35,8 +35,8 @@ namespace BeeFee.WebApplication
 
 			services.AddLogging();
 
-			services.AddSession();
 			services.AddDistributedMemoryCache();
+			services.AddSession();
 
 			services.AddAuthentication("MyCookieAuthenticationScheme")
 				.AddCookie("MyCookieAuthenticationScheme", options =>
@@ -50,11 +50,12 @@ namespace BeeFee.WebApplication
 			//	//options.AddPolicy("ip-policy", policy => policy.Requirements.Add(new UserHostRequirement()));
 			//	//options.AddPolicy("resource-allow-policy", x => { x.AddRequirements(new PermissionRequirement(new[] { Operations.Read })); });
 			//});
-
+			services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
 			services.AddScoped<UserName>(x =>
 			{
 				var user = x.GetService<IHttpContextAccessor>()?.HttpContext?.User;
-				if (user != null && user.Identity != null && !String.IsNullOrWhiteSpace(user.FindFirst(ClaimTypes.NameIdentifier)?.Value))
+				Console.WriteLine("User: "+user?.Identity?.Name+" - "+(x.GetService<IHttpContextAccessor>() != null).ToString());
+				if (user?.Identity != null && !String.IsNullOrWhiteSpace(user.FindFirst(ClaimTypes.NameIdentifier)?.Value))
 					return new UserName(user.FindFirst(ClaimTypes.NameIdentifier).Value);
 				return null;
 			});

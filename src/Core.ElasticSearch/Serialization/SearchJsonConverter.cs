@@ -59,7 +59,7 @@ namespace Core.ElasticSearch.Serialization
             using (var r = jsonObject.CreateReader())
                 serializer.Populate(r, target);
             sw.Stop();
-            Debug.WriteLine("Deserialize: " + sw.ElapsedMilliseconds);
+            Console.WriteLine($"Deserialize<{objectType.Name}>: " + sw.ElapsedMilliseconds);
             return target;
         }
 

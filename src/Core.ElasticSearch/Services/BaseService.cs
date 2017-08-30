@@ -98,7 +98,7 @@ namespace Core.ElasticSearch
             try
             {
                 var sw = new Stopwatch();
-                return result(_client.Stopwatch(sw, x => func(_client)).Fluent(x => Debug.WriteLine("Try: " + sw.ElapsedMilliseconds))
+                return result(_client.Stopwatch(sw, x => func(_client)).Fluent(x => Console.WriteLine("Try: " + sw.ElapsedMilliseconds))
                     .LogDebug(_logger, operationText ?? eventId.Name)
                     .LogError(_logger, operationText ?? eventId.Name));
             }
