@@ -91,6 +91,25 @@ namespace Core.ElasticSearch
 						r => r.Documents.If(load, Load),
 						RepositoryLoggingEvents.ES_SEARCH));
 
+		protected Task<IReadOnlyCollection<T>> FilterAsync<T>(
+			Func<QueryContainerDescriptor<T>, QueryContainer> query,
+			Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, int page = 0, int take = 0, bool load = true)
+			where T : class, IProjection, ISearchProjection
+			=> _mapping.GetProjectionItem<T>()
+				.Convert(
+					projection => TryAsync(
+						c => c.SearchAsync<T>(
+							x => x
+								.Index(projection.MappingItem.IndexName)
+								.Type(projection.MappingItem.TypeName)
+								.Source(s => s.Includes(f => f.Fields(projection.Fields)))
+								.Query(q => q.Bool(b => b.Filter(query)))
+								.IfNotNull(sort, y => y.Sort(sort))
+								.Is<SearchDescriptor<T>, T, IWithVersion>(y => y.Version())
+								.IfNotNull(take, y => y.Take(take).Skip(page * take))),
+						r => r.Documents.If(load, Load),
+						RepositoryLoggingEvents.ES_SEARCH));
+
 		protected IReadOnlyCollection<T> Search<T>(
 			Func<QueryContainerDescriptor<T>, QueryContainer> query,
 			Func<SortDescriptor<T>, IPromise<IList<ISort>>> sort = null, int page = 0, int take = 0, bool load = true)

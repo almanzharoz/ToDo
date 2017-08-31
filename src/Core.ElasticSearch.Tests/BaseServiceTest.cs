@@ -1,6 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Reflection;
+using System.Threading.Tasks;
 using Core.ElasticSearch;
 using Core.ElasticSearch.Domain;
 using Core.ElasticSearch.Exceptions;
@@ -704,5 +708,41 @@ namespace Core.ElasticSearch.Tests
 
 		//	var result = _repository.FilterNested<Product, FullNameNested>(q => q.Bool(b => b.Filter(f => f.Term(t => t.Field(p => p.Name).Value("Product1")))), p=>p.FullName);
 	 //   }
+
+
+	    private async Task<long> Load(string url)
+	    {
+		    var request = WebRequest.CreateHttp(url);
+			var sw = new Stopwatch();
+		    sw.Start();
+		    using (var response = await request.GetResponseAsync())
+		    {
+			    sw.Stop();
+			    return sw.ElapsedMilliseconds;
+		    }
+	    }
+
+	    [TestMethod]
+	    public void PerfTest()
+	    {
+			var sw = new Stopwatch();
+		    Load("http://localhost:5000/event/event/sobytie-1").Wait();
+			sw.Start();
+		    var tasks = new List<Task<long>>();
+		    for (var i = 0; i < 10; i++)
+		    {
+			    var t = Load("http://localhost:5000/event/event/sobytie-1");
+			    //t.Wait();
+				tasks.Add(t);
+			    tasks.Add(Load("http://localhost:5000/event/event/sobytie-2"));
+		    }
+		    Task.WaitAll(tasks.ToArray());
+			sw.Stop();
+
+
+			Console.WriteLine(sw.ElapsedMilliseconds);
+			foreach(var t in tasks)
+				Console.WriteLine(t.Result);
+	    }
 	}
 }

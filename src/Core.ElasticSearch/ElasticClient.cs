@@ -2,6 +2,7 @@
 using Core.ElasticSearch.Serialization;
 using Elasticsearch.Net;
 using Nest;
+using Newtonsoft.Json.Serialization;
 
 namespace Core.ElasticSearch
 {
@@ -13,7 +14,8 @@ namespace Core.ElasticSearch
 		public ElasticClient(TSettings settings, ElasticMapping<TSettings> mapping, RequestContainer<TSettings> container)
 		{
 			var connectionPool = new StaticConnectionPool(new[] { settings.Url });
-			var connectionSettings = new ConnectionSettings(connectionPool, new HttpConnection(), new SerializerFactory(values => new ElasticSerializer<TSettings>(values, mapping, container)));
+			var connectionSettings = new ConnectionSettings(connectionPool, new HttpConnection(), 
+				new SerializerFactory(values => new ElasticSerializer<TSettings>(values, mapping, container)));
 
 			connectionSettings.DefaultFieldNameInferrer(x => x.ToLower());
 			connectionSettings.DisablePing();

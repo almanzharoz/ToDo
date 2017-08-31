@@ -21,13 +21,17 @@ namespace Core.ElasticSearch.Serialization
 
 		public ElasticSerializer(IConnectionSettingsValues settings, ElasticMapping<TSettings> mapping,
 			RequestContainer<TSettings> container) : base(settings
-				//,(serializerSettings, values) =>
-				//serializerSettings.ContractResolver = new SisoJsonDefaultContractResolver(settings, new List<Func<Type, JsonConverter>>())
+				//, (serializerSettings, values) =>
+				// serializerSettings.ContractResolver = new CoreElasticContractResolver(settings, null)
 			)
 		{
 			_mapping = mapping;
 			_container = container;
 			ContractConverters.Add(GetJsonConverter);
+			//var t = typeof(Nest.JsonNetSerializer);
+			//var p = t.GetFields(BindingFlags.Instance | BindingFlags.NonPublic)[3];
+			//var p = t.GetProperty("ContractResolver", BindingFlags.CreateInstance | BindingFlags.NonPublic);
+			//p.SetValue(this, new CoreElasticContractResolver(settings, null));
 		}
 
 		private JsonConverter GetJsonConverter(Type x)
