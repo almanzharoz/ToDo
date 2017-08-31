@@ -3,7 +3,7 @@ using Core.ElasticSearch;
 using Core.ElasticSearch.Mapping;
 using BeeFee.Model;
 using BeeFee.Model.Models;
-using BeeFee.OrganizerApp.Projections;
+using BeeFee.OrganizerApp.Projections.Event;
 using BeeFee.OrganizerApp.Services;
 
 namespace BeeFee.OrganizerApp

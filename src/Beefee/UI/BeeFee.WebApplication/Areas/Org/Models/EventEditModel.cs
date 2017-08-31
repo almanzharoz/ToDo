@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using BeeFee.Model.Embed;
 using BeeFee.Model.Projections;
-using BeeFee.OrganizerApp.Projections;
+using BeeFee.OrganizerApp.Projections.Event;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BeeFee.WebApplication.Areas.Org.Models

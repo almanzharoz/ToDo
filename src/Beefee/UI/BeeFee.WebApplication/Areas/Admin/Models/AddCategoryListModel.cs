@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using BeeFee.AdminApp.Projections;
-using BeeFee.Model.Models;
+using BeeFee.AdminApp.Projections.Category;
 
 namespace BeeFee.WebApplication.Areas.Admin.Models
 {

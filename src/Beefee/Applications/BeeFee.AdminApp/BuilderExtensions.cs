@@ -1,11 +1,12 @@
 ﻿using System;
 using Core.ElasticSearch;
 using Core.ElasticSearch.Mapping;
-using BeeFee.AdminApp.Projections;
+using BeeFee.AdminApp.Projections.Category;
+using BeeFee.AdminApp.Projections.Event;
+using BeeFee.AdminApp.Projections.User;
 using BeeFee.AdminApp.Services;
 using BeeFee.Model;
 using BeeFee.Model.Models;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BeeFee.AdminApp
 {
