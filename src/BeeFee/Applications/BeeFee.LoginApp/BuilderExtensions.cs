@@ -1,7 +1,6 @@
-﻿using System;
-using Core.ElasticSearch;
+﻿using Core.ElasticSearch;
 using Core.ElasticSearch.Mapping;
-using BeeFee.LoginApp.Projections;
+using BeeFee.LoginApp.Projections.User;
 using BeeFee.LoginApp.Services;
 using BeeFee.Model;
 using BeeFee.Model.Models;
