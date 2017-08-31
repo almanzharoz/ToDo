@@ -27,7 +27,6 @@ namespace BeeFee.Model
 			    .AddMapping<Event>(x => x.EventIndexName)
 			    .AddMapping<Category>(x => x.EventIndexName)
 			    // внутренние документы
-			    .AddStruct<Price>()
 			    .AddStruct<TicketPrice>()
 			    .AddStruct<Address>()
 			    .AddStruct<EventDateTime>()

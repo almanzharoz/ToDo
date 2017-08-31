@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace BeeFee.LoginApp.Services
+﻿namespace BeeFee.LoginApp.Services
 {
     public enum UserRegistrationResult
     {

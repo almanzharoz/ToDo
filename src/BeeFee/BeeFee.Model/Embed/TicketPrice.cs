@@ -5,6 +5,6 @@ namespace BeeFee.Model.Embed
     {
 		public string Name { get; set; }
 		public string Description { get; set; }
-	    public Price Price { get; set; }
+		public decimal Price { get; set; }
     }
 }

@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using Core.ElasticSearch;
 using BeeFee.AdminApp.Projections;
+using BeeFee.AdminApp.Projections.Category;
 using BeeFee.Model;
 using BeeFee.Model.Helpers;
 using BeeFee.Model.Models;
 using BeeFee.Model.Projections;
 using Microsoft.Extensions.Logging;
 using SharpFuncExt;
-using CategoryProjection = BeeFee.AdminApp.Projections.CategoryProjection;
+using CategoryProjection = BeeFee.AdminApp.Projections.Category.CategoryProjection;
 
 namespace BeeFee.AdminApp.Services
 {

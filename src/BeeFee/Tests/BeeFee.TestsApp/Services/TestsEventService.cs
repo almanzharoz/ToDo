@@ -28,7 +28,7 @@ namespace BeeFee.TestsApp.Services
 					Category = category,
 					Page = new EventPage(name, category.Name, "", dateTime, address, "<p>Html text</p>"),
 					Prices = new TicketPrice[1]
-						{new TicketPrice() {Description = "description price", Name = "price", Price = new Price() {Rubles = 0}}}
+						{new TicketPrice() {Description = "description price", Name = "price", Price = 0.00m}}
 				}
 				.Fluent(x => Insert(x, true))
 				.Id;

@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Core.ElasticSearch;
-using BeeFee.AdminApp.Projections;
+using BeeFee.AdminApp.Projections.Event;
 using BeeFee.Model;
 using BeeFee.Model.Exceptions;
 using BeeFee.Model.Models;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.ElasticSearch;
-using BeeFee.ClientApp.Projections;
+using BeeFee.ClientApp.Projections.Event;
 using BeeFee.Model;
 using BeeFee.Model.Embed;
 using BeeFee.Model.Models;
@@ -93,7 +93,7 @@ namespace BeeFee.ClientApp.Services
 		//TODO сделать агргегацию посредством эластика+кеширование
 		// скорее всего сделаем справочник городов
 		public IReadOnlyCollection<string> GetAllCities()
-			=> Filter<Event, EventAddressProjections>(q => q).Select(a => a.Address.City).Distinct().OrderBy(c => c).ToArray();
+			=> Filter<Event, EventAddressProjection>(q => q).Select(a => a.Address.City).Distinct().OrderBy(c => c).ToArray();
 
 	}
 }

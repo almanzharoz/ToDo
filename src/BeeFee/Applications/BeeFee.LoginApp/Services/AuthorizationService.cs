@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Core.ElasticSearch;
-using BeeFee.LoginApp.Projections;
+using BeeFee.LoginApp.Projections.User;
 using BeeFee.Model;
 using BeeFee.Model.Embed;
 using BeeFee.Model.Helpers;

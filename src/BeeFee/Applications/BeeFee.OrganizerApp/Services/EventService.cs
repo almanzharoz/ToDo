@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Core.ElasticSearch;
 using BeeFee.Model;
 using BeeFee.Model.Embed;
 using BeeFee.Model.Exceptions;
 using BeeFee.Model.Models;
 using BeeFee.Model.Projections;
-using BeeFee.OrganizerApp.Projections;
+using BeeFee.OrganizerApp.Projections.Event;
 using Microsoft.Extensions.Logging;
 using SharpFuncExt;
 
