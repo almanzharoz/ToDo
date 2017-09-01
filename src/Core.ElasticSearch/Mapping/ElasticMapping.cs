@@ -214,8 +214,8 @@ namespace Core.ElasticSearch.Mapping
 		internal bool TryGetResponseJsonConverter(Type type, out JsonConverter result)
 			=> _converters.TryGetValue(type, out result);
 
-		internal JsonConverter GetJsonConverter(Type type, IRequestContainer container)
-			=> _projection[type].GetJsonConverter(container);
+		internal JsonConverter GetJsonConverter(Type type)
+			=> _projection[type].GetJsonConverter();
 
 		internal IProjectionItem GetProjectionItem(Type type)
 			=> _projection[type];

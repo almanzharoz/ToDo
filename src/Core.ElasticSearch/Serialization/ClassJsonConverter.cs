@@ -25,13 +25,10 @@ namespace Core.ElasticSearch.Serialization
 
 	internal class ClassJsonConverter<T> : JsonConverter, IWithContainer where T : class, IProjection, new()
 	{
-		private readonly IRequestContainer _entityContainer;
 		private readonly IProjectionItem _projectionItem;
-		public ClassJsonConverter(IProjectionItem projectionItem, IRequestContainer entityContainer)
+		public ClassJsonConverter(IProjectionItem projectionItem)
 		{
-			_entityContainer = entityContainer;
 			_projectionItem = projectionItem;
-			Debug.WriteLine($"ClassJsonConverter<{typeof(T).Name}>: " + _entityContainer.GetHashCode());
 		}
 
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -51,15 +48,16 @@ namespace Core.ElasticSearch.Serialization
 
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 		{
+			var container = ((CoreElasticContractResolver) serializer.ContractResolver).Container;
 			if (reader.Value is string)
-				return _entityContainer.GetOrAdd<T>(reader.Value as string, true);
+				return container.GetOrAdd<T>(reader.Value as string, true);
 			var jsonObject = JObject.Load(reader);
 			jsonObject.Remove("_type");
-			var target = existingValue ?? _entityContainer.GetOrAdd<T>(jsonObject["id"].ToString(), false);
+			var target = existingValue ?? container.GetOrAdd<T>(jsonObject["id"].ToString(), false);
 			using (var r = jsonObject.CreateReader())
 				serializer.Populate(r, target);
 			if (jsonObject.TryGetValue("parent", out var parent))
-				_entityContainer.GetOrAdd<T>(parent.Value<string>(), true);
+				container.GetOrAdd<T>(parent.Value<string>(), true);
 			if (target is IWithVersion && jsonObject.TryGetValue("version", out var v))
 				((BaseEntityWithVersion) target).Version = (int)v;
 			return target;

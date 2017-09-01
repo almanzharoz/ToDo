@@ -15,7 +15,7 @@ namespace Core.ElasticSearch.Mapping
 		string[] Fields { get; }
 		PropertyInfo[] Properties { get; }
 		IMappingItem MappingItem { get; }
-		JsonConverter GetJsonConverter(IRequestContainer container);
+		JsonConverter GetJsonConverter();
 	}
 
 	internal abstract class BaseProjectionItem<T, TMapping, TSettings> : IProjectionItem
@@ -37,7 +37,7 @@ namespace Core.ElasticSearch.Mapping
 		public PropertyInfo[] Properties { get; }
 		public IMappingItem MappingItem { get; }
 
-		public abstract JsonConverter GetJsonConverter(IRequestContainer container);
+		public abstract JsonConverter GetJsonConverter();
 	}
 
 	internal class ProjectionItem<T, TMapping, TSettings> : BaseProjectionItem<T, TMapping, TSettings>
@@ -49,8 +49,8 @@ namespace Core.ElasticSearch.Mapping
 		{
 		}
 
-		public override JsonConverter GetJsonConverter(IRequestContainer container)
-			=> new ClassJsonConverter<T>(this, container);
+		public override JsonConverter GetJsonConverter()
+			=> new ClassJsonConverter<T>(this);
 	}
 
 	internal class ProjectionWithParentItem<T, TMapping, TParent, TSettings> : BaseProjectionItem<T, TMapping, TSettings>
@@ -64,7 +64,7 @@ namespace Core.ElasticSearch.Mapping
 			// TODO: Сделать проверку типа парента
 		}
 
-		public override JsonConverter GetJsonConverter(IRequestContainer container)
-			=> new ParentJsonConverter<T, TParent>(this, container);
+		public override JsonConverter GetJsonConverter()
+			=> new ParentJsonConverter<T, TParent>(this);
 	}
 }

@@ -7,16 +7,14 @@ using Newtonsoft.Json.Linq;
 
 namespace Core.ElasticSearch.Serialization
 {
-	internal class ParentJsonConverter<T, TParent> : JsonConverter, IWithContainer
+	internal class ParentJsonConverter<T, TParent> : JsonConverter
 		where T : class, IEntity, IProjection, IWithParent<TParent>, new()
 		where TParent : class, IEntity, IProjection, new()
 	{
-		private readonly IRequestContainer _entityContainer;
 		private readonly IProjectionItem _projection;
 
-		public ParentJsonConverter(IProjectionItem projection, IRequestContainer entityContainer)
+		public ParentJsonConverter(IProjectionItem projection)
 		{
-			_entityContainer = entityContainer;
 			_projection = projection;
 		}
 
@@ -37,19 +35,20 @@ namespace Core.ElasticSearch.Serialization
 
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 		{
+			var container = ((CoreElasticContractResolver)serializer.ContractResolver).Container;
 			if (reader.Value is string)
-				return _entityContainer.GetOrAdd<T>(reader.Value as string, true);
+				return container.GetOrAdd<T>(reader.Value as string, true);
 			var jsonObject = JObject.Load(reader);
 			jsonObject.Remove("_type");
-			T target = _entityContainer.GetOrAdd<T>(jsonObject["id"].ToString(), false);
+			T target = container.GetOrAdd<T>(jsonObject["id"].ToString(), false);
 			using (var r = jsonObject.CreateReader())
 				serializer.Populate(r, target);
 			if (jsonObject.TryGetValue("parent", out var v))
 			{
 				if (target is BaseEntityWithParent<TParent>)
-					(target as BaseEntityWithParent<TParent>).Parent = _entityContainer.GetOrAdd<TParent>(v.Value<string>(), true);
+					(target as BaseEntityWithParent<TParent>).Parent = container.GetOrAdd<TParent>(v.Value<string>(), true);
 				else
-					(target as BaseEntityWithParentAndVersion<TParent>).Parent = _entityContainer.GetOrAdd<TParent>(v.Value<string>(), true);
+					(target as BaseEntityWithParentAndVersion<TParent>).Parent = container.GetOrAdd<TParent>(v.Value<string>(), true);
 			}
 			return target;
 		}

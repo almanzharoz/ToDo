@@ -20,9 +20,6 @@ namespace Core.ElasticSearch.Serialization
 	internal class ElasticSerializer<TSettings> : IElasticsearchSerializer
 		where TSettings : BaseElasticConnection
 	{
-		//private readonly ConcurrentDictionary<Type, JsonConverter> _converters = new ConcurrentDictionary<Type, JsonConverter>();
-
-		private readonly RequestContainer<TSettings> _container;
 		private readonly ElasticMapping<TSettings> _mapping;
 		private static readonly InnerValueJsonConverter _innerValueJsonConverter = new InnerValueJsonConverter();
 
@@ -31,10 +28,8 @@ namespace Core.ElasticSearch.Serialization
 		{
 			this.Settings = settings;
 			_mapping = mapping;
-			_container = container;
-			ContractResolver = new CoreElasticContractResolver(settings, this.ContractConverters);
+			ContractResolver = new CoreElasticContractResolver(settings, this.ContractConverters, container);
 			ContractConverters.Add(GetJsonConverter);
-			Debug.WriteLine("ElasticSerializer: " + _container.GetHashCode());
 
 			var indented = new JsonSerializerSettings()
 			{
@@ -48,13 +43,12 @@ namespace Core.ElasticSearch.Serialization
 
 		private JsonConverter GetJsonConverter(Type x)
 		{
-			Debug.WriteLine("GetJsonConverter: "+_container.GetHashCode());
 			if (x == typeof(InnerValue))
 				return _innerValueJsonConverter;
 			if (x == typeof(IProjection))
-				return new BaseClassJsonConverter<TSettings>(_container);
+				return new BaseClassJsonConverter<TSettings>();
 			if (typeof(IProjection).IsAssignableFrom(x))
-				return _mapping.GetJsonConverter(x, _container);
+				return _mapping.GetJsonConverter(x);
 			if (_mapping.TryGetResponseJsonConverter(x, out JsonConverter result))
 				return result;
 			return null;
@@ -72,9 +66,6 @@ namespace Core.ElasticSearch.Serialization
 		/// Resolves JsonContracts for types
 		/// </summary>
 		private CoreElasticContractResolver ContractResolver { get; }
-
-		//TODO this internal smells
-		internal JsonSerializer Serializer => _mapping.DefaultSerializer;
 
 		/// <summary>
 		/// The size of the buffer to use when writing the serialized request
@@ -118,8 +109,6 @@ namespace Core.ElasticSearch.Serialization
 			using (var streamReader = new StreamReader(stream))
 			using (var jsonTextReader = new JsonTextReader(streamReader))
 			{
-				//if (GetJsonConverter(typeof(T)) == null)
-				//	return Serializer.Deserialize<T>(jsonTextReader);
 				return _indentedSerializer.Deserialize<T>(jsonTextReader);
 			}
 		}
