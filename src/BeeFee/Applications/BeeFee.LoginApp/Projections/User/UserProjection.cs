@@ -8,15 +8,12 @@ namespace BeeFee.LoginApp.Projections.User
 {
 	public class UserProjection : BaseEntity, IProjection<Model.Models.User>, IGetProjection, ISearchProjection
 	{
-		[JsonProperty]
 		public string Email { get; private set; }
-		[JsonProperty]
 		public string Name { get; private set; }
 		[JsonProperty]
 		private string Password { get; set; }
 		[JsonProperty]
 		private string Salt { get; set; }
-		[JsonProperty]
 		public EUserRole[] Roles { get; private set; }
 
 		internal bool CheckPassword(string password)

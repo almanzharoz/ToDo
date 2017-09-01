@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Core.ElasticSearch.Serialization
 {
-    internal class SearchJsonConverter<T> : JsonConverter where T : class, IProjection
+    internal class SearchJsonConverter<T> : JsonConverter, IWithContainer where T : class, IProjection
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {

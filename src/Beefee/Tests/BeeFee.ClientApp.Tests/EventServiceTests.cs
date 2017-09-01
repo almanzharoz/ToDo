@@ -30,7 +30,7 @@ namespace BeeFee.ClientApp.Tests
 
             Assert.IsNotNull(eventId);
 
-			var @event = Service.GetEventByUrl("event-1");
+			var @event = Service.GetEventByUrl("event-1").Result;
 
 			Assert.AreEqual(@event.Name, "Event 1");
             Assert.AreEqual(@event.Category.Name, "Category 1");

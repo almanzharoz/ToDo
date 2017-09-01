@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Core.ElasticSearch.Domain;
@@ -34,7 +35,7 @@ namespace Core.ElasticSearch
 		public RequestContainer(ElasticMapping<TSettings> mapping)
 		{
 			_mapping = mapping;
-			//Console.WriteLine("Create container");
+			Debug.WriteLine("Create Container "+this.GetHashCode());
 		}
 
 		//TODO: Возможно, нужно добавить GetOrAdd<T, TParent>(id, parent)

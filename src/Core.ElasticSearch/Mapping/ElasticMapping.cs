@@ -40,7 +40,7 @@ namespace Core.ElasticSearch.Mapping
 	{
 		private readonly ConcurrentDictionary<Type, IMappingItem> _mapping = new ConcurrentDictionary<Type, IMappingItem>();
 		private readonly ConcurrentDictionary<Type, IProjectionItem> _projection = new ConcurrentDictionary<Type, IProjectionItem>();
-		private static readonly ConcurrentDictionary<Type, JsonConverter> _converters = new ConcurrentDictionary<Type, JsonConverter>();
+		private readonly ConcurrentDictionary<Type, JsonConverter> _converters = new ConcurrentDictionary<Type, JsonConverter>();
 		private readonly TSettings _settings;
 		private ILogger<ElasticMapping<TSettings>> _logger;
 
@@ -52,12 +52,12 @@ namespace Core.ElasticSearch.Mapping
 			_converters.TryAdd(typeof(SearchResponse<IProjection>), new SearchJsonConverter<IProjection>());
 		}
 
-		/// <summary>
-		/// Регистрирует маппинг
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <returns></returns>
-		public IElasticMapping<TSettings> AddMapping<T>(Func<TSettings, string> indexName) where T : class, IModel
+	/// <summary>
+	/// Регистрирует маппинг
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <returns></returns>
+	public IElasticMapping<TSettings> AddMapping<T>(Func<TSettings, string> indexName) where T : class, IModel
 		{
 			_mapping.AddOrUpdate(typeof(T), x => new MappingItem<T, TSettings>(_settings, indexName),
 				(t, m) => throw new Exception($"Mapping for type \"{typeof(T).Name}\" already exists."));
@@ -174,6 +174,17 @@ namespace Core.ElasticSearch.Mapping
 							.LogError(_logger, "Mapping error:\r\n" + x.DebugInformation)
 							.Throw(t => new Exception("Mapping error"))));
 			}
+
+			var jsettings = new JsonSerializerSettings()
+			{
+				Formatting = Formatting.None,
+				ContractResolver = new ElasticContractResolver(connectionSettings, null),
+				DefaultValueHandling = DefaultValueHandling.Include,
+				NullValueHandling = NullValueHandling.Ignore
+			};
+
+			DefaultSerializer = JsonSerializer.Create(jsettings);
+
 		}
 
 		internal void Build<TService>(Action<TService> initFunc, TService repository)
@@ -197,6 +208,8 @@ namespace Core.ElasticSearch.Mapping
 				if (client.IndexExists(indexName).Exists)
 					client.DeleteIndex(indexName);
 		}
+
+		internal JsonSerializer DefaultSerializer { get; private set; }
 
 		internal bool TryGetResponseJsonConverter(Type type, out JsonConverter result)
 			=> _converters.TryGetValue(type, out result);

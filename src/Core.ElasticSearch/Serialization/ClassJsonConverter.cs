@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Core.ElasticSearch.Domain;
@@ -22,7 +23,7 @@ namespace Core.ElasticSearch.Serialization
 		}
 	}
 
-	internal class ClassJsonConverter<T> : JsonConverter where T : class, IProjection, new()
+	internal class ClassJsonConverter<T> : JsonConverter, IWithContainer where T : class, IProjection, new()
 	{
 		private readonly IRequestContainer _entityContainer;
 		private readonly IProjectionItem _projectionItem;
@@ -30,6 +31,7 @@ namespace Core.ElasticSearch.Serialization
 		{
 			_entityContainer = entityContainer;
 			_projectionItem = projectionItem;
+			Debug.WriteLine($"ClassJsonConverter<{typeof(T).Name}>: " + _entityContainer.GetHashCode());
 		}
 
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -40,8 +42,8 @@ namespace Core.ElasticSearch.Serialization
 				var v = property.GetValue(value);
 				if (v == null)
 					continue;
-				writer.WritePropertyName(property.Name.ToLower());
 				var o = JToken.FromObject(new InnerValue(v), serializer);
+				writer.WritePropertyName(property.Name.ToLower());
 				o.WriteTo(writer);
 			}
 			writer.WriteEndObject();

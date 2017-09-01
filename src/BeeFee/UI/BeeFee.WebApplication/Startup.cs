@@ -50,7 +50,8 @@ namespace BeeFee.WebApplication
 			//	//options.AddPolicy("ip-policy", policy => policy.Requirements.Add(new UserHostRequirement()));
 			//	//options.AddPolicy("resource-allow-policy", x => { x.AddRequirements(new PermissionRequirement(new[] { Operations.Read })); });
 			//});
-			services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
+			if (!services.Any(x => x.ServiceType == typeof(IHttpContextFactory)))
+				services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
 			services.AddScoped<UserName>(x =>
 			{
 				var user = x.GetService<IHttpContextAccessor>()?.HttpContext?.User;
