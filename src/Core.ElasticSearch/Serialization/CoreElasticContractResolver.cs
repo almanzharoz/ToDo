@@ -16,7 +16,7 @@ namespace Core.ElasticSearch.Serialization
 		protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
 		{
 			var p = base.CreateProperty(member, memberSerialization);
-			if (!p.Writable)
+			if (/*p.PropertyName != "Id" && */!p.Writable)
 			{
 				var property = member as PropertyInfo;
 				if (property != null)

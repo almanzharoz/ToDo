@@ -1,14 +1,15 @@
-﻿using Core.ElasticSearch.Mapping;
+﻿using System;
+using Core.ElasticSearch.Mapping;
 using Core.ElasticSearch.Serialization;
 using Elasticsearch.Net;
 using Nest;
-using Newtonsoft.Json.Serialization;
 
 namespace Core.ElasticSearch
 {
 	internal class ElasticClient<TSettings>
 		where TSettings : BaseElasticConnection
 	{
+
 		public ElasticClient Client { get; }
 
 		public ElasticClient(TSettings settings, ElasticMapping<TSettings> mapping, RequestContainer<TSettings> container)

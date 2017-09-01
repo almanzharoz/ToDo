@@ -181,8 +181,9 @@ namespace Core.ElasticSearch.Tests
             Assert.IsNotNull(loadProduct);
             Assert.IsNotNull(loadProduct.Parent);
             Assert.AreEqual(loadProduct.Parent.Id, category.Id);
+            Assert.AreEqual(loadProduct.Parent.Name, null);
             Assert.IsNull(loadProduct.Parent.Name);
-            Assert.IsNotNull(loadProduct.FullName);
+			Assert.IsNotNull(loadProduct.FullName);
             Assert.AreEqual(loadProduct.FullName.Name, product.FullName.Name);
         }
 
@@ -443,6 +444,7 @@ namespace Core.ElasticSearch.Tests
 			Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category2")));
 			Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category3")));
 			Assert.AreEqual(childCategories.FirstOrDefault().Name, "Child Category3");
+			Assert.AreEqual(childCategories.FirstOrDefault().Top.Name, null);
 			Assert.IsNull(childCategories.FirstOrDefault().Top.Name);
 		}
 
@@ -469,6 +471,7 @@ namespace Core.ElasticSearch.Tests
 			Assert.AreEqual(childCategories.Count, 1);
 			Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category2")));
 			Assert.AreEqual(childCategories.FirstOrDefault().Top.Id, parentCategory.Id);
+			Assert.AreEqual(childCategories.FirstOrDefault().Top.Name, null);
 			Assert.IsNull(childCategories.FirstOrDefault().Top.Name);
 		}
 
@@ -572,6 +575,7 @@ namespace Core.ElasticSearch.Tests
 			Assert.AreEqual(childCategories.Limit, 1);
 			Assert.AreEqual(childCategories.Page, 1);
 			Assert.IsTrue(childCategories.Any(c => c.Name.Equals("Child Category3")));
+			Assert.AreEqual(childCategories.FirstOrDefault().Top.Name, null);
 			Assert.IsNull(childCategories.FirstOrDefault().Top.Name);
 		}
 
@@ -722,27 +726,27 @@ namespace Core.ElasticSearch.Tests
 		    }
 	    }
 
-	    [TestMethod]
-	    public void PerfTest()
-	    {
-			var sw = new Stopwatch();
-		    Load("http://localhost:5000/event/event/sobytie-1").Wait();
-			sw.Start();
-		    var tasks = new List<Task<long>>();
-		    for (var i = 0; i < 10; i++)
-		    {
-			    var t = Load("http://localhost:5000/event/event/sobytie-1");
-			    //t.Wait();
-				tasks.Add(t);
-			    tasks.Add(Load("http://localhost:5000/event/event/sobytie-2"));
-		    }
-		    Task.WaitAll(tasks.ToArray());
-			sw.Stop();
+	  //  [TestMethod]
+	  //  public void PerfTest()
+	  //  {
+			//var sw = new Stopwatch();
+		 //   Load("http://localhost:5000/event/event/sobytie-1").Wait();
+			//sw.Start();
+		 //   var tasks = new List<Task<long>>();
+		 //   for (var i = 0; i < 10; i++)
+		 //   {
+			//    var t = Load("http://localhost:5000/event/event/sobytie-1");
+			//    //t.Wait();
+			//	tasks.Add(t);
+			//    tasks.Add(Load("http://localhost:5000/event/event/sobytie-2"));
+		 //   }
+		 //   Task.WaitAll(tasks.ToArray());
+			//sw.Stop();
 
 
-			Console.WriteLine(sw.ElapsedMilliseconds);
-			foreach(var t in tasks)
-				Console.WriteLine(t.Result);
-	    }
+			//Console.WriteLine(sw.ElapsedMilliseconds);
+			//foreach(var t in tasks)
+			//	Console.WriteLine(t.Result);
+	  //  }
 	}
 }
