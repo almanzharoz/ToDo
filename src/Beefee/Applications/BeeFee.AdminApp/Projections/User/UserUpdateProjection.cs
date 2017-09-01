@@ -3,22 +3,16 @@ using BeeFee.Model.Embed;
 using BeeFee.Model.Helpers;
 using Core.ElasticSearch.Domain;
 using Microsoft.AspNetCore.WebUtilities;
-using Newtonsoft.Json;
 using SharpFuncExt;
 
 namespace BeeFee.AdminApp.Projections.User
 {
 	internal class UserUpdateProjection : BaseEntity, IProjection<Model.Models.User>, IGetProjection, IUpdateProjection
 	{
-		[JsonProperty]
 		public string Email { get; private set; }
-		[JsonProperty]
 		public string Name { get; private set; }
-		[JsonProperty]
 		public string Password { get; private set; }
-		[JsonProperty]
 		public EUserRole[] Roles { get; private set; }
-		[JsonProperty]
 		public string Salt { get; private set; }
 
 		/// <summary>
