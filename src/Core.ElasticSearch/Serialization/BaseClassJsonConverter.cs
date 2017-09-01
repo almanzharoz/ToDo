@@ -1,17 +1,21 @@
 ﻿using System;
+using System.Diagnostics;
 using Core.ElasticSearch.Mapping;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Core.ElasticSearch.Serialization
 {
-	internal class BaseClassJsonConverter<TSettings> : JsonConverter
+	internal interface IWithContainer{}
+
+	internal class BaseClassJsonConverter<TSettings> : JsonConverter, IWithContainer
 		where TSettings : BaseElasticConnection
 	{
 		private readonly RequestContainer<TSettings> _entityContainer;
 		public BaseClassJsonConverter(RequestContainer<TSettings> entityContainer)
 		{
 			_entityContainer = entityContainer;
+			Debug.WriteLine("BaseClassJsonConverter: " + _entityContainer.GetHashCode());
 		}
 
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

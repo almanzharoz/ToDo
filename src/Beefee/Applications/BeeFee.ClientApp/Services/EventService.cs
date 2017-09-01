@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Core.ElasticSearch;
 using BeeFee.ClientApp.Projections.Event;
 using BeeFee.Model;
@@ -20,8 +21,8 @@ namespace BeeFee.ClientApp.Services
 		{
 		}
 
-		public EventProjection GetEventByUrl(string url)
-			=> Filter<EventProjection>(f => f.Term(p => p.Url, url.HasNotNullArg("event url"))).SingleOrDefault();
+		public async Task<EventProjection> GetEventByUrl(string url)
+			=> (await FilterAsync<EventProjection>(f => f.Term(p => p.Url, url.HasNotNullArg("event url")))).SingleOrDefault();
 
 		//public IReadOnlyCollection<EventSearchProjection> SearchByName(string query)
 		//    => Search<Event, EventSearchProjection>(q => q

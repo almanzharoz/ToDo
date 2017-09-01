@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using BeeFee.Model.Embed;
 using BeeFee.ClientApp.Services;
 using BeeFee.Model.Projections;
@@ -34,17 +35,17 @@ namespace BeeFee.WebApplication.Controllers
             return View(model);
         }
 
-        public IActionResult Event(string id)
-        {
-	        var model = _service.GetEventByUrl(id);
+		public async Task<IActionResult> Event(string id)
+		{
+			var model = await _service.GetEventByUrl(id);
 			//.IfNotNullOrDefault(m => new EventPageModel() { Caption = m.Name, Date = m.DateTime.ToString(), Html = m.Page.Html, Title = m.Page.Title });
 			// здесь не нужна ViewMode, т.к. EventPage итак выполняет эту роль
-            if (model == null)
-                return NotFound();
-            return View(model);
-        }
+			if (model == null)
+				return NotFound();
+			return View(model);
+		}
 
-        [HttpGet]
+		[HttpGet]
         public IActionResult LoadEvents(LoadEventsRequest request)
         {
             List<EEventType> types = new List<EEventType>();

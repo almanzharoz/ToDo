@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Core.ElasticSearch.Serialization
 {
-	internal class ParentJsonConverter<T, TParent> : JsonConverter 
+	internal class ParentJsonConverter<T, TParent> : JsonConverter, IWithContainer
 		where T : class, IEntity, IProjection, IWithParent<TParent>, new()
 		where TParent : class, IEntity, IProjection, new()
 	{
