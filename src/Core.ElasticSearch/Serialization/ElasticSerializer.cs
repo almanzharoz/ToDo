@@ -17,7 +17,13 @@ using SharpFuncExt;
 
 namespace Core.ElasticSearch.Serialization
 {
-	internal class ElasticSerializer<TSettings> : IElasticsearchSerializer
+	internal interface IElasticSerializer
+	{
+		Stopwatch _sw { get; }
+		Stopwatch _sw2 { get; }
+		CoreElasticContractResolver ContractResolver { get; }
+	}
+	internal class ElasticSerializer<TSettings> : IElasticsearchSerializer, IElasticSerializer
 		where TSettings : BaseElasticConnection
 	{
 		private readonly ElasticMapping<TSettings> _mapping;
@@ -65,7 +71,7 @@ namespace Core.ElasticSearch.Serialization
 		/// <summary>
 		/// Resolves JsonContracts for types
 		/// </summary>
-		private CoreElasticContractResolver ContractResolver { get; }
+		public CoreElasticContractResolver ContractResolver { get; }
 
 		/// <summary>
 		/// The size of the buffer to use when writing the serialized request
@@ -90,18 +96,21 @@ namespace Core.ElasticSearch.Serialization
 
 		public void Serialize(object data, Stream writableStream, SerializationFormatting formatting = SerializationFormatting.Indented)
 		{
-			//var serializer = formatting == SerializationFormatting.None
-			//	? Serializer
-			//	: _indentedSerializer;
-
 			using (var writer = new StreamWriter(writableStream, ExpectedEncoding, BufferSize, leaveOpen: true))
 			using (var jsonWriter = new JsonTextWriter(writer))
 			{
+				//var t = _sw2.ElapsedMilliseconds;
+				//_sw2.Start();
 				_indentedSerializer.Serialize(jsonWriter, data);
+				//_sw2.Stop();
+				//Console.WriteLine($"Serialize<{data.GetType().FullName}> "+(_sw2.ElapsedMilliseconds-t));
 				writer.Flush();
 				jsonWriter.Flush();
 			}
 		}
+
+		public Stopwatch _sw => new Stopwatch();
+		public Stopwatch _sw2 => new Stopwatch();
 
 		public T Deserialize<T>(Stream stream)
 		{
@@ -109,11 +118,17 @@ namespace Core.ElasticSearch.Serialization
 			using (var streamReader = new StreamReader(stream))
 			using (var jsonTextReader = new JsonTextReader(streamReader))
 			{
-				return _indentedSerializer.Deserialize<T>(jsonTextReader);
+				//var t = _sw.ElapsedMilliseconds;
+				//_sw.Start();
+				var result = _indentedSerializer.Deserialize<T>(jsonTextReader);
+				//_sw.Stop();
+				//Console.WriteLine($"Deserialize<{typeof(T).FullName}> "+(_sw.ElapsedMilliseconds-t));
+				return result;
 			}
 		}
 
 		public Task<T> DeserializeAsync<T>(Stream stream, CancellationToken cancellationToken = default(CancellationToken))
 			=> Task.FromResult(Deserialize<T>(stream));
 	}
+
 }

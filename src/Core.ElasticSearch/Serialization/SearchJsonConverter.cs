@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Core.ElasticSearch.Serialization
 {
-    internal class SearchJsonConverter<T> : JsonConverter, IWithContainer where T : class, IProjection
+    internal class SearchJsonConverter<T> : JsonConverter where T : class, IProjection
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
@@ -17,8 +17,6 @@ namespace Core.ElasticSearch.Serialization
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            var sw = new Stopwatch();
-            sw.Start();
             var jsonObject = JObject.Load(reader);
             foreach (var j in jsonObject["hits"]["hits"].AsEnumerable())
             {
@@ -58,8 +56,6 @@ namespace Core.ElasticSearch.Serialization
             var target = new SearchResponse<T>();
             using (var r = jsonObject.CreateReader())
                 serializer.Populate(r, target);
-            sw.Stop();
-            Console.WriteLine($"Deserialize<{objectType.Name}>: " + sw.ElapsedMilliseconds);
             return target;
         }
 

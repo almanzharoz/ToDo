@@ -23,7 +23,7 @@ namespace Core.ElasticSearch.Serialization
 		}
 	}
 
-	internal class ClassJsonConverter<T> : JsonConverter, IWithContainer where T : class, IProjection, new()
+	internal class ClassJsonConverter<T> : JsonConverter where T : class, IProjection, new()
 	{
 		private readonly IProjectionItem _projectionItem;
 		public ClassJsonConverter(IProjectionItem projectionItem)

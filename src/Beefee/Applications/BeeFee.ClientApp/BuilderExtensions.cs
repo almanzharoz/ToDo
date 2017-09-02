@@ -1,6 +1,5 @@
 ﻿using Core.ElasticSearch;
 using Core.ElasticSearch.Mapping;
-using BeeFee.ClientApp.Projections.Category;
 using BeeFee.ClientApp.Projections.Event;
 using BeeFee.ClientApp.Services;
 using BeeFee.Model;
@@ -21,9 +20,7 @@ namespace BeeFee.ClientApp
             return services
                 .AddProjection<EventProjection, Event>()
                 .AddProjection<EventCellProjection, Event>()
-                .AddProjection<EventAddressProjection, Event>()
-				
-				.AddProjection<CategoryProjection, Category>();
+                .AddProjection<EventAddressProjection, Event>();
 
         }
     }

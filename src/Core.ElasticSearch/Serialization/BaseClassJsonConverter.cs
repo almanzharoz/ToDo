@@ -6,9 +6,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Core.ElasticSearch.Serialization
 {
-	internal interface IWithContainer{}
-
-	internal class BaseClassJsonConverter<TSettings> : JsonConverter, IWithContainer
+	internal class BaseClassJsonConverter<TSettings> : JsonConverter
 		where TSettings : BaseElasticConnection
 	{
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

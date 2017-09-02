@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -36,66 +38,28 @@ namespace Core.ElasticSearch.Serialization
 		}
 
 		private static readonly ConcurrentDictionary<Type, JsonContract> Cache = new ConcurrentDictionary<Type, JsonContract>();
-
 		public override JsonContract ResolveContract(Type type)
+			=> Cache.GetOrAdd(type.HasNotNullArg(nameof(type)), CreateContract);
+
+		public Stopwatch sw1 = new Stopwatch();
+		public Stopwatch sw2 = new Stopwatch();
+
+		protected override JsonContract CreateContract(Type objectType)
 		{
-			//return Cache.GetOrAdd(type.HasNotNullArg(nameof(type)), CreateContract);
-			
-			var t = typeof(IEntity).IsAssignableFrom(type);
-			var t2 = type.IsGenericType && typeof(IEntity).IsAssignableFrom(type.GenericTypeArguments.First());
-			var result = Cache.GetOrAdd(type.HasNotNullArg(nameof(type)), CreateContract);
-			return result;
-			if (t || t2)
+			var result = base.CreateContract(objectType);
+			if (typeof(ICollection).IsAssignableFrom(result.UnderlyingType))
+				return result;
+			if (!typeof(ICollection).IsAssignableFrom(result.UnderlyingType))
 			{
-				var c = (JsonObjectContract) result;
-				var newResult = new JsonObjectContract(type);
-				newResult.CreatedType = result.CreatedType;
-				newResult.ExtensionDataGetter = c.ExtensionDataGetter;
-				newResult.ExtensionDataNameResolver = c.ExtensionDataNameResolver;
-				newResult.ExtensionDataSetter = c.ExtensionDataSetter;
-				newResult.ExtensionDataValueType = c.ExtensionDataValueType;
-				newResult.ItemRequired = c.ItemRequired;
-				newResult.MemberSerialization = c.MemberSerialization;
-				newResult.OverrideCreator = c.OverrideCreator;
-				newResult.DefaultCreator = c.DefaultCreator;
-				newResult.DefaultCreatorNonPublic = c.DefaultCreatorNonPublic;
-				newResult.IsReference = c.IsReference;
-				newResult.ItemConverter = c.ItemConverter;
-				newResult.ItemRequired = c.ItemRequired;
-				newResult.ItemIsReference = c.ItemIsReference;
-				newResult.ItemReferenceLoopHandling = c.ItemReferenceLoopHandling;
-				newResult.ItemTypeNameHandling = c.ItemTypeNameHandling;
-				foreach (var p in c.CreatorParameters)
-					newResult.CreatorParameters.Add(p);
-				foreach (var p in c.Properties)
-					newResult.Properties.Add(p);
-				newResult.Converter = result.Converter;
-				return newResult;
+				typeof(JsonContract).GetField("_onDeserializingCallbacks", BindingFlags.Instance | BindingFlags.NonPublic)
+					.SetValue(result, new List<SerializationCallback>() {(o, context) => sw2.Start()});
+				typeof(JsonContract).GetField("_onDeserializedCallbacks", BindingFlags.Instance | BindingFlags.NonPublic)
+					.SetValue(result, new List<SerializationCallback>() {(o, context) => sw2.Stop()});
+				typeof(JsonContract).GetField("_onSerializingCallbacks", BindingFlags.Instance | BindingFlags.NonPublic)
+					.SetValue(result, new List<SerializationCallback>() {(o, context) => sw1.Start()});
+				typeof(JsonContract).GetField("_onSerializedCallbacks", BindingFlags.Instance | BindingFlags.NonPublic)
+					.SetValue(result, new List<SerializationCallback>() {(o, context) => sw1.Stop()});
 			}
-			return result;
-			// TODO: do refactoring
-			return t || t2
-				? CreateContract(type)
-				: Cache.GetOrAdd(type.HasNotNullArg(nameof(type)), CreateContract);
-		}
-
-		protected override JsonConverter ResolveContractConverter(Type objectType)
-		{
-			var sw = new Stopwatch();
-			sw.Start();
-			var result = base.ResolveContractConverter(objectType);
-			sw.Stop();
-			Debug.WriteLine($"ResolveContractConverter<{objectType.Name}> " + sw.ElapsedMilliseconds);
-			return result;
-		}
-
-		protected override JsonObjectContract CreateObjectContract(Type objectType)
-		{
-			var sw = new Stopwatch();
-			sw.Start();
-			var result = base.CreateObjectContract(objectType);
-			sw.Stop();
-			Debug.WriteLine($"CreateObjectContract<{objectType.Name}> "+sw.ElapsedMilliseconds);
 			return result;
 		}
 	}

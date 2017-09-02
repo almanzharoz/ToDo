@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Core.ElasticSearch.Domain;
 using Core.ElasticSearch.Exceptions;
 using Core.ElasticSearch.Mapping;
 using Core.ElasticSearch.Serialization;
-using Elasticsearch.Net;
 using Microsoft.Extensions.Logging;
 using Nest;
 using SharpFuncExt;
@@ -20,7 +17,8 @@ namespace Core.ElasticSearch
     {
         protected readonly ILogger _logger;
         protected readonly ElasticClient _client;
-        private readonly RequestContainer<TConnection> _container;
+        private readonly ElasticClient<TConnection> _topclient;
+		private readonly RequestContainer<TConnection> _container;
         private readonly TConnection _settings;
         private readonly ElasticMapping<TConnection> _mapping;
 
@@ -29,6 +27,7 @@ namespace Core.ElasticSearch
             _container = factory.Container;
             _settings = settings;
             _mapping = factory.Mapping;
+	        _topclient = factory.Client;
             _client = factory.Client.Client;
             _logger = loggerFactory.CreateLogger<BaseService<TConnection>>();
         }
@@ -86,7 +85,7 @@ namespace Core.ElasticSearch
                 }
             } while ((entitiesToLoad = _container.PopEntitiesForLoad()).Any());
             sw.Stop();
-            Debug.WriteLine("Load: " + sw.ElapsedMilliseconds);
+            Console.WriteLine("Load: " + sw.ElapsedMilliseconds);
         }
 
 	    protected void ClearCache() => _container.ClearCache();
@@ -97,10 +96,17 @@ namespace Core.ElasticSearch
         {
             try
             {
-                var sw = new Stopwatch();
-                return result(_client.Stopwatch(sw, x => func(_client)).Fluent(x => Console.WriteLine("Try: " + sw.ElapsedMilliseconds))
-                    .LogDebug(_logger, operationText ?? eventId.Name)
-                    .LogError(_logger, operationText ?? eventId.Name));
+				Stopwatch sw = new Stopwatch();
+	            return result(_client.Stopwatch(sw, x => func(_client))
+		            .Fluent(x =>
+			            Console.WriteLine("Try: " + sw.ElapsedMilliseconds
+			                              + ", Deserialize: " + ((IElasticSerializer) _client.Serializer)._sw.ElapsedMilliseconds
+			                              + ", Serialize: " + ((IElasticSerializer) _client.Serializer)._sw2.ElapsedMilliseconds
+			                              + ", Deserialize: " + ((IElasticSerializer)_client.Serializer).ContractResolver.sw2.ElapsedMilliseconds
+			                              + ", Serialize: " + ((IElasticSerializer)_client.Serializer).ContractResolver.sw1.ElapsedMilliseconds
+										  ))
+		            .LogDebug(_logger, operationText ?? eventId.Name)
+		            .LogError(_logger, operationText ?? eventId.Name));
             }
             catch (Exception e)
             {
@@ -114,8 +120,19 @@ namespace Core.ElasticSearch
         {
             try
             {
-                return result((await func(_client))
-                    .LogDebug(_logger, operationText ?? eventId.Name)
+				Stopwatch sw = new Stopwatch();
+				sw.Start();
+				var f = await func(_client);
+				sw.Stop();
+				return result(f
+	                .Fluent(x =>
+		                Console.WriteLine("Try: " + sw.ElapsedMilliseconds
+		                                  + ", Deserialize: " + ((IElasticSerializer)_client.Serializer)._sw.ElapsedMilliseconds
+		                                  + ", Serialize: " + ((IElasticSerializer)_client.Serializer)._sw2.ElapsedMilliseconds
+		                                  + ", Deserialize: " + ((IElasticSerializer)_client.Serializer).ContractResolver.sw2.ElapsedMilliseconds
+		                                  + ", Serialize: " + ((IElasticSerializer)_client.Serializer).ContractResolver.sw1.ElapsedMilliseconds
+		                ))
+					.LogDebug(_logger, operationText ?? eventId.Name)
                     .LogError(_logger, operationText ?? eventId.Name));
             }
             catch (Exception e)
