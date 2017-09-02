@@ -15,7 +15,6 @@ namespace Core.ElasticSearch.Tests.Projections
 	public class ProductProjection : BaseEntityWithParent<Models.Category>, IProjection<Models.Product>, IGetProjection
 	{
         public string Name { get; set; }
-        [JsonProperty]
 		public FullName FullName { get; private set; }
     }
 }

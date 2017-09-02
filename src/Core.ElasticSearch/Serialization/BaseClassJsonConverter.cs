@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Core.ElasticSearch.Mapping;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -8,12 +9,6 @@ namespace Core.ElasticSearch.Serialization
 	internal class BaseClassJsonConverter<TSettings> : JsonConverter
 		where TSettings : BaseElasticConnection
 	{
-		private readonly RequestContainer<TSettings> _entityContainer;
-		public BaseClassJsonConverter(RequestContainer<TSettings> entityContainer)
-		{
-			_entityContainer = entityContainer;
-		}
-
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
 		{
 			throw new NotImplementedException();
@@ -23,7 +18,7 @@ namespace Core.ElasticSearch.Serialization
 		{
 			var jsonObject = JObject.Load(reader);
 			//jsonObject.Remove("_type"); // не десериализовать это поле
-			var target = existingValue ?? _entityContainer.Get(jsonObject["id"].ToString());
+			var target = existingValue ?? ((CoreElasticContractResolver)serializer.ContractResolver).Container.Get(jsonObject["id"].ToString());
 			using (var r = jsonObject.CreateReader())
 				serializer.Populate(r, target);
 			return target;

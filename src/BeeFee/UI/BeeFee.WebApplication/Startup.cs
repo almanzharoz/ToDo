@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace BeeFee.WebApplication
 {
@@ -50,7 +51,8 @@ namespace BeeFee.WebApplication
 			//	//options.AddPolicy("ip-policy", policy => policy.Requirements.Add(new UserHostRequirement()));
 			//	//options.AddPolicy("resource-allow-policy", x => { x.AddRequirements(new PermissionRequirement(new[] { Operations.Read })); });
 			//});
-			services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
+
+			services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 			services.AddScoped<UserName>(x =>
 			{
 				var user = x.GetService<IHttpContextAccessor>()?.HttpContext?.User;

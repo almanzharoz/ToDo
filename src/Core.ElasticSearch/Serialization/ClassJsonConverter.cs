@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Core.ElasticSearch.Domain;
@@ -24,11 +25,9 @@ namespace Core.ElasticSearch.Serialization
 
 	internal class ClassJsonConverter<T> : JsonConverter where T : class, IProjection, new()
 	{
-		private readonly IRequestContainer _entityContainer;
 		private readonly IProjectionItem _projectionItem;
-		public ClassJsonConverter(IProjectionItem projectionItem, IRequestContainer entityContainer)
+		public ClassJsonConverter(IProjectionItem projectionItem)
 		{
-			_entityContainer = entityContainer;
 			_projectionItem = projectionItem;
 		}
 
@@ -40,8 +39,8 @@ namespace Core.ElasticSearch.Serialization
 				var v = property.GetValue(value);
 				if (v == null)
 					continue;
-				writer.WritePropertyName(property.Name.ToLower());
 				var o = JToken.FromObject(new InnerValue(v), serializer);
+				writer.WritePropertyName(property.Name.ToLower());
 				o.WriteTo(writer);
 			}
 			writer.WriteEndObject();
@@ -49,15 +48,16 @@ namespace Core.ElasticSearch.Serialization
 
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 		{
+			var container = ((CoreElasticContractResolver) serializer.ContractResolver).Container;
 			if (reader.Value is string)
-				return _entityContainer.GetOrAdd<T>(reader.Value as string, true);
+				return container.GetOrAdd<T>(reader.Value as string, true);
 			var jsonObject = JObject.Load(reader);
 			jsonObject.Remove("_type");
-			var target = existingValue ?? _entityContainer.GetOrAdd<T>(jsonObject["id"].ToString(), false);
+			var target = existingValue ?? container.GetOrAdd<T>(jsonObject["id"].ToString(), false);
 			using (var r = jsonObject.CreateReader())
 				serializer.Populate(r, target);
 			if (jsonObject.TryGetValue("parent", out var parent))
-				_entityContainer.GetOrAdd<T>(parent.Value<string>(), true);
+				container.GetOrAdd<T>(parent.Value<string>(), true);
 			if (target is IWithVersion && jsonObject.TryGetValue("version", out var v))
 				((BaseEntityWithVersion) target).Version = (int)v;
 			return target;
