@@ -21,10 +21,6 @@
                 <span asp-validation-for="Email"></span>
             </div>
             <div class="container">
-                <input type="text" asp-for="Password" placeholder="Password" class="form-control" />
-                <span asp-validation-for="Password"></span>
-            </div>
-            <div class="container">
                 @Html.ListBox("Roles", Html.GetEnumSelectList<EUserRole>(), new {@class = "form-control"})
             </div>
             <div class="container">

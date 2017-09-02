@@ -20,12 +20,12 @@ namespace BeeFee.AdminApp.Services
 		}
 
 		///<exception cref="EntityAlreadyExistsException"></exception>
-		public string AddUser(string email, string password, string name, EUserRole[] roles)
+		public string AddUser(string email, string name, EUserRole[] roles)
 		{
 			if (FilterCount<UserProjection>(q => q.Term(x => x.Email.ToLowerInvariant(), email.ToLowerInvariant())) != 0)
 				throw new EntityAlreadyExistsException();
 
-			return new NewUserProjection(email, name, password) { Roles = roles }.Fluent(x => Insert(x, true)).Id;
+			return new NewUserProjection(email, name) { Roles = roles }.Fluent(x => Insert(x, true)).Id;
 		}
 
 		public bool EditUser(string id, string email, string name, EUserRole[] roles)
