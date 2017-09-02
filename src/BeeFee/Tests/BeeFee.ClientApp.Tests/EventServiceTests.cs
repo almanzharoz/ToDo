@@ -32,8 +32,8 @@ namespace BeeFee.ClientApp.Tests
 
 			var @event = Service.GetEventByUrl("event-1");
 
-			Assert.AreEqual(@event.Name, "Event 1");
-            Assert.AreEqual(@event.Category.Name, "Category 1");
+			Assert.AreEqual(@event.Result.Name, "Event 1");
+            Assert.AreEqual(@event.Result.Category.Name, "Category 1");
         }
 
         [TestMethod]
