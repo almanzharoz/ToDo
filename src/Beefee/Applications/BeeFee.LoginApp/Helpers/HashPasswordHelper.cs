@@ -2,9 +2,8 @@
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
-namespace BeeFee.Model.Helpers
+namespace BeeFee.LoginApp.Helpers
 {
-	// TODO: Убрать отсюда
 	public static class HashPasswordHelper
 	{
 		/// <summary>

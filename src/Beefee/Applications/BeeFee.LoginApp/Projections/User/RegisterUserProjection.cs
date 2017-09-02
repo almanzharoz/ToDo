@@ -1,5 +1,5 @@
-﻿using BeeFee.Model.Embed;
-using BeeFee.Model.Helpers;
+﻿using BeeFee.LoginApp.Helpers;
+using BeeFee.Model.Embed;
 using Core.ElasticSearch.Domain;
 using Microsoft.AspNetCore.WebUtilities;
 using SharpFuncExt;

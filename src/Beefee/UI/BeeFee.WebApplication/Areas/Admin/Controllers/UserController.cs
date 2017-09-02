@@ -31,7 +31,6 @@ namespace BeeFee.WebApplication.Areas.Admin.Controllers
 		{
 			_service.AddUser(
 				addUserModel.Email,
-				addUserModel.Password,
 				addUserModel.Name,
 				addUserModel.Roles);
 

@@ -15,13 +15,10 @@ namespace BeeFee.AdminApp.Projections.User
 
 		public NewUserProjection() { } //Hack
 
-		public NewUserProjection(string email, string name, string password)
+		public NewUserProjection(string email, string name)
 		{
 			Email = email.ToLowerInvariant();
 			Name = name.Trim();
-			var salt = HashPasswordHelper.GenerateSalt();
-			Salt = Base64UrlTextEncoder.Encode(salt);
-			Password = HashPasswordHelper.GetHash(password, salt);
 		}
 	}
 }
