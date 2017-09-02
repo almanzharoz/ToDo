@@ -22,19 +22,22 @@ namespace BeeFee.OrganizerApp.Services
 			=> GetWithVersion<Event, EventProjection>(id, f => UserQuery<EventProjection>(null));
 
 		/// <exception cref="AddEntityException"></exception>
-		// TODO: добавить проверку пользователя
-		public void AddEvent(string categoryId, string name, string url, EEventType type, EventDateTime dateTime, Address address,
+		// TODO: добавить проверку 
+		public bool AddEvent(string categoryId, string name, string url, EEventType type, EventDateTime dateTime,
+			Address address,
 			TicketPrice[] prices, string html)
-			=> Insert(new NewEvent(Get<BaseUserProjection>(User.Id), Get<BaseCategoryProjection>(categoryId), name, url, type, dateTime, address, html), true)
+			=> Insert(
+					new NewEvent(Get<BaseUserProjection>(User.Id), Get<BaseCategoryProjection>(categoryId), name, url, type, dateTime,
+						address, prices, html), true)
 				.ThrowIfNot<AddEntityException>();
 
 		///<exception cref="RemoveEntityException"></exception>
-		public void RemoveEvent(string id, int version)
+		public bool RemoveEvent(string id, int version)
 			// TODO: Добавить проверку пользователя
 			=> Remove<EventProjection>(id, version, true);
 
 		///<exception cref="UpdateEntityException"></exception>
-		public void UpdateEvent(string id, int version, string name, string url, EventDateTime dateTime, Address address, EEventType type,
+		public bool UpdateEvent(string id, int version, string name, string url, EventDateTime dateTime, Address address, EEventType type,
 			string categoryId, TicketPrice[] prices, string html)
 			=> Update<EventProjection>(id, version, x => x.Change(name, url, dateTime, address, type, Get<BaseCategoryProjection>(categoryId.HasNotNullArg("category")), prices, html), true)
 				.ThrowIfNot<UpdateEntityException>();
