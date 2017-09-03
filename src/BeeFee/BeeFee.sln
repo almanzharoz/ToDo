@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.10
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sharp7Func", "..\Sharp7Func\Sharp7Func.csproj", "{DD9ADD0E-9376-4673-B78E-15B56D589056}"
 EndProject
@@ -11,33 +11,37 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{29FC54FA-C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{24455C41-3567-41CF-8E06-938E56280229}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.ElasticSearch.Tests", "..\Core.ElasticSearch.Tests\Core.ElasticSearch.Tests.csproj", "{AC221FB5-ACDC-4A94-8874-B259200E491F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.ElasticSearch.Tests", "..\Core.ElasticSearch.Tests\Core.ElasticSearch.Tests.csproj", "{AC221FB5-ACDC-4A94-8874-B259200E491F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeeFee.Model", "BeeFee.Model\BeeFee.Model.csproj", "{A9FD2886-4459-4F67-A01C-A6A38EB159E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeeFee.Model", "BeeFee.Model\BeeFee.Model.csproj", "{A9FD2886-4459-4F67-A01C-A6A38EB159E3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{B8E11930-34BA-4585-BC87-0FC519EAEC23}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Applications", "Applications", "{264231BC-2B1E-4DFC-9E5F-C6BB9442FA26}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeeFee.AdminApp", "Applications\BeeFee.AdminApp\BeeFee.AdminApp.csproj", "{9DBAF38B-B658-4DB8-AC13-325D00179436}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeeFee.AdminApp", "Applications\BeeFee.AdminApp\BeeFee.AdminApp.csproj", "{9DBAF38B-B658-4DB8-AC13-325D00179436}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeeFee.AdminApp.Tests", "Tests\BeeFee.AdminApp.Tests\BeeFee.AdminApp.Tests.csproj", "{50523E65-9EC8-46D3-AEAF-9A8AD03E0100}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeeFee.AdminApp.Tests", "Tests\BeeFee.AdminApp.Tests\BeeFee.AdminApp.Tests.csproj", "{50523E65-9EC8-46D3-AEAF-9A8AD03E0100}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeeFee.TestsApp", "Tests\BeeFee.TestsApp\BeeFee.TestsApp.csproj", "{8E67E7F3-34E4-4AFF-AF0E-9D42582C4FD9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeeFee.TestsApp", "Tests\BeeFee.TestsApp\BeeFee.TestsApp.csproj", "{8E67E7F3-34E4-4AFF-AF0E-9D42582C4FD9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeeFee.LoginApp.Tests", "Tests\BeeFee.LoginApp.Tests\BeeFee.LoginApp.Tests.csproj", "{53E71183-4867-4DAE-8F0F-C9810722904B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeeFee.LoginApp.Tests", "Tests\BeeFee.LoginApp.Tests\BeeFee.LoginApp.Tests.csproj", "{53E71183-4867-4DAE-8F0F-C9810722904B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeeFee.LoginApp", "Applications\BeeFee.LoginApp\BeeFee.LoginApp.csproj", "{6EE96DBF-7DB4-4DDF-8939-5E1E14F0D122}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeeFee.LoginApp", "Applications\BeeFee.LoginApp\BeeFee.LoginApp.csproj", "{6EE96DBF-7DB4-4DDF-8939-5E1E14F0D122}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeeFee.ClientApp", "Applications\BeeFee.ClientApp\BeeFee.ClientApp.csproj", "{CF6403F5-77CB-4D67-90A9-252DA2763C6E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeeFee.ClientApp", "Applications\BeeFee.ClientApp\BeeFee.ClientApp.csproj", "{CF6403F5-77CB-4D67-90A9-252DA2763C6E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeeFee.OrganizerApp", "Applications\BeeFee.OrganizerApp\BeeFee.OrganizerApp.csproj", "{C3BA88A5-2F80-46B3-B815-91DCFE5107DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeeFee.OrganizerApp", "Applications\BeeFee.OrganizerApp\BeeFee.OrganizerApp.csproj", "{C3BA88A5-2F80-46B3-B815-91DCFE5107DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeeFee.OrganizerApp.Tests", "Tests\BeeFee.OrganizerApp.Tests\BeeFee.OrganizerApp.Tests.csproj", "{EF124A85-CA9B-4FC1-BEAA-95ECF1745144}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeeFee.OrganizerApp.Tests", "Tests\BeeFee.OrganizerApp.Tests\BeeFee.OrganizerApp.Tests.csproj", "{EF124A85-CA9B-4FC1-BEAA-95ECF1745144}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeeFee.ClientApp.Tests", "Tests\BeeFee.ClientApp.Tests\BeeFee.ClientApp.Tests.csproj", "{12CD837A-FA34-417F-8F22-8268DAE6B405}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeeFee.ClientApp.Tests", "Tests\BeeFee.ClientApp.Tests\BeeFee.ClientApp.Tests.csproj", "{12CD837A-FA34-417F-8F22-8268DAE6B405}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeeFee.WebApplication", "UI\BeeFee.WebApplication\BeeFee.WebApplication.csproj", "{579823DD-83F7-4BB9-8AC4-8FB5E5B56658}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeeFee.WebApplication", "UI\BeeFee.WebApplication\BeeFee.WebApplication.csproj", "{579823DD-83F7-4BB9-8AC4-8FB5E5B56658}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeeFee.ImageApp", "Applications\BeeFee.ImageApp\BeeFee.ImageApp.csproj", "{E0256FD5-CF03-47A8-B4E9-0772912C87E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeeFee.ImageApp.Tests", "Tests\BeeFee.ImageApp.Tests\BeeFee.ImageApp.Tests.csproj", "{01A7B836-EB1F-4566-9350-8AA1CA95C5C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,6 +105,14 @@ Global
 		{579823DD-83F7-4BB9-8AC4-8FB5E5B56658}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{579823DD-83F7-4BB9-8AC4-8FB5E5B56658}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{579823DD-83F7-4BB9-8AC4-8FB5E5B56658}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0256FD5-CF03-47A8-B4E9-0772912C87E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0256FD5-CF03-47A8-B4E9-0772912C87E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0256FD5-CF03-47A8-B4E9-0772912C87E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0256FD5-CF03-47A8-B4E9-0772912C87E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01A7B836-EB1F-4566-9350-8AA1CA95C5C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01A7B836-EB1F-4566-9350-8AA1CA95C5C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01A7B836-EB1F-4566-9350-8AA1CA95C5C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01A7B836-EB1F-4566-9350-8AA1CA95C5C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -119,6 +131,8 @@ Global
 		{EF124A85-CA9B-4FC1-BEAA-95ECF1745144} = {24455C41-3567-41CF-8E06-938E56280229}
 		{12CD837A-FA34-417F-8F22-8268DAE6B405} = {24455C41-3567-41CF-8E06-938E56280229}
 		{579823DD-83F7-4BB9-8AC4-8FB5E5B56658} = {B8E11930-34BA-4585-BC87-0FC519EAEC23}
+		{E0256FD5-CF03-47A8-B4E9-0772912C87E8} = {264231BC-2B1E-4DFC-9E5F-C6BB9442FA26}
+		{01A7B836-EB1F-4566-9350-8AA1CA95C5C9} = {24455C41-3567-41CF-8E06-938E56280229}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E8287FBF-0FC4-4441-BE8B-CA1E25292B1B}

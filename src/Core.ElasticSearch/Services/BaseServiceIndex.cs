@@ -12,7 +12,7 @@ namespace Core.ElasticSearch
 		//protected bool Insert<T>(T entity) where T : BaseNewEntity => Insert(entity, true);
 		protected bool Insert<T>(T entity, bool refresh) where T : BaseNewEntity, IProjection
 			=> Try(
-				c => c.Index(entity, s => s
+				c => c.Index(entity.HasNotNullArg(nameof(entity)), s => s
 						.Index(_mapping.GetIndexName<T>())
 						.Type(_mapping.GetTypeName<T>())
 						.IfNotNull(entity.Id, x => x.OpType(OpType.Create))
@@ -23,7 +23,7 @@ namespace Core.ElasticSearch
 
 		protected Task<bool> InsertAsync<T>(T entity, bool refresh) where T : BaseNewEntity, IProjection
 			=> TryAsync(
-				c => c.IndexAsync(entity, s => s
+				c => c.IndexAsync(entity.HasNotNullArg(nameof(entity)), s => s
 						.Index(_mapping.GetIndexName<T>())
 						.Type(_mapping.GetTypeName<T>())
 						.IfNotNull(entity.Id, x => x.OpType(OpType.Create))
@@ -42,7 +42,7 @@ namespace Core.ElasticSearch
 		protected T Insert<TNew, T>(TNew entity) where TNew : BaseNewEntity, IProjection
 			where T : BaseEntity, IProjection, IGetProjection
 			=> Try(
-				c => c.Index(entity, s => s
+				c => c.Index(entity.HasNotNullArg(nameof(entity)), s => s
 						.Index(_mapping.GetIndexName<T>())
 						.Type(_mapping.GetTypeName<T>())
 						.IfNotNull(entity.Id, x => x.OpType(OpType.Create))
@@ -61,7 +61,7 @@ namespace Core.ElasticSearch
 		protected T InsertWithVersion<TNew, T>(TNew entity) where TNew : BaseNewEntity, IProjection
 			where T : BaseEntityWithVersion, IProjection, IGetProjection
 			=> Try(
-				c => c.Index(entity, s => s
+				c => c.Index(entity.HasNotNullArg(nameof(entity)), s => s
 						.Index(_mapping.GetIndexName<T>())
 						.Type(_mapping.GetTypeName<T>())
 						.IfNotNull(entity.Id, x => x.OpType(OpType.Create))
