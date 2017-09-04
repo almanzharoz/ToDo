@@ -56,17 +56,41 @@ namespace BeeFee.ImageApp
 		    return new AddImageResult(EAddImageResut.Ok, filename, null);
 	    }
 
-	    public string GetImageUrl(ImageSize size, string filename)
+		public string GetImageUrl(ImageSize size, string filename)
 	    {
-			var path = Path.Combine(_folder, $"{size.Width}_{size.Height}", filename);
+		    var path = Path.Combine(_folder, $"{size.Width}_{size.Height}", filename);
 		    return File.Exists(path) ? $"/{size.Width}_{size.Height}/{filename}" : "";
-		}
+	    }
 
 	    public string GetImageUrl(string filename)
 	    {
-			var path = Path.Combine(_folder, filename);
+		    var path = Path.Combine(_folder, filename);
 		    return File.Exists(path) ? $"/{filename}" : "";
-		}
+	    }
+
+	    public void Remove(string filename)
+	    {
+		    var dirInfo = new DirectoryInfo(_folder);
+		    foreach (var dir in dirInfo.GetDirectories())
+			    dir.EnumerateFiles(filename).ToList().ForEach(x => x.Delete());
+		    dirInfo.EnumerateFiles(filename).ToList().ForEach(x => x.Delete());
+	    }
+
+	    public async Task<AddImageResult> Update(Stream stream, string filename, ImageSize[] sizes)
+	    {
+		    var files = new DirectoryInfo(_folder).GetFiles(filename, SearchOption.AllDirectories);
+		    foreach (var file in files)
+		    {
+			    var isExists = sizes
+				    .Any(size =>
+					    file.Directory.Name
+						    .Contains($"{size.Width}_{size.Height}"));
+			    if(!isExists) return new AddImageResult(EAddImageResut.Error, filename, "Not all sizes for changing");
+		    }
+
+		    Remove(filename);
+		    return await AddImage(stream, filename, sizes);
+	    }
 
 		private string GetMinDirectoryName(ImageSize size)
 		    => String.Concat(size.Width, "_", size.Height);
