@@ -28,8 +28,7 @@ namespace BeeFee.OrganizerApp.Services
 			TicketPrice[] prices, string html)
 			=> Insert(
 					new NewEvent(Get<BaseUserProjection>(User.Id), Get<BaseCategoryProjection>(categoryId), name, url, type, dateTime,
-						address, prices, html), true)
-				.ThrowIfNot<AddEntityException>();
+						address, prices, html), true);
 
 		///<exception cref="RemoveEntityException"></exception>
 		public bool RemoveEvent(string id, int version)
