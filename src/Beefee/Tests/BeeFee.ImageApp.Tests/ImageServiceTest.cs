@@ -11,24 +11,23 @@ namespace BeeFee.ImageApp.Tests
 	    [TestInitialize]
 	    public void Setup()
 	    {
+		    if (!Directory.Exists("images"))
+			    Directory.CreateDirectory("images");
 		    foreach (var file in new DirectoryInfo("images").GetFiles())
 			    file.Delete();
 		    _service = new ImageService(@"images");
 	    }
 
-        //[TestMethod]
-        //public void AddImage()
-        //{
-	       // var s = Path.GetFullPath("images");
-	       // using (var stream = new MemoryStream(ImagesResource.priroda_bwua_02_06_2012_019__1920x12001))
-		      //  _service.AddImage(stream, "priroda.jpg", null).Wait();
-        //}
+	    private const string TestImageName = "IMG_3946.jpg";
+
+	    private Stream GetImage(string filename)
+		    => File.OpenRead(filename);
 
 	    [TestMethod]
 	    public void AddImageTest()
 	    {
 		    AddImageResult result;
-			using (var stream = new MemoryStream(ImagesResource.Rio_de_Janeiro))
+			using (var stream = GetImage(TestImageName))
 			{
 				result = _service.AddImage(stream, "priroda.jpg", null).Result;
 			}
@@ -42,7 +41,7 @@ namespace BeeFee.ImageApp.Tests
 		public void AddExistingImageTest()
 		{
 			AddImageResult result;
-			using (var stream = new MemoryStream(ImagesResource.Rio_de_Janeiro))
+			using (var stream = GetImage(TestImageName))
 			{
 				result = _service.AddImage(stream, "priroda.jpg", null).Result;
 			}
@@ -51,7 +50,7 @@ namespace BeeFee.ImageApp.Tests
 			Assert.AreEqual(null, result.Error);
 			Assert.AreEqual("priroda.jpg", result.Path);
 
-			using (var stream = new MemoryStream(ImagesResource.Rio_de_Janeiro))
+			using (var stream = GetImage(TestImageName))
 			{
 				result = _service.AddImage(stream, "priroda.jpg", null).Result;
 			}
@@ -65,7 +64,7 @@ namespace BeeFee.ImageApp.Tests
 	    public void AddImageWithSize()
 	    {
 			AddImageResult result;
-		    using (var stream = new MemoryStream(ImagesResource.Rio_de_Janeiro))
+		    using (var stream = GetImage(TestImageName))
 		    {
 			    result = _service.AddImage(stream, "priroda.jpg", new[] {new ImageSize(200, 200), new ImageSize(400, 200)})
 				    .Result;
@@ -83,7 +82,7 @@ namespace BeeFee.ImageApp.Tests
 		public void GetOriginalImage()
 	    {
 			AddImageResult result;
-		    using (var stream = new MemoryStream(ImagesResource.Rio_de_Janeiro))
+		    using (var stream = GetImage(TestImageName))
 		    {
 			    result = _service.AddImage(stream, "priroda.jpg", new[] { new ImageSize(200, 200), new ImageSize(400, 200) })
 				    .Result;
@@ -100,7 +99,7 @@ namespace BeeFee.ImageApp.Tests
 	    public void GetResizedImage()
 	    {
 		    AddImageResult result;
-		    using (var stream = new MemoryStream(ImagesResource.Rio_de_Janeiro))
+		    using (var stream = GetImage(TestImageName))
 		    {
 			    result = _service.AddImage(stream, "priroda.jpg", new[] { new ImageSize(200, 200), new ImageSize(400, 200) })
 				    .Result;
@@ -118,7 +117,7 @@ namespace BeeFee.ImageApp.Tests
 	    public void GetNonexistentImage()
 	    {
 			AddImageResult result;
-		    using (var stream = new MemoryStream(ImagesResource.Rio_de_Janeiro))
+		    using (var stream = GetImage(TestImageName))
 		    {
 			    result = _service.AddImage(stream, "priroda.jpg", new[] { new ImageSize(200, 200), new ImageSize(400, 200) })
 				    .Result;
