@@ -56,16 +56,16 @@ namespace BeeFee.ImageApp
 		    return new AddImageResult(EAddImageResut.Ok, filename, null);
 	    }
 
-	    public Image<Rgba32> GetImageOrDefault(ImageSize size, string filename)
+	    public string GetImageUrl(ImageSize size, string filename)
 	    {
-		    var path = Path.Combine(_folder, $"{size.Width}_{size.Height}", filename);
-		    return File.Exists(path) ? Image.Load(File.OpenRead(path)) : null;
+			var path = Path.Combine(_folder, $"{size.Width}_{size.Height}", filename);
+		    return File.Exists(path) ? $"/{size.Width}_{size.Height}/{filename}" : "";
 		}
 
-		public Image<Rgba32> GetImageOrDefault(string filename)
+	    public string GetImageUrl(string filename)
 	    {
-		    var path = Path.Combine(_folder, filename);
-		    return File.Exists(path) ? Image.Load(File.OpenRead(path)) : null;
+			var path = Path.Combine(_folder, filename);
+		    return File.Exists(path) ? $"/{filename}" : "";
 		}
 
 		private string GetMinDirectoryName(ImageSize size)

@@ -92,7 +92,7 @@ namespace BeeFee.ImageApp.Tests
 		    Assert.AreEqual(null, result.Error);
 		    Assert.AreEqual("priroda.jpg", result.Path);
 
-			Assert.IsNotNull(_service.GetImageOrDefault("priroda.jpg"));
+			Assert.AreEqual("/priroda.jpg" ,_service.GetImageUrl("priroda.jpg"));
 		}
 
 	    [TestMethod]
@@ -109,8 +109,8 @@ namespace BeeFee.ImageApp.Tests
 		    Assert.AreEqual(null, result.Error);
 		    Assert.AreEqual("priroda.jpg", result.Path);
 
-		    Assert.IsNotNull(_service.GetImageOrDefault(new ImageSize(200, 200), "priroda.jpg"));
-		    Assert.IsNotNull(_service.GetImageOrDefault(new ImageSize(400, 200), "priroda.jpg"));
+		    Assert.AreEqual("/200_200/priroda.jpg", _service.GetImageUrl(new ImageSize(200, 200), "priroda.jpg"));
+		    Assert.AreEqual("/400_200/priroda.jpg", _service.GetImageUrl(new ImageSize(400, 200), "priroda.jpg"));
 	    }
 
 	    [TestMethod]
@@ -127,7 +127,8 @@ namespace BeeFee.ImageApp.Tests
 		    Assert.AreEqual(null, result.Error);
 		    Assert.AreEqual("priroda.jpg", result.Path);
 
-		    Assert.IsNull(_service.GetImageOrDefault(new ImageSize(300, 200), "priroda.jpg"));
+		    Assert.AreEqual("", _service.GetImageUrl(new ImageSize(300, 200), "priroda.jpg"));
+
 		}
 	}
 }
