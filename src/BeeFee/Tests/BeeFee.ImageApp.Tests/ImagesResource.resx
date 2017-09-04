@@ -118,7 +118,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="priroda_bwua_02_06_2012_019__1920x12001" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <!--<data name="priroda_bwua_02_06_2012_019__1920x12001" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\..\..\..\..\Users\Alexandr\Pictures\test\priroda_bwua_02.06.2012_019__1920x12001.jpg;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>-->
+  <data name="Rio_de_Janeiro" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\..\..\..\..\..\..\Downloads\Rio de Janeiro, Brazil.jpg;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

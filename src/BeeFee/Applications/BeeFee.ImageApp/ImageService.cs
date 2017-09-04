@@ -56,6 +56,18 @@ namespace BeeFee.ImageApp
 		    return new AddImageResult(EAddImageResut.Ok, filename, null);
 	    }
 
+	    public string GetImageUrl(ImageSize size, string filename)
+	    {
+			var path = Path.Combine(_folder, $"{size.Width}_{size.Height}", filename);
+		    return File.Exists(path) ? $"/{size.Width}_{size.Height}/{filename}" : "";
+		}
+
+	    public string GetImageUrl(string filename)
+	    {
+			var path = Path.Combine(_folder, filename);
+		    return File.Exists(path) ? $"/{filename}" : "";
+		}
+
 		private string GetMinDirectoryName(ImageSize size)
 		    => String.Concat(size.Width, "_", size.Height);
 
