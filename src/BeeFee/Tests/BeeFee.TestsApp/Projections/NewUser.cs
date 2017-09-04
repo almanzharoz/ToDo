@@ -1,6 +1,6 @@
 ﻿using Core.ElasticSearch.Domain;
 using BeeFee.Model.Embed;
-using BeeFee.Model.Helpers;
+using BeeFee.TestsApp.Helpers;
 using BeeFee.Model.Models;
 using Microsoft.AspNetCore.WebUtilities;
 
