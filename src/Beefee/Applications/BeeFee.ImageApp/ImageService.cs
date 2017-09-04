@@ -59,7 +59,7 @@ namespace BeeFee.ImageApp
 		public string GetImageUrl(ImageSize size, string filename)
 	    {
 		    var path = Path.Combine(_folder, $"{size.Width}_{size.Height}", filename);
-		    return File.Exists(path) ? $"/{size.Width}_{size.Height}/{filename}" : "";
+		    return File.Exists(path) ? $"/{size}/{filename}" : "";
 	    }
 
 	    public string GetImageUrl(string filename)
@@ -84,7 +84,7 @@ namespace BeeFee.ImageApp
 			    var isExists = sizes
 				    .Any(size =>
 					    file.Directory.Name
-						    .Contains($"{size.Width}_{size.Height}"));
+						    .Contains(size.ToString()));
 			    if(!isExists) return new AddImageResult(EAddImageResut.Error, filename, "Not all sizes for changing");
 		    }
 
@@ -92,12 +92,9 @@ namespace BeeFee.ImageApp
 		    return await AddImage(stream, filename, sizes);
 	    }
 
-		private string GetMinDirectoryName(ImageSize size)
-		    => String.Concat(size.Width, "_", size.Height);
-
 	    private void ResizeImage(Image<Rgba32> image, ImageSize size, string filename)
 	    {
-		    var folder = Path.Combine(_folder, Path.GetDirectoryName(filename), GetMinDirectoryName(size));
+		    var folder = Path.Combine(_folder, Path.GetDirectoryName(filename), size.ToString());
 		    var minfullpath = Path.Combine(folder, Path.GetFileName(filename));
 		    if (!Directory.Exists(folder))
 			    Directory.CreateDirectory(folder);
@@ -108,7 +105,7 @@ namespace BeeFee.ImageApp
 		private async Task SaveToFile(Stream stream, string filename)
 	    {
 		    var buffer = new byte[65000];
-		    Task task = Task.CompletedTask;
+		    var task = Task.CompletedTask;
 		    var len = 1;
 		    using (var writeStream = File.Create(filename))
 		    {
