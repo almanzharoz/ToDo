@@ -111,5 +111,12 @@ namespace SharpFuncExt
 			sw.Stop();
 			return r;
 		}
+
+		public static async Task<TResult> Using<T, TResult>(this T arg, Func<T, Task<TResult>> func) where T : IDisposable
+		{
+			using (arg)
+				return await func(arg);
+		}
+
 	}
 }

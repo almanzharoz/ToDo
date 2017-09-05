@@ -10,6 +10,7 @@ using BeeFee.Model;
 using BeeFee.Model.Models;
 using BeeFee.Model.Projections;
 using BeeFee.OrganizerApp;
+using BeeFee.WebApplication.Infrastructure;
 using BeeFee.WebApplication.Infrastructure.Binders;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -17,6 +18,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace BeeFee.WebApplication
 {
@@ -32,6 +34,9 @@ namespace BeeFee.WebApplication
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+			services.Configure<BeeFeeWebAppSettings>(Configuration.GetSection("Settings"));
+			services.AddSingleton(cfg => cfg.GetService<IOptions<BeeFeeWebAppSettings>>().Value);
+
 			services.AddMvc(opts => opts.ModelBinderProviders.Insert(0, new CustomDateTimeModelBinderProvider()));
 
 			services.AddLogging();
@@ -101,6 +106,8 @@ namespace BeeFee.WebApplication
 					name: "default",
 					template: "{controller=Home}/{action=Index}/{id?}");
 			});
+
+			BeeFeeWebAppSettings.Instance = app.ApplicationServices.GetService<IOptions<BeeFeeWebAppSettings>>().Value;
 
 			app.ApplicationServices
 				.UseBeefeeModel(p => p

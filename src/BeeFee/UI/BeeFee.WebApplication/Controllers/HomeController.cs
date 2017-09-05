@@ -28,5 +28,10 @@ namespace BeeFee.WebApplication.Controllers
         {
             return View();
         }
+
+	    public IActionResult FileTest()
+	    {
+		    return View();
+	    }
     }
 }
