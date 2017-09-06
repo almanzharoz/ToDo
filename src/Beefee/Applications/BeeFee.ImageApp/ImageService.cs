@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using ImageSharp;
 using ImageSharp.Formats;
+using ImageSharp.Processing;
+using SixLabors.Primitives;
 
 namespace BeeFee.ImageApp
 {
@@ -40,10 +42,12 @@ namespace BeeFee.ImageApp
 						    }
 						    catch (Exception e)
 						    {
-							    image.Dispose();
 							    return new AddImageResult(EAddImageResut.Error, filename, e.Message);
 						    }
-						    image.Dispose();
+							finally
+							{
+							    image.Dispose();
+						    }
 						    return new AddImageResult(EAddImageResut.Ok, filename, null);
 					    }).ConfigureAwait(false);
 				    }
@@ -98,7 +102,9 @@ namespace BeeFee.ImageApp
 		    var minfullpath = Path.Combine(folder, Path.GetFileName(filename));
 		    if (!Directory.Exists(folder))
 			    Directory.CreateDirectory(folder);
-		    image.Resize(size.Width, size.Height).Save(minfullpath, new JpegEncoder { Quality = 85 });
+		    using (var newimg = new Image<Rgba32>(image))
+			    newimg.Resize(new ResizeOptions() {Mode = ResizeMode.Max, Size = new Size(size.Width, size.Height)})
+				    .Save(minfullpath, new JpegEncoder {Quality = 85});
 	    }
 
 

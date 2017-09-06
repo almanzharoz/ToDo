@@ -1,4 +1,6 @@
-﻿namespace BeeFee.ImageApp
+﻿using ImageSharp.Processing;
+
+namespace BeeFee.ImageApp
 {
 	public struct ImageSize
 	{
