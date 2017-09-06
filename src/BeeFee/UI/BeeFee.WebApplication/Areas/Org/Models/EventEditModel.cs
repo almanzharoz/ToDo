@@ -18,6 +18,7 @@ namespace BeeFee.WebApplication.Areas.Org.Models
 		public string Name { get; set; }
 
 		public string Url { get; set; }
+		public string Cover { get; set; }
 
 		public string CategoryId { get; set; }
 
@@ -62,6 +63,7 @@ namespace BeeFee.WebApplication.Areas.Org.Models
 			City = @event.Address.City;
 			Address = @event.Address.AddressString;
 			Html= @event.Page.Html;
+			Cover = @event.Page.Cover;
 		}
 
 		public EventEditModel Init(IReadOnlyCollection<CategoryProjection> categories)
