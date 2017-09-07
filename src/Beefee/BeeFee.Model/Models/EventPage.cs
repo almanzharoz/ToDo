@@ -14,35 +14,26 @@ namespace BeeFee.Model
 		/// <summary>
 		/// Внутренний HTML страницы мероприятия
 		/// </summary>
-		[JsonProperty]
 		public string Html { get; private set; }
 		/// <summary>
 		/// Заголовок title страницы
 		/// </summary>
-		[JsonProperty]
 		[Keyword(Index = false)]
 		public string Title { get; private set; }
-		[JsonProperty]
 		public string Caption { get; private set; }
-		[JsonProperty]
 		[Keyword(Index = false)]
 		public string Cover { get; private set; }
 		/// <summary>
 		/// Галерея
 		/// </summary>
-		[JsonProperty]
 		[Keyword(Index = false)]
 		public string[] Images { get; private set; }
 
-		[JsonProperty]
 		public Address Address { get; private set; }
-		[JsonProperty]
 		[Keyword(Index = false)]
 		public string Date { get; private set; }
-		[JsonProperty]
 		[Keyword(Index = false)]
 		public string Category { get; private set; }
-		[JsonProperty]
 		[Keyword(Index = false)]
 		public string Company { get; private set; }
 
