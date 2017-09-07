@@ -23,7 +23,7 @@ namespace BeeFee.AdminApp.Tests
 		[TestMethod]
 		public void AddUserTest()
 		{
-			var userId = Service.AddUser("test@test", "123", "test", new[] { EUserRole.Organizer});
+			var userId = Service.AddUser("test@test", "test", new[] { EUserRole.Organizer});
 			Assert.IsNotNull(userId);
 
 			var user = Service.GetUser(userId);
@@ -36,7 +36,7 @@ namespace BeeFee.AdminApp.Tests
 		[TestMethod]
 		public void DeleteUserTest()
 		{
-			var userId = Service.AddUser("test@test", "123", "test", new[] { EUserRole.Organizer});
+			var userId = Service.AddUser("test@test", "test", new[] { EUserRole.Organizer});
 			Assert.IsNotNull(userId);
 
 			Assert.IsTrue(Service.DeleteUser(userId));
@@ -47,7 +47,7 @@ namespace BeeFee.AdminApp.Tests
 		[TestMethod]
 		public void SearchUserByEmailTest()
 		{
-			var userId = Service.AddUser("test@mail.ru", "123", "test", new[] { EUserRole.Organizer });
+			var userId = Service.AddUser("test@mail.ru", "test", new[] { EUserRole.Organizer });
 			Assert.IsNotNull(userId);
 
 			var searched1 = Service.SearchUsersByEmail("test").SingleOrDefault();
@@ -68,7 +68,7 @@ namespace BeeFee.AdminApp.Tests
 		[TestMethod]
 		public void EditUserText()
 		{
-			var userId = Service.AddUser("test@mail.ru", "123", "test", new[] { EUserRole.Organizer });
+			var userId = Service.AddUser("test@mail.ru", "test", new[] { EUserRole.Organizer });
 			Assert.IsNotNull(userId);
 
 			var edited = Service.EditUser(userId, "newmail@mail.ru", "newName", new[] { EUserRole.User });
