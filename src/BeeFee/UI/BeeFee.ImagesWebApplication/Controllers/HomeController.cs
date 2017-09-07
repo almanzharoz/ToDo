@@ -19,6 +19,7 @@ namespace BeeFee.ImagesWebApplication.Controllers
 	{
 		public ImgSize[] Sizes { get; set; }
 		public IFormFile File { get; set; }
+		public string Filename { get; set; }
 	}
 
     [Route("api/[controller]")]
@@ -48,7 +49,7 @@ namespace BeeFee.ImagesWebApplication.Controllers
 	    [HttpPost]
 	    public async Task<JsonResult> Post(Model model)
 		    => Json(await model.File.OpenReadStream()
-			    .Using(stream => _service.AddImage(stream, model.File.FileName,
+			    .Using(stream => _service.AddImage(stream, model.Filename ?? model.File.FileName,
 				    model.Sizes.Select(x => new ImageSize(x.Width, x.Height)).ToArray())));
         
 
