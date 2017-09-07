@@ -16,5 +16,9 @@ namespace Core.ElasticSearch.Tests.Projections
 	{
         public string Name { get; set; }
 		public FullName FullName { get; private set; }
-    }
+
+		public ProductProjection(string id, Category parent) : base(id, parent)
+		{
+		}
+	}
 }

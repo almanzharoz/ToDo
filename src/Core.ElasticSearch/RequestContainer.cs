@@ -7,13 +7,16 @@ using System.Linq;
 using System.Text;
 using Core.ElasticSearch.Domain;
 using Core.ElasticSearch.Mapping;
+using Core.ElasticSearch.Serialization;
 using SharpFuncExt;
 
 namespace Core.ElasticSearch
 {
 	internal interface IRequestContainer
 	{
-		T GetOrAdd<T>(string key, bool load) where T : class, IEntity, new();
+		T GetOrAdd<T>(T entity) where T : class, IProjection, IJoinProjection;
+		//T AddOrUpdate<T>(T entity) where T : class, IProjection;
+		//T Get<T>(string key) where T : class, IProjection, IJoinProjection, new();
 		IEntity Get(string key);
 		IEnumerable<(string index, IEnumerable<string> types, IEnumerable<string> fields, IEnumerable<string> ids)> PopEntitiesForLoad();
 	}
@@ -39,45 +42,62 @@ namespace Core.ElasticSearch
 		}
 
 		//TODO: Возможно, нужно добавить GetOrAdd<T, TParent>(id, parent)
-		public T GetOrAdd<T>(string key, bool load) where T : class, IEntity, new()
+		public T GetOrAdd<T>(T entity) where T : class, IProjection, IJoinProjection
 		{
 			var type = typeof(T);
-			return (T) _cache.AddOrUpdate(key,
+			return (T) _cache.AddOrUpdate(entity.Id,
 					x =>
 					{
-						T result = new T();
-						if (result is BaseEntity)
-							(result as BaseEntity).Id = key;
-						else
-							(result as BaseEntityWithVersion).Id = key;
-
-						if (load)
-							lock (_locker)
-								_loadBag.Add(result);
+						lock (_locker)
+							_loadBag.Add(entity);
 						var list = new List<KeyValuePair<IEntity, bool>>();
-						list.Add(new KeyValuePair<IEntity, bool>(result, load));
+						list.Add(new KeyValuePair<IEntity, bool>(entity, true));
 						return list;
 					},
 					(k, e) =>
 					{
 						if (e.All(x => x.Key.GetType() != type))
 						{
-							T result = new T();
-							if (result is BaseEntity)
-								(result as BaseEntity).Id = key;
-							else
-								(result as BaseEntityWithVersion).Id = key;
-
-							if (load)
-								lock (_locker)
-									_loadBag.Add(result);
-							e.Add(new KeyValuePair<IEntity, bool>(result, load));
+							lock (_locker)
+								_loadBag.Add(entity);
+							e.Add(new KeyValuePair<IEntity, bool>(entity, true));
 						}
 						return e;
 					})
 				.First(x => x.Key.GetType() == type)
 				.Key;
 		}
+
+		//public T AddOrUpdate<T>(T entity) where T : class, IProjection
+		//{
+		//	var type = typeof(T);
+		//	return (T) _cache.AddOrUpdate(entity.Id, key =>
+		//		{
+		//			var list = new List<KeyValuePair<IEntity, bool>>();
+		//			list.Add(new KeyValuePair<IEntity, bool>(entity, false));
+		//			return list;
+
+		//		}, (key, list) =>
+		//		{
+		//			if (list.All(x => x.Key.GetType() != type))
+		//			{
+		//				list.Add(new KeyValuePair<IEntity, bool>(entity, false));
+		//			}
+		//			else throw new Exception($"Second load type {type.Name} with Id: {entity.Id}");
+		//			return list;
+
+		//		})
+		//		.First(x => x.Key.GetType() == type)
+		//		.Key;
+		//}
+
+		//public T Get<T>(string key) where T : class, IProjection, IJoinProjection, new()
+		//{
+		//	var type = typeof(T);
+		//	if(!_cache.TryGetValue(key, out var result))
+		//		throw new KeyNotFoundException();
+		//	return (T)result.First(x => x.Key.GetType() == type).Key;
+		//}
 
 		public IEntity Get(string key)
 		{

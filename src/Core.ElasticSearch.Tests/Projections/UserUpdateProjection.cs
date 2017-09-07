@@ -8,5 +8,13 @@ namespace Core.ElasticSearch.Tests.Projections
         public string Login { get; private set; }
         public string Email { get; set; }
         public string Password { get; set; }
+
+	    public UserUpdateProjection(string id) : base(id)
+	    {
+	    }
+
+	    public UserUpdateProjection(string id, int version) : base(id, version)
+	    {
+	    }
     }
 }

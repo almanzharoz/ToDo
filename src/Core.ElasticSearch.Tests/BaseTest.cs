@@ -26,17 +26,19 @@ namespace Core.ElasticSearch.Tests
 		        .AddMapping<Product>(x => x.FirstIndex)
 		        .AddMapping<User>(x => x.FirstIndex), s => s
 
-		        .AddProjection<Producer, Producer>()
-		        .AddProjection<NewProducer, Producer>()
-		        .AddProjection<Category, Category>()
+		        //.AddProjection<Producer, Producer>()
+		        //.AddProjection<NewProducer, Producer>()
+		        //.AddProjection<Category, Category>()
 		        .AddProjection<NewCategory, Category>()
 		        .AddProjection<CategoryProjection, Category>()
-		        .AddProjection<ProductProjection, Product, Category>()
-		        .AddProjection<Product, Product, Category>()
-		        .AddProjection<NewProduct, Product, Category>()
-		        .AddProjection<User, User>()
-		        .AddProjection<NewUser, User>()
-		        .AddProjection<UserUpdateProjection, User>(), true);
+		        .AddJoinProjection<CategoryJoin, Category>()
+		        //.AddProjection<ProductProjection, Product>()
+		        //.AddProjection<Product, Product>()
+		        //.AddProjection<NewProduct, Product>()
+		        //.AddProjection<User, User>()
+		        //.AddProjection<NewUser, User>()
+		        //.AddProjection<UserUpdateProjection, User>()
+				, true);
 
             _repository = serviceProvider.GetService<TestService>();
         }

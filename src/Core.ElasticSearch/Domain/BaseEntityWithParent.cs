@@ -7,6 +7,11 @@ namespace Core.ElasticSearch.Domain
 	{
 		[JsonIgnore]
 		public T Parent { get; internal set; }
+
+		protected BaseEntityWithParent(string id, T parent) : base(id)
+		{
+			Parent = parent;
+		}
 	}
 
 	public abstract class BaseEntityWithParentAndVersion<T> : BaseEntityWithVersion, IWithParent<T>
@@ -14,6 +19,16 @@ namespace Core.ElasticSearch.Domain
 	{
 		[JsonIgnore]
 		public T Parent { get; internal set; }
+
+		protected BaseEntityWithParentAndVersion(string id, T parent) : base(id)
+		{
+			Parent = parent;
+		}
+
+		protected BaseEntityWithParentAndVersion(string id, T parent, int version) : base(id, version)
+		{
+			Parent = parent;
+		}
 	}
 
 	public abstract class BaseNewEntityWithParent<T> : BaseNewEntity, IWithParent<T>, IProjection
@@ -22,9 +37,12 @@ namespace Core.ElasticSearch.Domain
 		[JsonIgnore]
 		public T Parent { get; }
 
-		protected BaseNewEntityWithParent() { } // TODO: Заменить везде where new() на контракты
-
 		protected BaseNewEntityWithParent(T parent)
+		{
+			Parent = parent;
+		}
+
+		protected BaseNewEntityWithParent(string id, T parent) : base(id)
 		{
 			Parent = parent;
 		}

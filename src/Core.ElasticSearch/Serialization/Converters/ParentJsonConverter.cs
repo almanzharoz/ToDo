@@ -8,8 +8,8 @@ using Newtonsoft.Json.Linq;
 namespace Core.ElasticSearch.Serialization
 {
 	internal class ParentJsonConverter<T, TParent> : JsonConverter
-		where T : class, IEntity, IProjection, IWithParent<TParent>, new()
-		where TParent : class, IEntity, IProjection, new()
+		where T : class, IEntity, IProjection, IWithParent<TParent>
+		where TParent : class, IEntity, IProjection
 	{
 		private readonly IProjectionItem _projection;
 
@@ -27,7 +27,7 @@ namespace Core.ElasticSearch.Serialization
 				if (v == null)
 					continue;
 				writer.WritePropertyName(property.Name.ToLower());
-				var o = JToken.FromObject(new InnerValue(v), serializer);
+				var o = JToken.FromObject(v, serializer);
 				o.WriteTo(writer);
 			}
 			writer.WriteEndObject();
@@ -35,22 +35,23 @@ namespace Core.ElasticSearch.Serialization
 
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 		{
-			var container = ((CoreElasticContractResolver)serializer.ContractResolver).Container;
-			if (reader.Value is string)
-				return container.GetOrAdd<T>(reader.Value as string, true);
-			var jsonObject = JObject.Load(reader);
-			jsonObject.Remove("_type");
-			T target = container.GetOrAdd<T>(jsonObject["id"].ToString(), false);
-			using (var r = jsonObject.CreateReader())
-				serializer.Populate(r, target);
-			if (jsonObject.TryGetValue("parent", out var v))
-			{
-				if (target is BaseEntityWithParent<TParent>)
-					(target as BaseEntityWithParent<TParent>).Parent = container.GetOrAdd<TParent>(v.Value<string>(), true);
-				else
-					(target as BaseEntityWithParentAndVersion<TParent>).Parent = container.GetOrAdd<TParent>(v.Value<string>(), true);
-			}
-			return target;
+			throw new NotImplementedException();
+			//var container = ((CoreElasticContractResolver)serializer.ContractResolver).Container;
+			//if (reader.Value is string)
+			//	return container.GetOrAdd<T>(reader.Value as string, true);
+			//var jsonObject = JObject.Load(reader);
+			//jsonObject.Remove("_type");
+			//T target = container.GetOrAdd<T>(jsonObject["id"].ToString(), false);
+			//using (var r = jsonObject.CreateReader())
+			//	serializer.Populate(r, target);
+			//if (jsonObject.TryGetValue("parent", out var v))
+			//{
+			//	if (target is BaseEntityWithParent<TParent>)
+			//		(target as BaseEntityWithParent<TParent>).Parent = container.GetOrAdd<TParent>(v.Value<string>(), true);
+			//	else
+			//		(target as BaseEntityWithParentAndVersion<TParent>).Parent = container.GetOrAdd<TParent>(v.Value<string>(), true);
+			//}
+			//return target;
 		}
 
 		public override bool CanConvert(Type objectType)

@@ -45,7 +45,7 @@ namespace Core.ElasticSearch.Tests
         public void AddObjectWithValidRelatedAndWithoutParent()
         {
             var parentCategory = new NewCategory() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
-            var parent = _repository.InsertWithVersion<NewCategory, Category>(parentCategory);
+            var parent = _repository.InsertWithVersion<NewCategory, CategoryJoin>(parentCategory);
 			Assert.IsNotNull(parent);
 			Assert.IsNotNull(parent.Id);
 			Assert.AreEqual(parent.Id, parentCategory.Id);
@@ -114,7 +114,7 @@ namespace Core.ElasticSearch.Tests
         public void GetObjectByIdWithoutAutoLoadAndWithoutParent()
         {
             var parentCategory = new NewCategory() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
-            var parent =  _repository.InsertWithVersion<NewCategory, Category>(parentCategory);
+            var parent =  _repository.InsertWithVersion<NewCategory, CategoryJoin>(parentCategory);
             var category = new NewCategory() { Name = "Category", Top = parent, CreatedOnUtc = DateTime.UtcNow };
 
 	        Assert.IsTrue(_repository.Insert(category));
@@ -147,7 +147,29 @@ namespace Core.ElasticSearch.Tests
             Assert.AreEqual(loadCategory.Id, category.Id);
         }
 
-        [TestMethod]
+	    [TestMethod]
+	    public void GetProjectionObjectByIdWithAutoLoad()
+	    {
+		    var top = new NewCategory() {Name = "Top"};
+		    var  t = _repository.InsertWithVersion<NewCategory, CategoryJoin>(top);
+
+			var category = new NewCategory() { Name = "Category", Top = t, CreatedOnUtc = DateTime.UtcNow };
+
+		    Assert.IsTrue(_repository.Insert(category));
+
+		    _repository.ClearCache();
+		    var loadCategory = _repository.Get<CategoryProjection>(category.Id, false);
+
+		    Assert.IsNotNull(loadCategory);
+		    Assert.IsNotNull(loadCategory.Top);
+		    Assert.AreEqual(loadCategory.Top.Name, t.Name);
+		    Assert.AreEqual(loadCategory.Top.Id, t.Id);
+		    Assert.AreNotEqual(loadCategory, category);
+		    Assert.AreEqual(loadCategory.Name, category.Name);
+		    Assert.AreEqual(loadCategory.Id, category.Id);
+	    }
+
+		[TestMethod]
         public void GetObjectByIdWithoutAutoLoadAndWithParent()
         {
             var category = new NewCategory() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
@@ -191,7 +213,7 @@ namespace Core.ElasticSearch.Tests
         public void GetObjectByIdWithAutoLoadAndWithoutParent()
         {
             var parentCategory = new NewCategory() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
-	        var parent = _repository.InsertWithVersion<NewCategory, Category>(parentCategory);
+	        var parent = _repository.InsertWithVersion<NewCategory, CategoryJoin>(parentCategory);
             var category = new NewCategory() { Name = "Category", Top = parent };
 
             _repository.Insert(category);
@@ -422,7 +444,7 @@ namespace Core.ElasticSearch.Tests
 		public void SearchCategoryByRelatedWithoutLimitationAndWithoutLoad()
 		{
 			var parentCategory = new NewCategory() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
-			var parent = _repository.InsertWithVersion<NewCategory, Category>(parentCategory);
+			var parent = _repository.InsertWithVersion<NewCategory, CategoryJoin>(parentCategory);
 			var childCategory1 = new NewCategory() { Name = "Child Category1", CreatedOnUtc = DateTime.UtcNow, Top = parent };
 			_repository.Insert(childCategory1);
 			var childCategory2 = new NewCategory() { Name = "Child Category2", CreatedOnUtc = DateTime.UtcNow, Top = parent };
@@ -452,7 +474,7 @@ namespace Core.ElasticSearch.Tests
 		public void SearchCategoryByRelatedWithLimitationAndWithoutLoad()
 		{
 			var parentCategory = new NewCategory() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
-			var parent = _repository.InsertWithVersion<NewCategory, Category>(parentCategory);
+			var parent = _repository.InsertWithVersion<NewCategory, CategoryJoin>(parentCategory);
 			var childCategory1 = new NewCategory() { Name = "Child Category1", CreatedOnUtc = DateTime.UtcNow, Top = parent };
 			_repository.Insert(childCategory1);
 			var childCategory2 = new NewCategory() { Name = "Child Category2", CreatedOnUtc = DateTime.UtcNow, Top = parent };
@@ -479,7 +501,7 @@ namespace Core.ElasticSearch.Tests
 		public void SearchCategoryByRelatedWithLimitationAndWithLoad()
 		{
 			var parentCategory = new NewCategory() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
-			var parent = _repository.InsertWithVersion<NewCategory, Category>(parentCategory);
+			var parent = _repository.InsertWithVersion<NewCategory, CategoryJoin>(parentCategory);
 			var childCategory1 = new NewCategory() { Name = "Child Category1", CreatedOnUtc = DateTime.UtcNow, Top = parent };
 			_repository.Insert(childCategory1);
 			var childCategory2 = new NewCategory() { Name = "Child Category2", CreatedOnUtc = DateTime.UtcNow, Top = parent };
@@ -504,7 +526,7 @@ namespace Core.ElasticSearch.Tests
 		public void SearchCategoryByParentWithLambdaAndWithoutLoad()
 		{
 			var parentCategory = new NewCategory() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
-			var parent = _repository.InsertWithVersion<NewCategory, Category>(parentCategory);
+			var parent = _repository.InsertWithVersion<NewCategory, CategoryJoin>(parentCategory);
 			var childCategory1 = new NewCategory() { Name = "Child Category1", CreatedOnUtc = DateTime.UtcNow, Top = parent };
 			_repository.Insert(childCategory1);
 			var childCategory2 = new NewCategory() { Name = "Child Category2", CreatedOnUtc = DateTime.UtcNow, Top = parent };
@@ -530,7 +552,7 @@ namespace Core.ElasticSearch.Tests
 		public void SearchCategoryByParentWithLambdaAndWithLoad()
 		{
 			var parentCategory = new NewCategory() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
-			var parent = _repository.InsertWithVersion<NewCategory, Category>(parentCategory);
+			var parent = _repository.InsertWithVersion<NewCategory, CategoryJoin>(parentCategory);
 			var childCategory1 = new NewCategory() { Name = "Child Category1", CreatedOnUtc = DateTime.UtcNow, Top = parent };
 			_repository.Insert(childCategory1);
 			var childCategory2 = new NewCategory() { Name = "Child Category2", CreatedOnUtc = DateTime.UtcNow, Top = parent };
@@ -555,7 +577,7 @@ namespace Core.ElasticSearch.Tests
 		public void SearchCategoryByParentWithPagingAndWithoutLoad()
 		{
 			var parentCategory = new NewCategory() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
-			var parent = _repository.InsertWithVersion<NewCategory, Category>(parentCategory);
+			var parent = _repository.InsertWithVersion<NewCategory, CategoryJoin>(parentCategory);
 			var childCategory1 = new NewCategory() { Name = "Child Category1", CreatedOnUtc = DateTime.UtcNow, Top = parent };
 			_repository.Insert(childCategory1);
 			var childCategory2 = new NewCategory() { Name = "Child Category2", CreatedOnUtc = DateTime.UtcNow, Top = parent };
@@ -583,7 +605,7 @@ namespace Core.ElasticSearch.Tests
 		public void SearchCategoryByParentWithPagingAndWithLoad()
 		{
 			var parentCategory = new NewCategory() { Name = "Parent Category", CreatedOnUtc = DateTime.UtcNow };
-			var parent = _repository.InsertWithVersion<NewCategory, Category>(parentCategory);
+			var parent = _repository.InsertWithVersion<NewCategory, CategoryJoin>(parentCategory);
 			var childCategory1 = new NewCategory() { Name = "Child Category1", CreatedOnUtc = DateTime.UtcNow, Top = parent };
 			_repository.Insert(childCategory1);
 			var childCategory2 = new NewCategory() { Name = "Child Category2", CreatedOnUtc = DateTime.UtcNow, Top = parent };

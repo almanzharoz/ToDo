@@ -14,6 +14,13 @@ namespace Core.ElasticSearch.Domain
 
 	}
 	/// <summary>
+	/// Использование проекции для связей
+	/// </summary>
+	public interface IJoinProjection : IEntity
+	{
+
+	}
+	/// <summary>
 	/// Использование проекции для поиска по Id
 	/// </summary>
 	public interface IGetProjection : IEntity

@@ -9,6 +9,10 @@ namespace Core.ElasticSearch.Tests.Models
         public string Email { get; set; }
         public string Password { get; set; }
         public string Salt { get; set; }
+
+	    public User(string id) : base(id)
+	    {
+	    }
     }
 
 	public class NewUser : BaseNewEntity, IProjection<User>

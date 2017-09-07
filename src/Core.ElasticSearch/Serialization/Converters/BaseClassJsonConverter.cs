@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
-using Core.ElasticSearch.Mapping;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 

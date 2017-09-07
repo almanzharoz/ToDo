@@ -12,7 +12,15 @@ namespace Core.ElasticSearch.Tests.Models
 
 	    [Completion]
 	    public string Title { get; set; }
-	}
+
+	    public Product(string id, Category parent) : base(id, parent)
+	    {
+	    }
+
+	    public Product(string id, Category parent, int version) : base(id, parent, version)
+	    {
+	    }
+    }
 
 	public class NewProduct : BaseNewEntityWithParent<Models.Category>, IProjection<Product>
 	{
@@ -24,7 +32,6 @@ namespace Core.ElasticSearch.Tests.Models
 		[Completion]
 		public string Title { get; set; }
 
-		public NewProduct() { }
 		public NewProduct(Category parent) : base(parent)
 		{
 		}

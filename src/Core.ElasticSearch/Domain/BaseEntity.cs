@@ -5,16 +5,32 @@ namespace Core.ElasticSearch.Domain
 	public abstract class BaseEntity : IEntity
 	{
 		[JsonIgnore]
-		public string Id { get; internal set; }
+		public string Id { get; }
+
+		protected BaseEntity(string id)
+		{
+			Id = id;
+		}
 	}
 
 	public abstract class BaseEntityWithVersion : IEntity, IWithVersion
 	{
 		[JsonIgnore]
-		public string Id { get; internal set; }
+		public string Id { get; }
 
 		[JsonIgnore]
 		public int Version { get; internal set; }
+
+		protected BaseEntityWithVersion(string id)
+		{
+			Id = id;
+		}
+
+		protected BaseEntityWithVersion(string id, int version)
+		{
+			Id = id;
+			Version = version;
+		}
 	}
 
 	/// <summary>

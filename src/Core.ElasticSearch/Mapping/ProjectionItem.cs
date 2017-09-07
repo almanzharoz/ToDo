@@ -7,6 +7,7 @@ using Core.ElasticSearch.Domain;
 using Core.ElasticSearch.Serialization;
 using Nest;
 using Newtonsoft.Json;
+using SharpFuncExt;
 
 namespace Core.ElasticSearch.Mapping
 {
@@ -19,7 +20,7 @@ namespace Core.ElasticSearch.Mapping
 	}
 
 	internal abstract class BaseProjectionItem<T, TMapping, TSettings> : IProjectionItem
-		where T : class, IProjection, IProjection<TMapping>, new()
+		where T : class, IProjection, IProjection<TMapping>
 		where TMapping : class, IModel
 		where TSettings : BaseElasticConnection
 	{
@@ -27,7 +28,7 @@ namespace Core.ElasticSearch.Mapping
 		{
 			MappingItem = mappingItem;
 			Fields = typeof(T).GetFieldsNames();
-			Properties = typeof(T).GetProperties();
+			Properties = typeof(T).GetProperties().ThrowIf(x => x.Any(y => typeof(IProjection).IsAssignableFrom(y.PropertyType) && !typeof(IJoinProjection).IsAssignableFrom(y.PropertyType)), x => new Exception($"Field in \"{typeof(T)}\" not join"));
 			var errorFields = mappingItem.CheckFields(Fields);
 			if (errorFields.Any())
 				throw new Exception($"Not found fields for \"{typeof(T).Name}\": {String.Join(", ", errorFields)}");
@@ -41,7 +42,7 @@ namespace Core.ElasticSearch.Mapping
 	}
 
 	internal class ProjectionItem<T, TMapping, TSettings> : BaseProjectionItem<T, TMapping, TSettings>
-		where T : class, IProjection, IProjection<TMapping>, new() 
+		where T : class, IProjection, IProjection<TMapping>
 		where TMapping : class, IModel
 		where TSettings : BaseElasticConnection
 	{
@@ -53,18 +54,31 @@ namespace Core.ElasticSearch.Mapping
 			=> new ClassJsonConverter<T>(this);
 	}
 
-	internal class ProjectionWithParentItem<T, TMapping, TParent, TSettings> : BaseProjectionItem<T, TMapping, TSettings>
-		where T : class, IProjection, IProjection<TMapping>, IWithParent<TParent>, new()
+	internal class JoinProjectionItem<T, TMapping, TSettings> : BaseProjectionItem<T, TMapping, TSettings>
+		where T : class, IProjection, IProjection<TMapping>, IJoinProjection
 		where TMapping : class, IModel
-		where TParent : class, IProjection, new()
 		where TSettings : BaseElasticConnection
 	{
-		public ProjectionWithParentItem(MappingItem<TMapping, TSettings> mappingItem) : base(mappingItem)
+		public JoinProjectionItem(MappingItem<TMapping, TSettings> mappingItem) : base(mappingItem)
 		{
-			// TODO: Сделать проверку типа парента
 		}
 
 		public override JsonConverter GetJsonConverter()
-			=> new ParentJsonConverter<T, TParent>(this);
+			=> new JoinConverter<T>();
 	}
+
+	//internal class ProjectionWithParentItem<T, TMapping, TParent, TSettings> : BaseProjectionItem<T, TMapping, TSettings>
+	//	where T : class, IProjection, IProjection<TMapping>, IWithParent<TParent>
+	//	where TMapping : class, IModel
+	//	where TParent : class, IProjection
+	//	where TSettings : BaseElasticConnection
+	//{
+	//	public ProjectionWithParentItem(MappingItem<TMapping, TSettings> mappingItem) : base(mappingItem)
+	//	{
+	//		// TODO: Сделать проверку типа парента
+	//	}
+
+	//	public override JsonConverter GetJsonConverter()
+	//		=> new ParentJsonConverter<T, TParent>(this);
+	//}
 }

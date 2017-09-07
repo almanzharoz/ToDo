@@ -25,13 +25,17 @@ namespace Core.ElasticSearch.Mapping
 	public interface IElasticProjections<TSettings> where TSettings : BaseElasticConnection
 	{
 		IElasticProjections<TSettings> AddProjection<T, TMapping>()
-			where T : class, IProjection, IProjection<TMapping>, new()
+			where T : class, IProjection, IProjection<TMapping>
 			where TMapping : class, IModel;
 
-		IElasticProjections<TSettings> AddProjection<T, TMapping, TParent>()
-			where T : class, IProjection, IProjection<TMapping>, IWithParent<TParent>, new()
-			where TMapping : class, IModel, IWithParent<TParent>
-			where TParent : class, IProjection, new();
+		IElasticProjections<TSettings> AddJoinProjection<T, TMapping>()
+			where T : class, IProjection, IProjection<TMapping>, IJoinProjection
+			where TMapping : class, IModel;
+
+		//IElasticProjections<TSettings> AddProjection<T, TMapping, TParent>()
+		//	where T : class, IProjection, IProjection<TMapping>, IWithParent<TParent>
+		//	where TMapping : class, IModel, IWithParent<TParent>
+		//	where TParent : class, IProjection;
 
 		IElasticProjections<TSettings> AddStruct<T>() where T : struct;
 	}
@@ -89,7 +93,7 @@ namespace Core.ElasticSearch.Mapping
 		/// <typeparam name="TMapping"></typeparam>
 		/// <returns></returns>
 		public IElasticProjections<TSettings> AddProjection<T, TMapping>()
-			where T : class, IProjection, IProjection<TMapping>, new()
+			where T : class, IProjection, IProjection<TMapping>
 			where TMapping : class, IModel
 		{
 			_projection.AddOrUpdate(typeof(T), x =>
@@ -109,6 +113,22 @@ namespace Core.ElasticSearch.Mapping
 			return this;
 		}
 
+		public IElasticProjections<TSettings> AddJoinProjection<T, TMapping>()
+			where T : class, IProjection, IProjection<TMapping>, IJoinProjection
+			where TMapping : class, IModel
+		{
+			_projection.AddOrUpdate(typeof(T), x =>
+				{
+					var result = new JoinProjectionItem<T, TMapping, TSettings>((MappingItem<TMapping, TSettings>)_mapping.GetOrAdd(typeof(TMapping),
+						y => throw new Exception($"Not found mapping for type \"{y.Name}\"")));
+					if (typeof(IGetProjection).IsAssignableFrom(x))
+						_converters.TryAdd(typeof(GetResponse<T>), new GetJsonConverter<T>());
+					_converters.TryAdd(typeof(SearchResponse<T>), new SearchJsonConverter<T>()); //TODO Заменить на LoadJsonConverter
+					return result;
+				},
+				(t, m) => throw new Exception($"Projection for type \"{typeof(T).Name}\" already exists."));
+			return this;
+		}
 		/// <summary>
 		/// Регистрирует проекцию типа с парентом
 		/// </summary>
@@ -116,26 +136,26 @@ namespace Core.ElasticSearch.Mapping
 		/// <typeparam name="TMapping"></typeparam>
 		/// <typeparam name="TParent"></typeparam>
 		/// <returns></returns>
-		public IElasticProjections<TSettings> AddProjection<T, TMapping, TParent>()
-			where T : class, IProjection, IProjection<TMapping>, IWithParent<TParent>, new()
-			where TMapping : class, IModel, IWithParent<TParent>
-			where TParent : class, IProjection, new()
-		{
-			_projection.AddOrUpdate(typeof(T), x =>
-				{
-					var result = new ProjectionWithParentItem<T, TMapping, TParent, TSettings>((MappingItem<TMapping, TSettings>)_mapping.GetOrAdd(typeof(TMapping),
-						y => throw new Exception($"Not found mapping for type \"{y.Name}\"")));
-					//if (typeof(IInsertProjection).IsAssignableFrom(x))
-					//	_converters.TryAdd(typeof(T), new InsertJsonConverter<T>(result));
-					if (typeof(IGetProjection).IsAssignableFrom(x))
-						_converters.TryAdd(typeof(GetResponse<T>), new GetJsonConverter<T>());
-					if (typeof(ISearchProjection).IsAssignableFrom(x))
-						_converters.TryAdd(typeof(SearchResponse<T>), new SearchJsonConverter<T>());
-					return result;
-				},
-				(t, m) => throw new Exception($"Projection for type \"{typeof(T).Name}\" already exists."));
-			return this;
-		}
+		//public IElasticProjections<TSettings> AddProjection<T, TMapping, TParent>()
+		//	where T : class, IProjection, IProjection<TMapping>, IWithParent<TParent>
+		//	where TMapping : class, IModel, IWithParent<TParent>
+		//	where TParent : class, IProjection
+		//{
+		//	_projection.AddOrUpdate(typeof(T), x =>
+		//		{
+		//			var result = new ProjectionWithParentItem<T, TMapping, TParent, TSettings>((MappingItem<TMapping, TSettings>)_mapping.GetOrAdd(typeof(TMapping),
+		//				y => throw new Exception($"Not found mapping for type \"{y.Name}\"")));
+		//			//if (typeof(IInsertProjection).IsAssignableFrom(x))
+		//			//	_converters.TryAdd(typeof(T), new InsertJsonConverter<T>(result));
+		//			if (typeof(IGetProjection).IsAssignableFrom(x))
+		//				_converters.TryAdd(typeof(GetResponse<T>), new GetJsonConverter<T>());
+		//			if (typeof(ISearchProjection).IsAssignableFrom(x))
+		//				_converters.TryAdd(typeof(SearchResponse<T>), new SearchJsonConverter<T>());
+		//			return result;
+		//		},
+		//		(t, m) => throw new Exception($"Projection for type \"{typeof(T).Name}\" already exists."));
+		//	return this;
+		//}
 
 		/// <summary>
 		/// Проверяем индекс и маппинг
