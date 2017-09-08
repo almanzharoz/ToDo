@@ -11,9 +11,9 @@ namespace BeeFee.AdminApp.Projections.User
 	{
 		public string Email { get; private set; }
 		public string Name { get; private set; }
-		public string Password { get; private set; }
+		private string Password { get; }
 		public EUserRole[] Roles { get; private set; }
-		public string Salt { get; private set; }
+		private string Salt { get; }
 
 		public UserUpdateProjection ChangeUser(string email, string name, EUserRole[] roles)
 		{
@@ -21,6 +21,15 @@ namespace BeeFee.AdminApp.Projections.User
 			Roles = roles.HasNotNullArg(nameof(roles));
 			Name = name.HasNotNullArg(nameof(name)).Trim();
 			return this;
+		}
+
+		public UserUpdateProjection(string id, string email, string name, string password, string salt, EUserRole[] roles) : base(id)
+		{
+			Name = name;
+			Email = email;
+			Roles = roles;
+			Password = password;
+			Salt = salt;
 		}
 	}
 }

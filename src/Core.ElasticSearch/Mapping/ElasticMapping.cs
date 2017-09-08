@@ -28,15 +28,6 @@ namespace Core.ElasticSearch.Mapping
 			where T : class, IProjection, IProjection<TMapping>
 			where TMapping : class, IModel;
 
-		IElasticProjections<TSettings> AddJoinProjection<T, TMapping>()
-			where T : class, IProjection, IProjection<TMapping>, IJoinProjection
-			where TMapping : class, IModel;
-
-		//IElasticProjections<TSettings> AddProjection<T, TMapping, TParent>()
-		//	where T : class, IProjection, IProjection<TMapping>, IWithParent<TParent>
-		//	where TMapping : class, IModel, IWithParent<TParent>
-		//	where TParent : class, IProjection;
-
 		IElasticProjections<TSettings> AddStruct<T>() where T : struct;
 	}
 
@@ -104,7 +95,7 @@ namespace Core.ElasticSearch.Mapping
 					//	_converters.TryAdd(typeof(T), new InsertJsonConverter<T>(result));
 					if (typeof(IGetProjection).IsAssignableFrom(x))
 						_converters.TryAdd(typeof(GetResponse<T>), new GetJsonConverter<T>());
-					if (typeof(ISearchProjection).IsAssignableFrom(x))
+					if (typeof(ISearchProjection).IsAssignableFrom(x) || typeof(IJoinProjection).IsAssignableFrom(x))
 						_converters.TryAdd(typeof(SearchResponse<T>), new SearchJsonConverter<T>());
 					//_converters.TryAdd(typeof(UpdateResponse<T>), new UpdateResultJsonConverter<T>());
 					return result;
@@ -112,50 +103,6 @@ namespace Core.ElasticSearch.Mapping
 				(t, m) => throw new Exception($"Projection for type \"{typeof(T).Name}\" already exists."));
 			return this;
 		}
-
-		public IElasticProjections<TSettings> AddJoinProjection<T, TMapping>()
-			where T : class, IProjection, IProjection<TMapping>, IJoinProjection
-			where TMapping : class, IModel
-		{
-			_projection.AddOrUpdate(typeof(T), x =>
-				{
-					var result = new JoinProjectionItem<T, TMapping, TSettings>((MappingItem<TMapping, TSettings>)_mapping.GetOrAdd(typeof(TMapping),
-						y => throw new Exception($"Not found mapping for type \"{y.Name}\"")));
-					if (typeof(IGetProjection).IsAssignableFrom(x))
-						_converters.TryAdd(typeof(GetResponse<T>), new GetJsonConverter<T>());
-					_converters.TryAdd(typeof(SearchResponse<T>), new SearchJsonConverter<T>()); //TODO Заменить на LoadJsonConverter
-					return result;
-				},
-				(t, m) => throw new Exception($"Projection for type \"{typeof(T).Name}\" already exists."));
-			return this;
-		}
-		/// <summary>
-		/// Регистрирует проекцию типа с парентом
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <typeparam name="TMapping"></typeparam>
-		/// <typeparam name="TParent"></typeparam>
-		/// <returns></returns>
-		//public IElasticProjections<TSettings> AddProjection<T, TMapping, TParent>()
-		//	where T : class, IProjection, IProjection<TMapping>, IWithParent<TParent>
-		//	where TMapping : class, IModel, IWithParent<TParent>
-		//	where TParent : class, IProjection
-		//{
-		//	_projection.AddOrUpdate(typeof(T), x =>
-		//		{
-		//			var result = new ProjectionWithParentItem<T, TMapping, TParent, TSettings>((MappingItem<TMapping, TSettings>)_mapping.GetOrAdd(typeof(TMapping),
-		//				y => throw new Exception($"Not found mapping for type \"{y.Name}\"")));
-		//			//if (typeof(IInsertProjection).IsAssignableFrom(x))
-		//			//	_converters.TryAdd(typeof(T), new InsertJsonConverter<T>(result));
-		//			if (typeof(IGetProjection).IsAssignableFrom(x))
-		//				_converters.TryAdd(typeof(GetResponse<T>), new GetJsonConverter<T>());
-		//			if (typeof(ISearchProjection).IsAssignableFrom(x))
-		//				_converters.TryAdd(typeof(SearchResponse<T>), new SearchJsonConverter<T>());
-		//			return result;
-		//		},
-		//		(t, m) => throw new Exception($"Projection for type \"{typeof(T).Name}\" already exists."));
-		//	return this;
-		//}
 
 		/// <summary>
 		/// Проверяем индекс и маппинг
@@ -184,12 +131,12 @@ namespace Core.ElasticSearch.Mapping
 										.Custom("html_strip", t => t.CharFilters("html_strip").Tokenizer("standard")))
 									.Tokenizers(t => t.EdgeNGram("autocomplete_token",
 										e => e.MinGram(1).MaxGram(10).TokenChars(TokenChar.Letter, TokenChar.Digit)))))
-							.Mappings(z => z.Each(mapping, m => m.Value.Map(z, _mapping.GetValueOrDefault))))
+							.Mappings(z => z.Each(mapping, m => m.Value.Map(z, p => _projection[p].MappingItem))))
 						.IfNot(x => x.IsValid, x => x
 							.LogError(_logger, "Mapping error:\r\n" + x.DebugInformation)
 							.Throw(t => new Exception("Create index error")), x => initAction.IfNotNull(f => f()));
 				else
-					mapping.Each(m => m.Value.Map(client, _mapping.GetValueOrDefault)
+					mapping.Each(m => m.Value.Map(client, p => _projection[p].MappingItem)
 						.IfNot(x => x.IsValid, x => x
 							.LogError(_logger, "Mapping error:\r\n" + x.DebugInformation)
 							.Throw(t => new Exception("Mapping error"))));

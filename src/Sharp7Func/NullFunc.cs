@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -182,20 +183,26 @@ namespace SharpFuncExt
 		public static bool IsNull<T>(this T[] arg) => arg == null || !arg.Any();
 		public static bool NotNull<T>(this T[] arg) => arg != null && arg.Any();
 
-		public static bool IsNull(this object arg, Type type) => arg == null || type.GetTypeInfo().IsValueType && GetTypedNull(type).Equals(arg);
+		/// <summary>
+		/// Хитрожопая проверка на null.
+		/// Для классов просто проверяет на null.
+		/// Для стринга, юзает IsNullOrWhiteSpace.
+		/// Для ValueType сравниет с закешированым дефолтными значением.
+		/// </summary>
+		/// <param name="arg"></param>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		public static bool IsNull(this object arg, Type type) => arg == null || type == typeof(string) && String.IsNullOrWhiteSpace((string)arg) || arg.Equals(GetDefaultValue(type));
 
-		private static Dictionary<Type, Delegate> lambdasMap = new Dictionary<Type, Delegate>();
-		private static object GetTypedNull(Type type)
-		{
-			Delegate func;
-			if (!lambdasMap.TryGetValue(type, out func))
-			{
-				var body = Expression.Default(type);
-				var lambda = Expression.Lambda(body);
-				func = lambda.Compile();
-				lambdasMap[type] = func;
-			}
-			return func.DynamicInvoke();
-		}
+		private static readonly ConcurrentDictionary<Type, object> _defaultValues = new ConcurrentDictionary<Type, object>();
+
+		public static object GetDefaultValue(this Type type)
+			=> type.GetTypeInfo().IsValueType
+				? _defaultValues.GetOrAdd(type.HasNotNullArg(nameof(type)), t =>
+					Expression.Lambda<Func<object>>(
+						Expression.Convert(
+							Expression.Default(type), typeof(object)
+						)).Compile()())
+				: null;
 	}
 }

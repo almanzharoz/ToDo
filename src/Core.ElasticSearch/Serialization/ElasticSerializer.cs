@@ -27,6 +27,7 @@ namespace Core.ElasticSearch.Serialization
 		where TSettings : BaseElasticConnection
 	{
 		private readonly ElasticMapping<TSettings> _mapping;
+		private static readonly InnerValueJsonConverter _innerValueJsonConverter = new InnerValueJsonConverter();
 
 		public ElasticSerializer(IConnectionSettingsValues settings, ElasticMapping<TSettings> mapping,
 			RequestContainer<TSettings> container)
@@ -48,6 +49,8 @@ namespace Core.ElasticSearch.Serialization
 
 		private JsonConverter GetJsonConverter(Type x)
 		{
+			if (x == typeof(InnerValue))
+				return _innerValueJsonConverter;
 			if (x == typeof(IProjection))
 				return new BaseClassJsonConverter<TSettings>();
 			if (typeof(IProjection).IsAssignableFrom(x))

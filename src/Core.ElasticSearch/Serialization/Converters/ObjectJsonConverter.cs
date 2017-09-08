@@ -9,10 +9,15 @@ using SharpFuncExt;
 
 namespace Core.ElasticSearch.Serialization
 {
+	/// <inheritdoc />
+	/// <summary>
+	/// Конвертер для вложенных документов (структур)
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
 	internal class ObjectJsonConverter<T> : JsonConverter where T : struct
 	{
 		private readonly PropertyInfo[] _properties;
-		private readonly (ObjectActivator<T> func, string[] parameters) _creator;
+		private readonly ActivatorData<T> _creator;
 
 		public ObjectJsonConverter()
 		{
@@ -26,7 +31,7 @@ namespace Core.ElasticSearch.Serialization
 			foreach (var property in _properties)
 			{
 				var v = property.GetValue(value);
-				if (v == null)
+				if (v.IsNull(property.PropertyType))
 					continue;
 				writer.WritePropertyName(property.Name.ToLower());
 				var o = JToken.FromObject(v, serializer);
@@ -37,10 +42,10 @@ namespace Core.ElasticSearch.Serialization
 
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 		{
-			if (_creator.parameters != null)
+			if (_creator.Parameters != null)
 			{
 				var parameters = new Dictionary<string, object>(
-					_creator.parameters.Select(x => KeyValuePair.Create<string, object>(x, null)));
+					_creator.Parameters.Select(x => KeyValuePair.Create<string, object>(x.Key, x.Value.GetDefaultValue())));
 				while (reader.Read() && reader.TokenType != JsonToken.EndObject)
 				{
 					if (reader.TokenType != JsonToken.PropertyName || reader.Value == null)
@@ -49,9 +54,9 @@ namespace Core.ElasticSearch.Serialization
 					reader.Value.As<string>()
 						.IfNotNull(
 							x => x.If(p => reader.Read() && parameters.ContainsKey(p),
-								p => parameters[p] = serializer.Deserialize(reader, reader.ValueType)));
+								p => parameters[p] = serializer.Deserialize(reader, _creator.Parameters.First(z => z.Key.Equals(p)).Value)));
 				}
-				return _creator.func(_creator.parameters.Select(x => parameters[x]).ToArray());
+				return _creator.Creator(_creator.Parameters.Select(x => parameters[x.Key]).ToArray());
 			}
 			var jsonObject = JObject.Load(reader);
 			var target = existingValue ?? new T();

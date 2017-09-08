@@ -100,10 +100,10 @@ namespace Core.ElasticSearch.Tests
         public void AddObjectWithValidParentAndWithoutRelated()
         {
             var category = new NewCategory() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
-            var parent =  _repository.InsertWithVersion<NewCategory, Category>(category);
+            var parent =  _repository.Insert<NewCategory, CategoryProjection>(category);
             var product = new NewProduct(parent) { Name = "Product", FullName = new FullName() { Name = "Product", Category = category.Name } };
 	        _repository.ClearCache();
-            _repository.InsertWithParent<NewProduct, Category>(product);
+            _repository.InsertWithParent<NewProduct, CategoryProjection>(product);
             Assert.IsNotNull(product.Id);
             Assert.IsNotNull(product.Parent);
             Assert.AreEqual(product.Parent.Id, category.Id);
@@ -158,7 +158,7 @@ namespace Core.ElasticSearch.Tests
 		    Assert.IsTrue(_repository.Insert(category));
 
 		    _repository.ClearCache();
-		    var loadCategory = _repository.Get<CategoryProjection>(category.Id, false);
+		    var loadCategory = _repository.Get<CategoryProjection>(category.Id, true);
 
 		    Assert.IsNotNull(loadCategory);
 		    Assert.IsNotNull(loadCategory.Top);
@@ -173,13 +173,13 @@ namespace Core.ElasticSearch.Tests
         public void GetObjectByIdWithoutAutoLoadAndWithParent()
         {
             var category = new NewCategory() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
-            var parent = _repository.InsertWithVersion<NewCategory, Category>(category);
+            var parent = _repository.Insert<NewCategory, CategoryProjection>(category);
             var product = new NewProduct(parent) { Name = "Product", FullName = new FullName() { Name = "Product", Category = category.Name } };
 
-			Assert.IsTrue(_repository.InsertWithParent<NewProduct, Category>(product));
+			Assert.IsTrue(_repository.InsertWithParent<NewProduct, CategoryProjection>(product));
 
 	        _repository.ClearCache();
-            var loadProduct = _repository.GetWithVersion<Product, Category>(product.Id, category.Id, false);
+            var loadProduct = _repository.GetWithVersion<Product, CategoryProjection>(product.Id, category.Id, false);
 
             Assert.IsNotNull(loadProduct);
             Assert.IsNotNull(loadProduct.Parent);
@@ -193,14 +193,15 @@ namespace Core.ElasticSearch.Tests
         public void GetProjectionObjectByIdWithoutAutoLoadAndWithParent()
         {
             var category = new NewCategory() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
-	        var parent = _repository.InsertWithVersion<NewCategory, Category>(category);
+	        var parent = _repository.Insert<NewCategory, CategoryProjection>(category);
 			var product = new NewProduct(parent) { Name = "Product", FullName = new FullName() { Name = "Product", Category = category.Name } };
-            _repository.InsertWithParent<NewProduct, Category>(product);
+            _repository.InsertWithParent<NewProduct, CategoryProjection>(product);
 
 	        _repository.ClearCache();
-            var loadProduct = _repository.Get<ProductProjection, Category>(product.Id, category.Id, false);
+            var loadProduct = _repository.GetWithVersion<ProductProjection, CategoryProjection>(product.Id, category.Id, false);
 
             Assert.IsNotNull(loadProduct);
+			Assert.AreEqual(loadProduct.Version, 1);
             Assert.IsNotNull(loadProduct.Parent);
             Assert.AreEqual(loadProduct.Parent.Id, category.Id);
             Assert.AreEqual(loadProduct.Parent.Name, null);
@@ -251,13 +252,13 @@ namespace Core.ElasticSearch.Tests
         public void GetObjectByIdWithAutoLoadAndWithParent()
         {
             var category = new NewCategory() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
-	        var parent = _repository.InsertWithVersion<NewCategory, Category>(category);
+	        var parent = _repository.Insert<NewCategory, CategoryProjection>(category);
             var product = new NewProduct(parent) { Name = "Product", FullName = new FullName() { Name = "Product", Category = category.Name } };
 
-            _repository.InsertWithParent<NewProduct, Category>(product);
+            Assert.IsTrue(_repository.InsertWithParent<NewProduct, CategoryProjection>(product));
 
 	        _repository.ClearCache();
-            var loadProduct = _repository.GetWithVersion<Product, Category>(product.Id, category.Id, true);
+            var loadProduct = _repository.GetWithVersion<ProductProjection, CategoryProjection>(product.Id, category.Id, true);
 
             Assert.IsNotNull(loadProduct);
             Assert.IsNotNull(loadProduct.Parent);
@@ -271,21 +272,22 @@ namespace Core.ElasticSearch.Tests
         public void GetProjectionObjectByIdWithAutoLoadAndWithParent()
         {
 	        var category = new NewCategory() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
-	        var parent = _repository.InsertWithVersion<NewCategory, Category>(category);
+	        var parent = _repository.Insert<NewCategory, CategoryProjection>(category);
 	        var product = new NewProduct(parent) { Name = "Product", FullName = new FullName() { Name = "Product", Category = category.Name } };
 
-	        _repository.InsertWithParent<NewProduct, Category>(product);
+	        Assert.IsTrue(_repository.InsertWithParent<NewProduct, CategoryProjection>(product));
 
 	        _repository.ClearCache();
-			var loadProduct = _repository.Get<ProductProjection, Category>(product.Id, category.Id, true);
+			var loadProduct = _repository.GetWithVersion<ProductProjection, CategoryProjection>(product.Id, category.Id, true);
 
             Assert.IsNotNull(loadProduct);
             Assert.IsNotNull(loadProduct.Parent);
+            Assert.AreEqual(loadProduct.Parent.Name, parent.Name);
             Assert.IsNotNull(loadProduct.FullName);
-            Assert.AreEqual(loadProduct.FullName.Name, product.FullName.Name);
+			Assert.AreEqual(loadProduct.FullName.Name, product.FullName.Name);
         }
 
-        [TestMethod]
+		[TestMethod]
         public void UpdateObjectSimply()
         {
             var category = new NewCategory() { Name = "Category", CreatedOnUtc = DateTime.UtcNow };
@@ -645,16 +647,16 @@ namespace Core.ElasticSearch.Tests
 		public void InsertIntoAnotherIndexWithJoin()
 		{
 			var producer = new NewProducer { Name = "Producer1" };
-			var p = _repository.InsertWithVersion<NewProducer, Producer>(producer);
+			var p = _repository.Insert<NewProducer, ProducerProjection>(producer);
 
 			var category = new NewCategory { Name = "Category1" };
-			var c = _repository.InsertWithVersion<NewCategory, Category>(category);
+			var c = _repository.Insert<NewCategory, CategoryProjection>(category);
 
 			var product = new NewProduct(c) { Name = "Product1", Producer = p };
-			_repository.InsertWithParent<NewProduct, Category>(product);
+			_repository.InsertWithParent<NewProduct, CategoryProjection>(product);
 
 			_repository.ClearCache();
-			var loaded = _repository.GetWithVersion<Product, Category>(product.Id, category.Id, true);
+			var loaded = _repository.GetWithVersion<Product, CategoryProjection>(product.Id, category.Id, true);
 
 			Assert.AreEqual(loaded.Name, product.Name);
 			Assert.AreEqual(loaded.Producer.Id, product.Producer.Id);
@@ -679,7 +681,7 @@ namespace Core.ElasticSearch.Tests
 			loaded.Email = "new@user1.ru";
 			loaded.Password = "newPass";
 
-			_repository.UpdateWithVersion(loaded);
+			Assert.IsTrue(_repository.UpdateWithVersion(loaded));
 
 			var loadedFullUser = _repository.Get<User>(user.Id, true);
 
@@ -699,16 +701,16 @@ namespace Core.ElasticSearch.Tests
 		public void AutocompleteTest()
 		{
 			var category = new NewCategory { Name = "Category1" };
-			var c = _repository.InsertWithVersion<NewCategory, Category>(category);
+			var c = _repository.Insert<NewCategory, CategoryProjection>(category);
 
 			var product = new NewProduct(c) { Name = "Product1", Title = "ProductA" };
-			_repository.InsertWithParent<NewProduct, Category>(product);
+			_repository.InsertWithParent<NewProduct, CategoryProjection>(product);
 
 			product = new NewProduct(c) { Name = "Product2", Title = "ProductA1" };
-			_repository.InsertWithParent<NewProduct, Category>(product);
+			_repository.InsertWithParent<NewProduct, CategoryProjection>(product);
 
 			product = new NewProduct(c) { Name = "Product3", Title = "ProductB" };
-			_repository.InsertWithParent<NewProduct, Category>(product);
+			_repository.InsertWithParent<NewProduct, CategoryProjection>(product);
 
 			var products = _repository.CompletionSuggest<Product, Product>(s => s.Field(p => p.Title).Prefix("pr"));
 
@@ -719,11 +721,12 @@ namespace Core.ElasticSearch.Tests
 			Assert.IsTrue(products.Any());
 			Assert.AreEqual(products.Count, 2);
 			// Есть уже анализатор, но лучше покурить это: https://www.red-gate.com/simple-talk/dotnet/net-development/how-to-build-a-search-page-with-elasticsearch-and-net/
+			// NGrams: https://qbox.io/blog/multi-field-partial-word-autocomplete-in-elasticsearch-using-ngrams
 		}
 
 		//[TestMethod]
-	 //   public void NestedTest()
-	 //   {
+		//   public void NestedTest()
+		//   {
 		//	var category = new NewCategory { Name = "Category1" };
 		//    var c = _repository.InsertWithVersion<NewCategory, Category>(category);
 
@@ -733,10 +736,10 @@ namespace Core.ElasticSearch.Tests
 		//    _repository.InsertWithParent<NewProduct, Category>(product2);
 
 		//	var result = _repository.FilterNested<Product, FullNameNested>(q => q.Bool(b => b.Filter(f => f.Term(t => t.Field(p => p.Name).Value("Product1")))), p=>p.FullName);
-	 //   }
+		//   }
 
 
-	    private async Task<long> Load(string url)
+		private async Task<long> Load(string url)
 	    {
 		    var request = WebRequest.CreateHttp(url);
 			var sw = new Stopwatch();

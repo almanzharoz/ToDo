@@ -25,9 +25,9 @@ namespace BeeFee.AdminApp.Tests
 		}
 
 		[TestMethod]
-		public void RemoveEventTestTest()
+		public void RemoveEventTest()
 		{
-			var eventId = AddEvent(AddCategory("Category 1"), "Event 1");
+			var eventId = AddEvent(AddCategory("Category 1"), "Event 1", new EventDateTime(DateTime.Now, DateTime.Now.AddDays(1)));
 
 			Assert.IsNotNull(eventId);
 
@@ -37,7 +37,7 @@ namespace BeeFee.AdminApp.Tests
 		[TestMethod]
 		public void SetCategoryTest()
 		{
-			var eventId = AddEvent(AddCategory("Category 1"), "Event 1");
+			var eventId = AddEvent(AddCategory("Category 1"), "Event 1", new EventDateTime(DateTime.Now, DateTime.Now.AddDays(1)));
 			Assert.IsNotNull(eventId);
 			var categoryId = AddCategory("Category 2");
 			Assert.IsNotNull(categoryId);
@@ -48,7 +48,7 @@ namespace BeeFee.AdminApp.Tests
 		[TestMethod]
 		public void SerachEvent()
 		{
-			var eventId = AddEvent(AddCategory("Category 1"), "Event 1");
+			var eventId = AddEvent(AddCategory("Category 1"), "Event 1", new EventDateTime(DateTime.Now, DateTime.Now.AddDays(1)));
 			Assert.IsNotNull(eventId);
 
 			var searched = Service.SearchByName("Event 1").SingleOrDefault();

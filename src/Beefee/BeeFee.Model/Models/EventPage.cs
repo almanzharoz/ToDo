@@ -43,14 +43,14 @@ namespace BeeFee.Model
 			return this;
 		}
 
-		public EventPage(string caption, string category, string cover, EventDateTime date, Address address, string html)
+		public EventPage(string caption, string category, string cover, string date, Address address, string html)
 		{
 			Title = caption;
 			Caption = caption;
 			Category = category;
 			Cover = cover;
 			Address = address;
-			Date = date.ToString();
+			Date = date;
 			Html = html;
 
 			Company = null;

@@ -44,7 +44,7 @@ namespace BeeFee.OrganizerApp.Projections.Event
 			Type = type;
 			Address = address;
 			Prices = prices;
-			Page = new EventPage(name, category.Name, cover, dateTime, address, html);
+			Page = new EventPage(name, category.Name, cover, dateTime.ToString(), address, html);
 			_throws.Throw();
 		}
 	}

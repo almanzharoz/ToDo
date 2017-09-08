@@ -28,7 +28,11 @@ namespace Core.ElasticSearch.Mapping
 		{
 			MappingItem = mappingItem;
 			Fields = typeof(T).GetFieldsNames();
-			Properties = typeof(T).GetProperties().ThrowIf(x => x.Any(y => typeof(IProjection).IsAssignableFrom(y.PropertyType) && !typeof(IJoinProjection).IsAssignableFrom(y.PropertyType)), x => new Exception($"Field in \"{typeof(T)}\" not join"));
+			Properties = typeof(T).GetProperties()
+				.EachThrowIf(
+					y => typeof(IProjection).IsAssignableFrom(y.PropertyType) &&
+						!typeof(IJoinProjection).IsAssignableFrom(y.PropertyType),
+					x => new Exception($"Field \"{x.Name}\" in \"{typeof(T)}\" not join"));
 			var errorFields = mappingItem.CheckFields(Fields);
 			if (errorFields.Any())
 				throw new Exception($"Not found fields for \"{typeof(T).Name}\": {String.Join(", ", errorFields)}");
@@ -53,32 +57,5 @@ namespace Core.ElasticSearch.Mapping
 		public override JsonConverter GetJsonConverter()
 			=> new ClassJsonConverter<T>(this);
 	}
-
-	internal class JoinProjectionItem<T, TMapping, TSettings> : BaseProjectionItem<T, TMapping, TSettings>
-		where T : class, IProjection, IProjection<TMapping>, IJoinProjection
-		where TMapping : class, IModel
-		where TSettings : BaseElasticConnection
-	{
-		public JoinProjectionItem(MappingItem<TMapping, TSettings> mappingItem) : base(mappingItem)
-		{
-		}
-
-		public override JsonConverter GetJsonConverter()
-			=> new JoinConverter<T>();
-	}
-
-	//internal class ProjectionWithParentItem<T, TMapping, TParent, TSettings> : BaseProjectionItem<T, TMapping, TSettings>
-	//	where T : class, IProjection, IProjection<TMapping>, IWithParent<TParent>
-	//	where TMapping : class, IModel
-	//	where TParent : class, IProjection
-	//	where TSettings : BaseElasticConnection
-	//{
-	//	public ProjectionWithParentItem(MappingItem<TMapping, TSettings> mappingItem) : base(mappingItem)
-	//	{
-	//		// TODO: Сделать проверку типа парента
-	//	}
-
-	//	public override JsonConverter GetJsonConverter()
-	//		=> new ParentJsonConverter<T, TParent>(this);
-	//}
+	
 }

@@ -8,6 +8,10 @@ namespace BeeFee.Model.Models
 	{
 		public string Name { get; set; }
 		public CompanyUser[] Users { get; set; }
+
+		public Company(string id) : base(id)
+		{
+		}
 	}
 
 	public struct CompanyUser

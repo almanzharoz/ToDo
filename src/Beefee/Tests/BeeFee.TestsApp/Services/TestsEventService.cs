@@ -1,8 +1,6 @@
 ﻿using Core.ElasticSearch;
 using BeeFee.Model;
 using BeeFee.Model.Embed;
-using BeeFee.Model.Exceptions;
-using BeeFee.Model.Models;
 using BeeFee.Model.Projections;
 using BeeFee.TestsApp.Projections;
 using Microsoft.Extensions.Logging;
@@ -26,9 +24,9 @@ namespace BeeFee.TestsApp.Services
 					Address = address,
 					Type = type,
 					Category = category,
-					Page = new EventPage(name, category.Name, "", dateTime, address, "<p>Html text</p>"),
+					Page = new EventPage(name, category.Name, "", dateTime.ToString(), address, "<p>Html text</p>"),
 					Prices = new TicketPrice[1]
-						{new TicketPrice() {Description = "description price", Name = "price", Price = 0.00m}}
+						{new TicketPrice() {Description = "description price", Name = "price", Price = price}}
 				}
 				.Fluent(x => Insert(x, true))
 				.Id;

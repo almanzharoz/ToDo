@@ -2,6 +2,7 @@
 using BeeFee.Model.Helpers;
 using Core.ElasticSearch.Domain;
 using Microsoft.AspNetCore.WebUtilities;
+using SharpFuncExt;
 
 namespace BeeFee.AdminApp.Projections.User
 {
@@ -9,16 +10,13 @@ namespace BeeFee.AdminApp.Projections.User
 	{
 		public string Email { get; }
 		public string Name { get; }
-		public string Password { get; }
-		public string Salt { get; }
-		public EUserRole[] Roles { get; set; }
+		public EUserRole[] Roles { get; }
 
-		public NewUserProjection() { } //Hack
-
-		public NewUserProjection(string email, string name)
+		public NewUserProjection(string email, string name, EUserRole[] roles)
 		{
-			Email = email.ToLowerInvariant();
-			Name = name.Trim();
+			Email = email.HasNotNullArg(nameof(email)).ToLowerInvariant();
+			Name = name.HasNotNullArg(nameof(name)).Trim();
+			Roles = roles.HasNotNullArg(nameof(roles));
 		}
 	}
 }

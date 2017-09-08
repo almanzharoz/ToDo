@@ -161,6 +161,22 @@ namespace SharpFuncExt
 			return arg;
 		}
 
+		public static IEnumerable<T> EachThrowIf<T, TException>(this IEnumerable<T> arg, Func<T, bool> check, Func<T, TException> func) where TException : Exception
+		{
+			if (arg != null)
+				foreach (var v in arg)
+					if (check(v)) throw func(v);
+			return arg;
+		}
+
+		public static T[] EachThrowIf<T, TException>(this T[] arg, Func<T, bool> check, Func<T, TException> func) where TException : Exception
+		{
+			if (arg != null)
+				foreach (var v in arg)
+					if (check(v)) throw func(v);
+			return arg;
+		}
+
 		public static bool In<T>(this T arg, IEnumerable<T> array) => arg.IfNotNull(array.Contains, ()=>false);
 		public static bool In<T>(this IEnumerable<T> array, T arg) => arg.IfNotNull(array.Contains, ()=>false);
 
@@ -213,6 +229,20 @@ namespace SharpFuncExt
 
 
 		#region Fluent-version
+
+		public static T IfAny<T, TArray>(this T arg, IEnumerable<TArray> array, Func<T, T> func)
+		{
+			if (array != null && array.Any())
+				return func(arg);
+			return arg;
+		}
+		public static T IfNotAny<T, TArray>(this T arg, IEnumerable<TArray> array, Func<T, T> func)
+		{
+			if (array == null || !array.Any())
+				return func(arg);
+			return arg;
+		}
+
 		public static T IfIn<T, TArray, TResult>(this T arg, IEnumerable<TArray> array, TArray element, Func<T, TArray, IEnumerable<TArray>, TResult> func)
 		{
 			if (array.NotNull() && array.Contains(element))

@@ -14,7 +14,6 @@ namespace BeeFee.LoginApp.Projections.User
 		public string Salt { get; }
 		public EUserRole[] Roles { get; }
 
-		public RegisterUserProjection() { }
 		public RegisterUserProjection(string email, string name, string password, EUserRole[] roles)
 		{
 			Roles = roles.HasNotNullArg(nameof(roles));

@@ -2,7 +2,7 @@
 
 namespace Core.ElasticSearch.Tests.Projections
 {
-	public class ProducerProjection : BaseEntity, IProjection<Models.Producer>
+	public class ProducerProjection : BaseEntity, IProjection<Models.Producer>, IGetProjection, IJoinProjection
 	{
 		public string Name { get; set; }
 

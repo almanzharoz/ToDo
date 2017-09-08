@@ -10,18 +10,28 @@ namespace BeeFee.AdminApp.Projections.Event
 	{
 		[Keyword]
 		public BaseCategoryProjection Category { get; private set; }
-		public string Name { get; private set; }
-		public EventDateTime DateTime { get; private set; }
-		public Address Address { get; private set; }
-		public EEventType Type { get; private set; }
+		public string Name { get; }
+		public EventDateTime DateTime { get; }
+		public Address Address { get; }
+		public EEventType Type { get; }
 
 		[Keyword]
-		public BaseUserProjection Owner { get; private set; }
+		public BaseUserProjection Owner { get; }
 
 		internal EventProjection ChangeCategory(BaseCategoryProjection newCategory)
 		{
 			Category = newCategory;
 			return this;
+		}
+
+		public EventProjection(string id, int version, BaseUserProjection owner, BaseCategoryProjection category, string name, EventDateTime datetime, Address address, EEventType type) : base(id, version)
+		{
+			Owner = owner;
+			Category = category;
+			Name = name;
+			DateTime = datetime;
+			Address = address;
+			Type = type;
 		}
 	}
 }

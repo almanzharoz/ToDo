@@ -14,7 +14,7 @@ namespace Core.ElasticSearch
 {
 	internal interface IRequestContainer
 	{
-		T GetOrAdd<T>(T entity) where T : class, IProjection, IJoinProjection;
+		T GetOrAdd<T>(T entity) where T : class, IProjection;
 		//T AddOrUpdate<T>(T entity) where T : class, IProjection;
 		//T Get<T>(string key) where T : class, IProjection, IJoinProjection, new();
 		IEntity Get(string key);
@@ -42,7 +42,7 @@ namespace Core.ElasticSearch
 		}
 
 		//TODO: Возможно, нужно добавить GetOrAdd<T, TParent>(id, parent)
-		public T GetOrAdd<T>(T entity) where T : class, IProjection, IJoinProjection
+		public T GetOrAdd<T>(T entity) where T : class, IProjection
 		{
 			var type = typeof(T);
 			return (T) _cache.AddOrUpdate(entity.Id,

@@ -12,12 +12,12 @@ namespace Core.ElasticSearch.Tests.Projections
 		public string Producer { get; set; }
 	}
 
-	public class ProductProjection : BaseEntityWithParent<Models.Category>, IProjection<Models.Product>, IGetProjection
+	public class ProductProjection : BaseEntityWithParentAndVersion<CategoryProjection>, IProjection<Models.Product>, IGetProjection
 	{
         public string Name { get; set; }
 		public FullName FullName { get; private set; }
 
-		public ProductProjection(string id, Category parent) : base(id, parent)
+		public ProductProjection(string id, CategoryProjection parent, int version) : base(id, parent, version)
 		{
 		}
 	}

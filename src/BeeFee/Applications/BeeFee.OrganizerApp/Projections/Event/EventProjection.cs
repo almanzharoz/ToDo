@@ -38,5 +38,9 @@ namespace BeeFee.OrganizerApp.Projections.Event
 			Page = Page.SetHtml(html).Change(name, category.Name, cover, dateTime, address);
 			return this;
 		}
+
+		public EventProjection(string id, int version) : base(id, version)
+		{
+		}
 	}
 }

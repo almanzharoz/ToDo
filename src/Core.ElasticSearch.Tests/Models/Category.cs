@@ -9,13 +9,9 @@ namespace Core.ElasticSearch.Tests.Models
 	public class Category : BaseEntityWithVersion, IModel, IProjection<Category>, IGetProjection, IUpdateProjection, ISearchProjection, IRemoveProjection
 	{
         [Keyword]
-		public Category Top { get; set; }
+		public CategoryProjection Top { get; set; }
 		public string Name { get; set; }
         public DateTime CreatedOnUtc { get; set; }
-
-		public Category(string id) : base(id)
-		{
-		}
 
 		public Category(string id, int version) : base(id, version)
 		{

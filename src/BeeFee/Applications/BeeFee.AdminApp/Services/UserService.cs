@@ -25,7 +25,7 @@ namespace BeeFee.AdminApp.Services
 			if (FilterCount<UserProjection>(q => q.Term(x => x.Email.ToLowerInvariant(), email.ToLowerInvariant())) != 0)
 				throw new EntityAlreadyExistsException();
 
-			return new NewUserProjection(email, name) { Roles = roles }.Fluent(x => Insert(x, true)).Id;
+			return new NewUserProjection(email, name, roles).Fluent(x => Insert(x, true)).Id;
 		}
 
 		public bool EditUser(string id, string email, string name, EUserRole[] roles)

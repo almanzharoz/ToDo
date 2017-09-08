@@ -14,5 +14,9 @@ namespace BeeFee.Model
 	{
         public string Email { get; set; }
         public DateTime Created { get; set; }
+
+		public OwnerEvent(string id, int version) : base(id, version)
+		{
+		}
 	}
 }

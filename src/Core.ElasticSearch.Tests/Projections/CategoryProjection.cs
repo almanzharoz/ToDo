@@ -6,14 +6,17 @@ namespace Core.ElasticSearch.Tests.Projections
 	public class CategoryProjection : BaseEntity, IProjection<Models.Category>, IGetProjection, ISearchProjection, IJoinProjection
 	{
 		[Keyword]
-		public Projections.CategoryJoin Top { get; }
-		public string Name { get; }
+		public Projections.CategoryJoin Top { get; private set; }
+		public string Name { get; private set; }
 
-		public CategoryProjection(string id, string name, CategoryJoin top) : base(id)
+		public CategoryProjection(string id) : base(id)
 		{
-			Name = name;
-			Top = top;
 		}
+		//public CategoryProjection(string id, string name, CategoryJoin top) : base(id)
+		//{
+		//	Name = name;
+		//	Top = top;
+		//}
 	}
 
 	public class CategoryJoin : BaseEntityWithVersion, IProjection<Models.Category>, IGetProjection, IJoinProjection

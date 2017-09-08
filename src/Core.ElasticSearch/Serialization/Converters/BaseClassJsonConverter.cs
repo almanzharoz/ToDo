@@ -4,6 +4,11 @@ using Newtonsoft.Json.Linq;
 
 namespace Core.ElasticSearch.Serialization
 {
+	/// <inheritdoc />
+	/// <summary>
+	/// Конвертер для десириализации загружаемых связей
+	/// </summary>
+	/// <typeparam name="TSettings"></typeparam>
 	internal class BaseClassJsonConverter<TSettings> : JsonConverter
 		where TSettings : BaseElasticConnection
 	{

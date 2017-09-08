@@ -5,8 +5,15 @@ namespace BeeFee.ClientApp.Projections.Event
 {
 	public class EventCellProjection : BaseEntity, IProjection<Model.Models.Event>, IWithUrl, ISearchProjection
 	{
-		public EventPageCell Page { get; private set; }
+		public EventPageCell Page { get; }
 
-		public string Url { get; private set; }
+		public string Url { get; }
+
+		public EventCellProjection(string id, string url, EventPageCell page) : base(id)
+		{
+			Page = page;
+			Url = url;
+		}
+
 	}
 }

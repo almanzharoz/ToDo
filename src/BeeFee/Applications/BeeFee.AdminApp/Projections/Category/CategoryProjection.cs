@@ -16,5 +16,9 @@ namespace BeeFee.AdminApp.Projections.Category
 			Name = name;
 			return this;
 		}
+
+		public CategoryProjection(string id, int version) : base(id, version)
+		{
+		}
 	}
 }

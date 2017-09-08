@@ -19,7 +19,7 @@ namespace Core.ElasticSearch
 			var fields = new List<string>();
 			foreach (var property in type.GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).Where(x => x.Name != "Id" && x.Name != "Version" && x.Name != "Parent"))
 			{
-				if (property.PropertyType.HasBaseType<IEntity>() && property.GetCustomAttribute<KeywordAttribute>() == null)
+				if (property.PropertyType.IsValueType && !property.PropertyType.IsPrimitive && !property.PropertyType.IsAutoLayout || property.PropertyType.HasBaseType<IEntity>() && property.GetCustomAttribute<KeywordAttribute>() == null)
 					fields.AddRange(GetFieldsNames(property.PropertyType, String.Join(".", new[] { lastName, property.Name.ToLower() }.Where(x => x != null))));
 				else
 					fields.Add(String.Join(".", new[] { lastName, property.Name.ToLower() }.Where(x => x != null)));

@@ -26,5 +26,7 @@ namespace BeeFee.Model.Models
 		public TicketPrice[] Prices { get; set; }
 
 		public EventPage Page { get; set; }
+
+		protected Event() : base(null) { }
 	}
 }
