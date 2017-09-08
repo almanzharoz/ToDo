@@ -65,13 +65,17 @@ namespace BeeFee.ClientApp.Services
 			{
 				qf.Add(Query<Event>.DateRange(m => m.Field(x => x.DateTime.Finish).LessThanOrEquals(endDateTime.Value)));
 			}
+			List<QueryContainer> notqf = new List<QueryContainer>();
 			if (maxPrice.HasValue)
 			{
-				qf.Add(Query<Event>.Range(m => m.Field(x => x.Prices.First().Price).LessThanOrEquals((double)maxPrice.Value)));
+				qf.Add(Query<Event>.Range(m => m.Field(x => x.Prices.First().Price).LessThanOrEquals((double)maxPrice.Value)) || !Query<Event>.Exists(x => x.Field(p => p.Prices.First().Price)));
+				//qf.Add(!Query<Event>.Exists(x => x.Field(p => p.Prices)));
 			}
 			return SearchPager<Event, EventCellProjection>(q => q
 				.Bool(b => b
-					.Must(qc.ToArray()).Filter(qf.ToArray())), pageIndex, pageSize, null, false);
+					.Must(qc.ToArray())
+					//.IfAny(notqf, x => x.MustNot(notqf.ToArray()))
+					.Filter(qf.ToArray())), pageIndex, pageSize, null, false);
 		}
 
 

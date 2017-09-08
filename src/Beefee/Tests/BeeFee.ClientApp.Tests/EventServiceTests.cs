@@ -26,7 +26,8 @@ namespace BeeFee.ClientApp.Tests
         [TestMethod]
         public void GetEventPage()
         {
-            var eventId = AddEvent(AddCategory("Category 1"), "Event 1");
+            var dateTimeNow = DateTime.UtcNow;
+            var eventId = AddEvent(AddCategory("Category 1"), "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)));
 
             Assert.IsNotNull(eventId);
 
@@ -74,8 +75,7 @@ namespace BeeFee.ClientApp.Tests
         public void SearchByType()
         {
             var dateTimeNow = DateTime.UtcNow;
-            AddEvent(AddCategory("Category 1"), "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert,
-                 0);
+            AddEvent(AddCategory("Category 1"), "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert, 0);
 
             var events = Service.SearchEvents(types: new List<EEventType>() { EEventType.Concert });
 
@@ -90,8 +90,7 @@ namespace BeeFee.ClientApp.Tests
         public void SearchByCity()
         {
             var dateTimeNow = DateTime.UtcNow;
-            AddEvent(AddCategory("Category 1"), "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert,
-                 0);
+            AddEvent(AddCategory("Category 1"), "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert, 0);
 
             var events = Service.SearchEvents(city: "Yekaterinburg");
 
@@ -107,8 +106,7 @@ namespace BeeFee.ClientApp.Tests
         {
             var dateTimeNow = DateTime.UtcNow;
             var categoryId = AddCategory("Category 1");
-            AddEvent(categoryId, "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert,
-                0);
+            AddEvent(categoryId, "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert, 0);
 
             var events = Service.SearchEvents(categories: new List<string>() { categoryId });
 
@@ -119,14 +117,12 @@ namespace BeeFee.ClientApp.Tests
             Assert.IsTrue(!events.Any());
         }
 
-        //зачем разделили на рубли/копейки? и как теперь искать?
         [TestMethod]
         public void SearchByMaxPrice()
         {
             var dateTimeNow = DateTime.UtcNow;
             var categoryId = AddCategory("Category 1");
-            AddEvent(categoryId, "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert,
-                0);
+            AddEvent(categoryId, "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert, 1);
 
             var events = Service.SearchEvents(maxPrice: 5);
 
@@ -137,13 +133,28 @@ namespace BeeFee.ClientApp.Tests
             Assert.IsTrue(!events.Any());
         }
 
-        [TestMethod]
+		[TestMethod]
+		public void SearchByMaxPriceOrFree()
+		{
+			var dateTimeNow = DateTime.UtcNow;
+			var categoryId = AddCategory("Category 1");
+			AddEvent(categoryId, "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert, 0);
+
+			var events = Service.SearchEvents(maxPrice: 5);
+
+			Assert.IsTrue(events.Any());
+
+			events = Service.SearchEvents(maxPrice: -2);
+
+			Assert.IsTrue(events.Any());
+		}
+
+		[TestMethod]
         public void GetAllCities()
         {
             var dateTimeNow = DateTime.UtcNow;
             var categoryId = AddCategory("Category 1");
-            AddEvent(categoryId, "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert,
-                 0);
+            AddEvent(categoryId, "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert, 0);
             AddEvent(categoryId, "Event 2", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Moscow", ""), EEventType.Concert,
                  0);
 

@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 namespace BeeFee.Model.Models
 
 {
-	public class User : BaseEntity, IModel, IWithName
+	public abstract class User : BaseEntity, IModel, IWithName
     {
         [Keyword]
         public string Email { get; set; }
@@ -19,5 +19,9 @@ namespace BeeFee.Model.Models
         public string Salt { get; set; }
         [Keyword]
         public EUserRole[] Roles { get; set; }
-    }
+
+		protected User() : base(null)
+		{
+		}
+	}
 }

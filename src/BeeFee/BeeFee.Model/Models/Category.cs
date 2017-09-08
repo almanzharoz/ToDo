@@ -4,11 +4,15 @@ using Nest;
 
 namespace BeeFee.Model.Models
 {
-	public class Category : BaseEntityWithVersion, IModel, IWithName, IWithUrl
+	public abstract class Category : BaseEntityWithVersion, IModel, IWithName, IWithUrl
 	{
 		[Keyword]
 		public string Name { get; set; }
 		[Keyword]
 		public string Url { get; set; }
+
+		protected Category() : base(null)
+		{
+		}
 	}
 }

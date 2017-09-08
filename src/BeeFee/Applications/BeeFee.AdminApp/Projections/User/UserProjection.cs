@@ -5,8 +5,15 @@ namespace BeeFee.AdminApp.Projections.User
 {
 	public class UserProjection : BaseEntity, IProjection<Model.Models.User>, IGetProjection, ISearchProjection, IRemoveProjection
 	{
-		public string Email { get; private set; }
-		public string Name { get; private set; }
-		public EUserRole[] Roles { get; private set; }
+		public string Email { get; }
+		public string Name { get; }
+		public EUserRole[] Roles { get; }
+
+		public UserProjection(string id, string name, string email, EUserRole[] roles) : base(id)
+		{
+			Email = email;
+			Name = name;
+			Roles = roles;
+		}
 	}
 }
