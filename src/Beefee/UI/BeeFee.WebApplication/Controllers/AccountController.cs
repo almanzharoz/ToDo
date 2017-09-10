@@ -82,6 +82,7 @@ namespace BeeFee.WebApplication.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)

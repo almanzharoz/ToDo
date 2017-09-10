@@ -31,10 +31,10 @@ namespace BeeFee.ClientApp.Tests
 
             Assert.IsNotNull(eventId);
 
-			var @event = Service.GetEventByUrl("event-1").Result;
+            var @event = Service.GetEventByUrl("event-1").Result;
 
-			Assert.AreEqual(@event.Name, "Event 1");
-            Assert.AreEqual(@event.Category.Name, "Category 1");
+            Assert.AreEqual(@event.Page.Caption, "Event 1");
+            Assert.AreEqual(@event.Page.Category, "Category 1");
         }
 
         [TestMethod]
@@ -42,6 +42,7 @@ namespace BeeFee.ClientApp.Tests
         {
             var dateTimeNow = DateTime.UtcNow;
             AddEvent(AddCategory("Category 1"), "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert, 0);
+            AddEvent(AddCategory("Category 2"), "Event 2", new EventDateTime(dateTimeNow.AddDays(10), dateTimeNow.AddDays(11)), new Address("Sverdlovsk", ""), EEventType.Concert, 0);
 
             var events = Service.SearchEvents(startDateTime: dateTimeNow.AddDays(-1), endDateTime: dateTimeNow.AddDays(1));
 
@@ -61,6 +62,7 @@ namespace BeeFee.ClientApp.Tests
         {
             var dateTimeNow = DateTime.UtcNow;
             AddEvent(AddCategory("Category 1"), "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert, 0);
+            AddEvent(AddCategory("Category 2"), "Event 2", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Sverdlovsk", ""), EEventType.Concert, 0);
 
             var events = Service.SearchEvents("Event 1");
 
@@ -75,7 +77,10 @@ namespace BeeFee.ClientApp.Tests
         public void SearchByType()
         {
             var dateTimeNow = DateTime.UtcNow;
-            AddEvent(AddCategory("Category 1"), "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert, 0);
+            AddEvent(AddCategory("Category 1"), "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert,
+                 0);
+            AddEvent(AddCategory("Category 2"), "Event 2", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Sverdlovsk", ""), EEventType.Exhibition,
+                0);
 
             var events = Service.SearchEvents(types: new List<EEventType>() { EEventType.Concert });
 
@@ -90,7 +95,10 @@ namespace BeeFee.ClientApp.Tests
         public void SearchByCity()
         {
             var dateTimeNow = DateTime.UtcNow;
-            AddEvent(AddCategory("Category 1"), "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert, 0);
+            AddEvent(AddCategory("Category 1"), "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert,
+                 0);
+            AddEvent(AddCategory("Category 2"), "Event 2", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Sverdlovsk", ""), EEventType.Concert,
+                0);
 
             var events = Service.SearchEvents(city: "Yekaterinburg");
 
@@ -105,58 +113,72 @@ namespace BeeFee.ClientApp.Tests
         public void SearchByCategory()
         {
             var dateTimeNow = DateTime.UtcNow;
-            var categoryId = AddCategory("Category 1");
-            AddEvent(categoryId, "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert, 0);
+            var category1Id = AddCategory("Category 1");
+            var category2Id = AddCategory("Category 2");
+            var eventid1 = AddEvent(category1Id, "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert,
+                0);
+            AddEvent(category2Id, "Event 3", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Sverdlovsk", ""), EEventType.Concert,
+                0);
 
-            var events = Service.SearchEvents(categories: new List<string>() { categoryId });
+            var events = Service.SearchEvents(categories: new List<string>() { category1Id });
 
-            Assert.IsTrue(events.Any());
+            Assert.AreEqual(events.Count, 1);
+
+            Assert.IsTrue(events.FirstOrDefault().Id == eventid1);
 
             events = Service.SearchEvents(categories: new List<string>() { "bla-bla" });
 
             Assert.IsTrue(!events.Any());
         }
 
+        //зачем разделили на рубли/копейки? и как теперь искать?
         [TestMethod]
         public void SearchByMaxPrice()
         {
             var dateTimeNow = DateTime.UtcNow;
             var categoryId = AddCategory("Category 1");
-            AddEvent(categoryId, "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert, 1);
+            AddEvent(categoryId, "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert,
+                1);
+            AddEvent(categoryId, "Event 2", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert,
+                7);
 
             var events = Service.SearchEvents(maxPrice: 5);
 
-            Assert.IsTrue(events.Any());
+            Assert.AreEqual(events.Count, 1);
 
             events = Service.SearchEvents(maxPrice: -2);
 
             Assert.IsTrue(!events.Any());
         }
 
-		[TestMethod]
-		public void SearchByMaxPriceOrFree()
-		{
-			var dateTimeNow = DateTime.UtcNow;
-			var categoryId = AddCategory("Category 1");
-			AddEvent(categoryId, "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert, 0);
-
-			var events = Service.SearchEvents(maxPrice: 5);
-
-			Assert.IsTrue(events.Any());
-
-			events = Service.SearchEvents(maxPrice: -2);
-
-			Assert.IsTrue(events.Any());
-		}
-
-		[TestMethod]
-        public void GetAllCities()
+        [TestMethod]
+        public void SearchByMaxPriceOrFree()
         {
             var dateTimeNow = DateTime.UtcNow;
             var categoryId = AddCategory("Category 1");
             AddEvent(categoryId, "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert, 0);
-            AddEvent(categoryId, "Event 2", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Moscow", ""), EEventType.Concert,
-                 0);
+            AddEvent(categoryId, "Event 2", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert,
+                7);
+
+            var events = Service.SearchEvents(maxPrice: 5);
+
+            Assert.AreEqual(events.Count, 1);
+
+            events = Service.SearchEvents(maxPrice: -2);
+
+            Assert.IsTrue(events.Any());
+        }
+
+        [TestMethod]
+        public void GetAllCities()
+        {
+            var dateTimeNow = DateTime.UtcNow;
+            var category1Id = AddCategory("Category 1");
+
+            AddEvent(category1Id, "Event 1", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Yekaterinburg", ""), EEventType.Concert,
+                0);
+            AddEvent(category1Id, "Event 2", new EventDateTime(dateTimeNow, dateTimeNow.AddDays(1)), new Address("Moscow", ""), EEventType.Concert,
+                0);
 
             var cities = Service.GetAllCities().Where(c => !string.IsNullOrEmpty(c)).ToList();
 
