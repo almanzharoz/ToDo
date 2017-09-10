@@ -1,108 +1,428 @@
-﻿@{
+@model BeeFee.WebApplication.Models.Event.EventFilterViewModel
+@{
     ViewData["Title"] = "Home Page";
 }
-
-<div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">
-    <ol class="carousel-indicators">
-        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-        <li data-target="#myCarousel" data-slide-to="1"></li>
-        <li data-target="#myCarousel" data-slide-to="2"></li>
-        <li data-target="#myCarousel" data-slide-to="3"></li>
-    </ol>
-    <div class="carousel-inner" role="listbox">
-        <div class="item active">
-            <img src="~/images/banner1.svg" alt="ASP.NET" class="img-responsive" />
-            <div class="carousel-caption" role="option">
-                <p>
-                    Learn how to build ASP.NET apps that can run anywhere.
-                    <a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkID=525028&clcid=0x409">
-                        Learn More
-                    </a>
-                </p>
-            </div>
-        </div>
-        <div class="item">
-            <img src="~/images/banner2.svg" alt="Visual Studio" class="img-responsive" />
-            <div class="carousel-caption" role="option">
-                <p>
-                    There are powerful new features in Visual Studio for building modern web apps.
-                    <a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkID=525030&clcid=0x409">
-                        Learn More
-                    </a>
-                </p>
-            </div>
-        </div>
-        <div class="item">
-            <img src="~/images/banner3.svg" alt="Package Management" class="img-responsive" />
-            <div class="carousel-caption" role="option">
-                <p>
-                    Bring in libraries from NuGet, Bower, and npm, and automate tasks using Grunt or Gulp.
-                    <a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkID=525029&clcid=0x409">
-                        Learn More
-                    </a>
-                </p>
-            </div>
-        </div>
-        <div class="item">
-            <img src="~/images/banner4.svg" alt="Microsoft Azure" class="img-responsive" />
-            <div class="carousel-caption" role="option">
-                <p>
-                    Learn how Microsoft's Azure cloud platform allows you to build, deploy, and scale web apps.
-                    <a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkID=525027&clcid=0x409">
-                        Learn More
-                    </a>
-                </p>
-            </div>
-        </div>
+@section fixed_header
+    {
+    <div class="fixed-box--r" data-fixed="filter">
+        <div class="container"><a class="filter--head in-fixed" href="#" data-goto="filter">Все события в городе Екатеринбург в ближайшее время</a></div>
     </div>
-    <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
-        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-    </a>
-    <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
-        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
-    </a>
-</div>
-
-<div class="row">
-    <div class="col-md-3">
-        <h2>Application uses</h2>
-        <ul>
-            <li>Sample pages using ASP.NET Core MVC</li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=518004">Bower</a> for managing client-side libraries</li>
-            <li>Theming using <a href="https://go.microsoft.com/fwlink/?LinkID=398939">Bootstrap</a></li>
-        </ul>
-    </div>
-    <div class="col-md-3">
-        <h2>How to</h2>
-        <ul>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkID=398600">Add a Controller and View</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=699315">Manage User Secrets using Secret Manager.</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=699316">Use logging to log a message.</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=699317">Add packages using NuGet.</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=699318">Add client packages using Bower.</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=699319">Target development, staging or production environment.</a></li>
-        </ul>
-    </div>
-    <div class="col-md-3">
-        <h2>Overview</h2>
-        <ul>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=518008">Conceptual overview of what is ASP.NET Core</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=699320">Fundamentals of ASP.NET Core such as Startup and middleware.</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=398602">Working with Data</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=398603">Security</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkID=699321">Client side development</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkID=699322">Develop on different platforms</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkID=699323">Read more on the documentation site</a></li>
-        </ul>
-    </div>
-    <div class="col-md-3">
-        <h2>Run & Deploy</h2>
-        <ul>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkID=517851">Run your app</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkID=517853">Run tools such as EF migrations and more</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkID=398609">Publish to Microsoft Azure Web Apps</a></li>
-        </ul>
+}
+<div class="intro hidden-xs" style="background-image: url(images/intro.png);">
+    <div class="intro--box">
+        <div class="container">
+            <div class="intro--title">Создай своё событие</div>
+            <div class="intro--text">И расскажи о нём всем</div>
+            <div class="intro--btn"><a class="btn is-block is-sm" href="#">Начать</a></div>
+        </div>
     </div>
 </div>
+<div class="filter" data-fixed-wrap="filter">
+    <div class="container"><a class="filter--head" href="#" data-toggle="filter">Все события в городе Екатеринбург в ближайшее время</a></div>
+    <div class="filter--body">
+        <div class="container">
+            <div class="filter--in hidden-xs">
+                <div class="filter--field">
+                    <div class="vertical-field">
+                        <div class="row">
+                            <div class="col-xs-4 col-md-3">
+                                <label class="vertical-field--l"><span>Поиск по ключевым словам</span></label>
+                            </div>
+                            <div class="col-xs-4 col-md-6">
+                                <input class="vertical-field--i" type="text" value="браво" id="txtSearchText1" />
+                            </div>
+                            <div class="col-xs-4 col-xs-offset-l-0 col-md-9 col-md-offset-l-3">
+                                <div class="vertical-field--t"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter--field">
+                    <div class="vertical-field">
+                        <div class="row">
+                            <div class="col-xs-4 col-md-3">
+                                <label class="vertical-field--l"><span>Выберите город</span></label>
+                            </div>
+                            <div class="col-xs-4 col-md-6">
+                                <div class="select">
+                                    <input class="select_hidden" id="selectCity1" type="hidden" />
+                                    <div class="select_in">
+                                        <div class="select_title"><span class="select_placeholder">Выберите город</span></div>
+                                    </div>
+                                    <ul class="select_list">
+                                        @{
+                                            var index = 1;
+                                            foreach (var city in Model.Cities)
+                                            {
+                                                <li data-value="@index">
+                                                    @city
+                                                </li>
+                                                index++;
+                                            }
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-xs-4 col-xs-offset-l-0 col-md-9 col-md-offset-l-3">
+                                <div class="vertical-field--t"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter--field">
+                    <div class="vertical-field">
+                        <div class="row">
+                            <div class="col-xs-4 col-md-3">
+                                <label class="vertical-field--l"><span>Выберите даты</span></label>
+                            </div>
+                            <div class="col-xs-4 col-md-4">
+                                <div class="vertical-field--d">
+                                    <input class="vertical-field--i js-date" type="text" id="endDate1" value="@Model.EndDate.Date.ToString("dd.MM.yyyy")" />
+                                </div>
+                            </div>
+                            <div class="col-xs-4 col-xs-offset-l-0 col-md-9 col-md-offset-l-3">
+                                <div class="vertical-field--t"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter--field">
+                    <div class="vertical-field">
+                        <div class="row">
+                            <div class="col-xs-4 col-md-3">
+                                <label class="vertical-field--l"><span>Выберите тип</span></label>
+                            </div>
+                            <div class="col-xs-4 col-md-9">
+                                <div class="vertical-field--c">
+                                    <div class="row">
+                                        <div class="col-xs-2 col-md-3">
+                                            <label class="checkbox">
+                                                <input class="checkbox--input" type="checkbox" checked="checked" id="chkConcert1" />
+                                                <div class="checkbox--label">Концерт</div>
+                                            </label>
+                                        </div>
+                                        <div class="col-xs-2 col-md-3">
+                                            <label class="checkbox">
+                                                <input class="checkbox--input" type="checkbox" checked="checked" id="chkExhibition1" />
+                                                <div class="checkbox--label">Выставка</div>
+                                            </label>
+                                        </div>
+                                        <div class="col-xs-2 col-md-3">
+                                            <label class="checkbox">
+                                                <input class="checkbox--input" type="checkbox" checked="checked" id="chkExcursion1" />
+                                                <div class="checkbox--label">Экскурсия</div>
+                                            </label>
+                                        </div>
+                                        <div class="col-xs-2 col-md-3">
+                                            <label class="checkbox">
+                                                <input class="checkbox--input" type="checkbox" checked="checked" data-checkboxes="total" />
+                                                <div class="checkbox--label">Все типы</div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-4 col-xs-offset-l-0 col-md-9 col-md-offset-l-3">
+                                <div class="vertical-field--t"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter--field">
+                    <div class="vertical-field">
+                        <div class="row">
+                            <div class="col-xs-4 col-md-3">
+                                <label class="vertical-field--l"><span>Максимальная цена билета</span></label>
+                            </div>
+                            <div class="col-xs-4 col-md-6">
+                                <input class="vertical-field--i" type="text" id="maxPrice1" />
+                            </div>
+                            <div class="col-xs-4 col-xs-offset-l-0 col-md-9 col-md-offset-l-3">
+                                <div class="vertical-field--t"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-4 col-md-6 col-md-offset-l-3">
+                        <button class="btn is-block" type="submit" id="btnLoad1">Найти мероприятия</button>
+                    </div>
+                </div>
+            </div>
+            <div class="filter--in visible-xs">
+                <div class="filter--field">
+                    <div class="input-field">
+                        <div class="input-field--b">
+                            <label class="input-field--l">Поиск по ключевым словам</label>
+                            <input class="input-field--i" type="text" id="txtSearchText2" />
+                        </div>
+                        <div class="input-field--t"></div>
+                    </div>
+                </div>
+                <div class="filter--field">
+                    <div class="input-field">
+                        <div class="select">
+                            <input class="select_hidden" id="selectCity2" type="hidden" />
+                            <div class="select_in">
+                                <div class="select_title"><span class="select_placeholder">Выберите город</span></div>
+                            </div>
+                            <ul class="select_list">
+                                @{
+                                    index = 1;
+                                    foreach (var city in Model.Cities)
+                                    {
+                                        <li data-value="@index">
+                                            @city
+                                        </li>
+                                        index++;
+                                    }
+                                }
+                                @*<li data-value="1">Екатеринбург</li>
+                                    <li data-value="2">Москва</li>
+                                    <li data-value="3">Санкт-Петербург</li>*@
+                            </ul>
+                        </div>
+                        <div class="input-field--t"></div>
+                    </div>
+                </div>
+                <div class="filter--field">
+                    <div class="input-field is-date">
+                        <div class="input-field--b">
+                            <label class="input-field--l">Выберите даты</label>
+                            <input class="input-field--i js-date" type="text" id="endDate2" value="@Model.EndDate.Date.ToString("dd.MM.yyyy")" />
+                        </div>
+                        <div class="input-field--t"></div>
+                    </div>
+                </div>
+                <div class="filter--field">
+                    <div class="input-field">
+                        <div class="input-field--c">
+                            <div class="row">
+                                <div class="col-xs-2 col-md-3">
+                                    <label class="checkbox">
+                                        <input class="checkbox--input" type="checkbox" checked="checked" id="chkConcert2" />
+                                        <div class="checkbox--label">Концерт</div>
+                                    </label>
+                                </div>
+                                <div class="col-xs-2 col-md-3">
+                                    <label class="checkbox">
+                                        <input class="checkbox--input" type="checkbox" checked="checked" id="chkExhibition2" />
+                                        <div class="checkbox--label">Выставка</div>
+                                    </label>
+                                </div>
+                                <div class="col-xs-2 col-md-3">
+                                    <label class="checkbox">
+                                        <input class="checkbox--input" type="checkbox" checked="checked" id="chkExcursion2" />
+                                        <div class="checkbox--label">Экскурсия</div>
+                                    </label>
+                                </div>
+                                <div class="col-xs-2 col-md-3">
+                                    <label class="checkbox">
+                                        <input class="checkbox--input" type="checkbox" checked="checked" data-checkboxes="total" />
+                                        <div class="checkbox--label">Все типы</div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-field--t"></div>
+                    </div>
+                </div>
+                <div class="filter--field">
+                    <div class="input-field">
+                        <div class="input-field--b">
+                            <label class="input-field--l">Максимальная цена билета</label>
+                            <input class="input-field--i" type="text" id="maxPrice2" />
+                        </div>
+                        <div class="input-field--t"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-4 col-xs-offset-l-0 col-md-6 col-md-offset-l-3">
+                        <button class="btn is-block" type="submit" id="btnLoad2">Найти мероприятия</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="page--in">
+    <div class="container">
+        <div class="grid">
+            <div class="row">
+                @*<div class="col-xs-4 col-md-4">
+                        <div class="grid--item">
+                            <a class="item" href="#"><span class="item--poster" style="background-image: url(http://placehold.it/310x160);"></span><span class="item--date"><span>10 июля 2017 18:00</span> – <span>12 июля 2017 21:00</span></span><span class="item--title">Queens of the Stone Age</span></a>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 col-md-4">
+                        <div class="grid--item">
+                            <a class="item" href="#"><span class="item--poster" style="background-image: url(http://placehold.it/310x160);"></span><span class="item--date"><span>10 июля 2017 18:00</span></span><span class="item--title">Клуб кинопутешественников</span></a>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 col-md-4">
+                        <div class="grid--item">
+                            <a class="item" href="#"><span class="item--poster" style="background-image: url(http://placehold.it/310x160);"></span><span class="item--date"><span>9 июля 2017 22:00</span></span><span class="item--title">Бизнес-тренинг</span></a>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 col-md-4">
+                        <div class="grid--item">
+                            <a class="item" href="#"><span class="item--poster" style="background-image: url(http://placehold.it/310x160);"></span><span class="item--date"><span>8 июля 2017 22:00</span></span><span class="item--title">Любители Екатеринбурга</span></a>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 col-md-4">
+                        <div class="grid--item">
+                            <a class="item" href="#"><span class="item--poster" style="background-image: url(http://placehold.it/310x160);"></span><span class="item--date"><span>8 июля 2017 21:00</span></span><span class="item--title">Архитектурные лекции</span></a>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 col-md-4">
+                        <div class="grid--item">
+                            <a class="item" href="#"><span class="item--poster" style="background-image: url(http://placehold.it/310x160);"></span><span class="item--date"><span>5 июля 2017 22:00</span></span><span class="item--title">Диалоги о животных</span></a>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 col-md-4">
+                        <div class="grid--item">
+                            <a class="item" href="#"><span class="item--poster" style="background-image: url(http://placehold.it/310x160);"></span><span class="item--date"><span>10 июля 2017 18:00</span> – <span>12 июля 2017 21:00</span></span><span class="item--title">Queens of the Stone Age</span></a>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 col-md-4">
+                        <div class="grid--item">
+                            <a class="item" href="#"><span class="item--poster" style="background-image: url(http://placehold.it/310x160);"></span><span class="item--date"><span>10 июля 2017 18:00</span></span><span class="item--title">Клуб кинопутешественников</span></a>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 col-md-4">
+                        <div class="grid--item">
+                            <a class="item" href="#"><span class="item--poster" style="background-image: url(http://placehold.it/310x160);"></span><span class="item--date"><span>9 июля 2017 22:00</span></span><span class="item--title">Бизнес-тренинг</span></a>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 col-md-4">
+                        <div class="grid--item">
+                            <a class="item" href="#"><span class="item--poster" style="background-image: url(http://placehold.it/310x160);"></span><span class="item--date"><span>8 июля 2017 22:00</span></span><span class="item--title">Любители Екатеринбурга</span></a>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 col-md-4">
+                        <div class="grid--item">
+                            <a class="item" href="#"><span class="item--poster" style="background-image: url(http://placehold.it/310x160);"></span><span class="item--date"><span>8 июля 2017 21:00</span></span><span class="item--title">Архитектурные лекции</span></a>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 col-md-4">
+                        <div class="grid--item">
+                            <a class="item" href="#"><span class="item--poster" style="background-image: url(http://placehold.it/310x160);"></span><span class="item--date"><span>5 июля 2017 22:00</span></span><span class="item--title">Диалоги о животных</span></a>
+                        </div>
+                    </div>*@
+            </div>
+        </div>
+        <div class="loader"></div>
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            eventsPageInit([{ enddateselector: "#txtSearchText2", cityselector: "#selectCity2", chkconcertselector: "#chkConcert2", chkexhibitionselector: "#chkExhibition2", chkexcursionselector: "#chkExcursion2", maxpriceselector: "#maxPrice2", btnloadselector: "#btnLoad2" },
+            { enddateselector: "#txtSearchText1", cityselector: "#selectCity1", chkconcertselector: "#chkConcert1", chkexhibitionselector: "#chkExhibition1", chkexcursionselector: "#chkExcursion1", maxpriceselector: "#maxPrice1", btnloadselector: "#btnLoad1" }], ".container .grid .row");
+        });
+    </script>
+}
+@*<div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">
+        <ol class="carousel-indicators">
+            <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+            <li data-target="#myCarousel" data-slide-to="1"></li>
+            <li data-target="#myCarousel" data-slide-to="2"></li>
+            <li data-target="#myCarousel" data-slide-to="3"></li>
+        </ol>
+        <div class="carousel-inner" role="listbox">
+            <div class="item active">
+                <img src="~/images/banner1.svg" alt="ASP.NET" class="img-responsive" />
+                <div class="carousel-caption" role="option">
+                    <p>
+                        Learn how to build ASP.NET apps that can run anywhere.
+                        <a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkID=525028&clcid=0x409">
+                            Learn More
+                        </a>
+                    </p>
+                </div>
+            </div>
+            <div class="item">
+                <img src="~/images/banner2.svg" alt="Visual Studio" class="img-responsive" />
+                <div class="carousel-caption" role="option">
+                    <p>
+                        There are powerful new features in Visual Studio for building modern web apps.
+                        <a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkID=525030&clcid=0x409">
+                            Learn More
+                        </a>
+                    </p>
+                </div>
+            </div>
+            <div class="item">
+                <img src="~/images/banner3.svg" alt="Package Management" class="img-responsive" />
+                <div class="carousel-caption" role="option">
+                    <p>
+                        Bring in libraries from NuGet, Bower, and npm, and automate tasks using Grunt or Gulp.
+                        <a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkID=525029&clcid=0x409">
+                            Learn More
+                        </a>
+                    </p>
+                </div>
+            </div>
+            <div class="item">
+                <img src="~/images/banner4.svg" alt="Microsoft Azure" class="img-responsive" />
+                <div class="carousel-caption" role="option">
+                    <p>
+                        Learn how Microsoft's Azure cloud platform allows you to build, deploy, and scale web apps.
+                        <a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkID=525027&clcid=0x409">
+                            Learn More
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <h2>Application uses</h2>
+            <ul>
+                <li>Sample pages using ASP.NET Core MVC</li>
+                <li><a href="https://go.microsoft.com/fwlink/?LinkId=518004">Bower</a> for managing client-side libraries</li>
+                <li>Theming using <a href="https://go.microsoft.com/fwlink/?LinkID=398939">Bootstrap</a></li>
+            </ul>
+        </div>
+        <div class="col-md-3">
+            <h2>How to</h2>
+            <ul>
+                <li><a href="https://go.microsoft.com/fwlink/?LinkID=398600">Add a Controller and View</a></li>
+                <li><a href="https://go.microsoft.com/fwlink/?LinkId=699315">Manage User Secrets using Secret Manager.</a></li>
+                <li><a href="https://go.microsoft.com/fwlink/?LinkId=699316">Use logging to log a message.</a></li>
+                <li><a href="https://go.microsoft.com/fwlink/?LinkId=699317">Add packages using NuGet.</a></li>
+                <li><a href="https://go.microsoft.com/fwlink/?LinkId=699318">Add client packages using Bower.</a></li>
+                <li><a href="https://go.microsoft.com/fwlink/?LinkId=699319">Target development, staging or production environment.</a></li>
+            </ul>
+        </div>
+        <div class="col-md-3">
+            <h2>Overview</h2>
+            <ul>
+                <li><a href="https://go.microsoft.com/fwlink/?LinkId=518008">Conceptual overview of what is ASP.NET Core</a></li>
+                <li><a href="https://go.microsoft.com/fwlink/?LinkId=699320">Fundamentals of ASP.NET Core such as Startup and middleware.</a></li>
+                <li><a href="https://go.microsoft.com/fwlink/?LinkId=398602">Working with Data</a></li>
+                <li><a href="https://go.microsoft.com/fwlink/?LinkId=398603">Security</a></li>
+                <li><a href="https://go.microsoft.com/fwlink/?LinkID=699321">Client side development</a></li>
+                <li><a href="https://go.microsoft.com/fwlink/?LinkID=699322">Develop on different platforms</a></li>
+                <li><a href="https://go.microsoft.com/fwlink/?LinkID=699323">Read more on the documentation site</a></li>
+            </ul>
+        </div>
+        <div class="col-md-3">
+            <h2>Run & Deploy</h2>
+            <ul>
+                <li><a href="https://go.microsoft.com/fwlink/?LinkID=517851">Run your app</a></li>
+                <li><a href="https://go.microsoft.com/fwlink/?LinkID=517853">Run tools such as EF migrations and more</a></li>
+                <li><a href="https://go.microsoft.com/fwlink/?LinkID=398609">Publish to Microsoft Azure Web Apps</a></li>
+            </ul>
+        </div>
+    </div>*@
