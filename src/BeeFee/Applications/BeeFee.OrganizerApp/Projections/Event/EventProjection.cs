@@ -29,7 +29,7 @@ namespace BeeFee.OrganizerApp.Projections.Event
 			BaseCategoryProjection category, TicketPrice[] prices, string html)
 		{
 			Name = name;
-			Url = url.IfNull(name, CommonHelper.UriTranslit);
+			Url = url.IfNull(name, CommonHelper.UriTransliterate);
 			DateTime = dateTime;
 			Address = address;
 			Type = type;
