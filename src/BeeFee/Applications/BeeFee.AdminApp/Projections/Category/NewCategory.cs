@@ -11,7 +11,7 @@ namespace BeeFee.AdminApp.Projections.Category
 
 		public NewCategory(string url, string name)
 		{
-			Url = url.IfNull(name, CommonHelper.UriTranslit);
+			Url = url.IfNull(name, CommonHelper.UriTransliterate);
 			Name = name;
 		}
 
