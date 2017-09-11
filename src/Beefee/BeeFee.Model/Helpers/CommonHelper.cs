@@ -8,33 +8,98 @@ namespace BeeFee.Model.Helpers
 {
     public class CommonHelper
     {
-		private static Regex _emailValidator = new Regex(@"^(?:[\w\!\#\$\%\&\'\*\+\-\/\=\?\^\`\{\|\}\~]+\.)*[\w\!\#\$\%\&\'\*\+\-\/\=\?\^\`\{\|\}\~]+@(?:(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-](?!\.)){0,61}[a-zA-Z0-9]?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9\-](?!$)){0,61}[a-zA-Z0-9]?)|(?:\[(?:(?:[01]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}(?:[01]?\d{1,2}|2[0-4]\d|25[0-5])\]))$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private static readonly Regex EmailValidator = new Regex(@"^(?:[\w\!\#\$\%\&\'\*\+\-\/\=\?\^\`\{\|\}\~]+\.)*[\w\!\#\$\%\&\'\*\+\-\/\=\?\^\`\{\|\}\~]+@(?:(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-](?!\.)){0,61}[a-zA-Z0-9]?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9\-](?!$)){0,61}[a-zA-Z0-9]?)|(?:\[(?:(?:[01]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}(?:[01]?\d{1,2}|2[0-4]\d|25[0-5])\]))$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-	    public static bool IsValidEmail(string email)
-		    => email.NotNullOrDefault(_emailValidator.IsMatch);
-
-	    public static string Translit(string str)
+	    private static readonly Dictionary<char, string> TransliterationDict = new Dictionary<char, string>
 	    {
-		    string[] lat_up = { "A", "B", "V", "G", "D", "E", "Yo", "Zh", "Z", "I", "Y", "K", "L", "M", "N", "O", "P", "R", "S", "T", "U", "F", "Kh", "Ts", "Ch", "Sh", "Shch", "\"", "Y", "'", "E", "Yu", "Ya" };
-		    string[] lat_low = { "a", "b", "v", "g", "d", "e", "yo", "zh", "z", "i", "y", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u", "f", "kh", "ts", "ch", "sh", "shch", "\"", "y", "'", "e", "yu", "ya" };
-		    string[] rus_up = { "А", "Б", "В", "Г", "Д", "Е", "Ё", "Ж", "З", "И", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ы", "Ь", "Э", "Ю", "Я" };
-		    string[] rus_low = { "а", "б", "в", "г", "д", "е", "ё", "ж", "з", "и", "й", "к", "л", "м", "н", "о", "п", "р", "с", "т", "у", "ф", "х", "ц", "ч", "ш", "щ", "ъ", "ы", "ь", "э", "ю", "я" };
-		    for (int i = 0; i <= 32; i++)
+		    { 'А', "A" },
+		    { 'Б', "B" },
+		    { 'В', "V" },
+		    { 'Г', "G" },
+		    { 'Д', "D" },
+		    { 'Е', "E" },
+		    { 'Ё', "Yo" },
+		    { 'Ж', "Zh" },
+		    { 'З', "Z" },
+		    { 'И', "I" },
+		    { 'Й', "Y" },
+		    { 'К', "K" },
+		    { 'Л', "L" },
+		    { 'М', "M" },
+		    { 'Н', "N" },
+		    { 'О', "O" },
+		    { 'П', "P" },
+		    { 'Р', "R" },
+		    { 'С', "S" },
+		    { 'Т', "T" },
+		    { 'У', "U" },
+		    { 'Ф', "F" },
+		    { 'Х', "Kh" },
+		    { 'Ц', "Ts" },
+		    { 'Ч', "Ch" },
+		    { 'Ш', "Sh" },
+		    { 'Щ', "Shch" },
+		    { 'Ъ', "" },
+			{ 'Ы', "Y" },
+		    { 'Ь', "" },
+		    { 'Э', "E" },
+		    { 'Ю', "Yu" },
+		    { 'Я', "Ya" },
+		    { 'а', "a" },
+		    { 'б', "b" },
+		    { 'в', "v" },
+		    { 'г', "g" },
+		    { 'д', "d" },
+		    { 'е', "e" },
+		    { 'ё', "yo" },
+		    { 'ж', "zh" },
+		    { 'з', "z" },
+		    { 'и', "i" },
+		    { 'й', "y" },
+		    { 'к', "k" },
+		    { 'л', "l" },
+		    { 'м', "m" },
+		    { 'н', "n" },
+		    { 'о', "o" },
+		    { 'п', "p" },
+		    { 'р', "r" },
+		    { 'с', "s" },
+		    { 'т', "t" },
+		    { 'у', "u" },
+		    { 'ф', "f" },
+		    { 'х', "kh" },
+		    { 'ц', "ts" },
+		    { 'ч', "ch" },
+		    { 'ш', "sh" },
+		    { 'щ', "shch" },
+		    { 'ъ', "" },
+			{ 'ы', "y" },
+		    { 'ь', "" },
+		    { 'э', "e" },
+		    { 'ю', "yu" },
+		    { 'я', "ya" },
+	    };
+
+
+		public static bool IsValidEmail(string email)
+		    => email.NotNullOrDefault(EmailValidator.IsMatch);
+
+	    public static string Transliterate(string str, Func<char, bool> isRightChar = null)
+	    {
+			var builder = new StringBuilder();
+		    foreach (var symbol in str)
 		    {
-			    str = str.Replace(rus_up[i], lat_up[i]);
-			    str = str.Replace(rus_low[i], lat_low[i]);
+			    if (isRightChar != null && !isRightChar(symbol))
+				    continue;
+			    builder.Append(TransliterationDict[symbol]);
 		    }
-		    return str;
+		    return builder.ToString();
 	    }
 
-	    public static string UriTranslit(string str)
+	    public static string UriTransliterate(string str)
 	    {
 		    str = str.ToLower().Trim().Replace("  ", " ").Replace("  ", " ").Replace(" ", "-");
-		    string[] lat_low = { "a", "b", "v", "g", "d", "e", "yo", "zh", "z", "i", "y", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u", "f", "kh", "ts", "ch", "sh", "shch", "", "y", "", "e", "yu", "ya" };
-		    string[] rus_low = { "а", "б", "в", "г", "д", "е", "ё", "ж", "з", "и", "й", "к", "л", "м", "н", "о", "п", "р", "с", "т", "у", "ф", "х", "ц", "ч", "ш", "щ", "ъ", "ы", "ь", "э", "ю", "я" };
-		    for (int i = 0; i <= 32; i++)
-			    str = str.Replace(rus_low[i], lat_low[i]);
-		    return str;
+		    return Transliterate(str, x => char.IsLetterOrDigit(x) || x == '-');
 		}
 	}
 }

@@ -28,7 +28,7 @@ namespace BeeFee.TestsApp.Projections
 		{
 			Owner = owner;
 			Name = name.Trim();
-			Url = (url ?? CommonHelper.UriTranslit(name)).ToLowerInvariant();
+			Url = (url ?? CommonHelper.UriTransliterate(name)).ToLowerInvariant();
 		}
 
 	}

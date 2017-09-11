@@ -5,7 +5,6 @@ using System.Linq;
 using BeeFee.Model.Embed;
 using BeeFee.Model.Models;
 using BeeFee.Model.Projections;
-using BeeFee.OrganizerApp.Projections;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BeeFee.WebApplication.Areas.Org.Models
