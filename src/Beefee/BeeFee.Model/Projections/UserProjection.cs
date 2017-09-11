@@ -1,5 +1,4 @@
 ﻿using BeeFee.Model.Embed;
-using BeeFee.Model.Interfaces;
 using BeeFee.Model.Models;
 using Core.ElasticSearch.Domain;
 

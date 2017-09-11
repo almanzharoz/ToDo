@@ -23,12 +23,13 @@ namespace BeeFee.OrganizerApp.Services
 
 		/// <exception cref="AddEntityException"></exception>
 		// TODO: добавить проверку 
-		public bool AddEvent(string categoryId, string name, string url, string cover, EEventType type, EventDateTime dateTime,
-			Address address,
-			TicketPrice[] prices, string html)
+		public bool AddEvent(string categoryId, string name, string url, string cover, EEventType type,
+			EventDateTime dateTime,
+			Address address, TicketPrice[] prices, string html)
 			=> Insert(
-					new NewEvent(Get<BaseUserProjection>(User.Id), Get<BaseCategoryProjection>(categoryId), name, url, cover, type, dateTime,
-						address, prices, html), true);
+				new NewEvent(Get<BaseUserProjection>(User.Id), Get<BaseCategoryProjection>(categoryId), name, url, cover, type,
+					dateTime,
+					address, prices, html), true);
 
 		///<exception cref="RemoveEntityException"></exception>
 		public bool RemoveEvent(string id, int version)
