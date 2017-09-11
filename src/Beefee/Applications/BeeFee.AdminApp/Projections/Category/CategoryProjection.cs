@@ -12,7 +12,7 @@ namespace BeeFee.AdminApp.Projections.Category
 
 		internal CategoryProjection Rename(string name, string url)
 		{
-			Url = url.IfNull(name, CommonHelper.UriTranslit);
+			Url = url.IfNull(name, CommonHelper.UriTransliterate);
 			Name = name;
 			return this;
 		}

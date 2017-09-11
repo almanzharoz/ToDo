@@ -15,7 +15,7 @@ namespace BeeFee.TestsApp.Projections
 		public NewCategory(string url, string name)
 		{
 			Name = name.HasNotNullArg(nameof(name));
-			Url = url.IfNull(() => CommonHelper.UriTranslit(name));
+			Url = url.IfNull(() => CommonHelper.UriTransliterate(name));
 		}
 
 	}
