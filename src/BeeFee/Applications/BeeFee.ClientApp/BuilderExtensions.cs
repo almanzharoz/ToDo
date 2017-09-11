@@ -19,7 +19,7 @@ namespace BeeFee.ClientApp
         {
             return services
                 .AddProjection<EventProjection, Event>()
-                .AddProjection<EventCellProjection, Event>()
+                .AddProjection<EventGridItem, Event>()
                 .AddProjection<EventAddressProjection, Event>();
 
         }

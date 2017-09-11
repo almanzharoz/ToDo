@@ -1867,7 +1867,7 @@ body.is-admin {
 
 .loader {
     margin: 0 0 38px;
-    background: url(../images/loader.svg) center center no-repeat;
+    background: url(/images/loader.svg) center center no-repeat;
     width: auto;
     height: 60px;
 }

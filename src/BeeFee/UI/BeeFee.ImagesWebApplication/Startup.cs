@@ -53,7 +53,7 @@ namespace BeeFee.ImagesWebApplication
 		        EnableDirectoryBrowsing = false
 	        });
 
-			app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyHeader());
+			app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader());
             app.UseMvc();
         }
     }

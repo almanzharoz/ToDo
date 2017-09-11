@@ -1,8 +1,5 @@
-﻿using Core.ElasticSearch.Domain;
-using BeeFee.Model.Embed;
-using BeeFee.Model.Models;
+﻿using BeeFee.Model.Embed;
 using Nest;
-using Newtonsoft.Json;
 
 namespace BeeFee.Model
 {

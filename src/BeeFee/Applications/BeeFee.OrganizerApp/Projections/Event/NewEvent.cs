@@ -29,8 +29,6 @@ namespace BeeFee.OrganizerApp.Projections.Event
 		public BaseUserProjection Owner { get; }
 		public TicketPrice[] Prices { get; }
 
-		public NewEvent() { }
-
 		private readonly ThrowCollection _throws = new ThrowCollection();
 
 		public NewEvent(BaseUserProjection owner, BaseCategoryProjection category, string name, string url, string cover, EEventType type,

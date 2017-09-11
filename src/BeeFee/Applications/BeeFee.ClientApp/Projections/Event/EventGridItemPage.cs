@@ -1,7 +1,7 @@
 ﻿
 namespace BeeFee.ClientApp.Projections.Event
 {
-	public struct EventPageCell
+	public struct EventGridItemPage
 	{
 		public string Caption { get; }
 		public string Cover { get; }
@@ -9,7 +9,7 @@ namespace BeeFee.ClientApp.Projections.Event
 		public string Date { get; }
 		public string Category { get; }
 
-		public EventPageCell(string caption, string cover, string date, string category)
+		public EventGridItemPage(string caption, string cover, string date, string category)
 		{
 			Caption = caption;
 			Cover = cover;

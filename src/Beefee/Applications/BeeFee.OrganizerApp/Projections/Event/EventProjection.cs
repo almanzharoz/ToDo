@@ -33,7 +33,7 @@ namespace BeeFee.OrganizerApp.Projections.Event
 			DateTime = dateTime;
 			Address = address;
 			Type = type;
-			Category = category;
+			Category = category.HasNotNullArg(nameof(category));
 			Prices = prices;
 			Page = Page.SetHtml(html).Change(name, category.Name, cover, dateTime, address);
 			return this;

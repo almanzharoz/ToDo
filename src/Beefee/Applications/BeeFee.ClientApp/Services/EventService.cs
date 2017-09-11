@@ -36,7 +36,7 @@ namespace BeeFee.ClientApp.Services
 		//            .Must(Query<Event>.Match(m => m.Field(x => x.Name).Query(query)) &&
 		//                  Query<Event>.Match(m => m.Field(x => x.Address.City).Query(city)))));
 
-		public Pager<EventCellProjection> SearchEvents(string query = null, string city = null, List<string> categories = null, List<EEventType> types = null, DateTime? startDateTime = null, DateTime? endDateTime = null, decimal? maxPrice = null, int pageSize = 9999, int pageIndex = 0)
+		public Pager<EventGridItem> SearchEvents(string query = null, string city = null, string[] categories = null, EEventType[] types = null, DateTime? startDateTime = null, DateTime? endDateTime = null, decimal? maxPrice = null, int? pageSize = 9, int pageIndex = 0)
 		{
 			List<QueryContainer> qc = new List<QueryContainer>();
 			if (!string.IsNullOrEmpty(query))
@@ -71,11 +71,11 @@ namespace BeeFee.ClientApp.Services
 				qf.Add(Query<Event>.Range(m => m.Field(x => x.Prices.First().Price).LessThanOrEquals((double)maxPrice.Value)) || !Query<Event>.Exists(x => x.Field(p => p.Prices.First().Price)));
 				//qf.Add(!Query<Event>.Exists(x => x.Field(p => p.Prices)));
 			}
-			return SearchPager<Event, EventCellProjection>(q => q
+			return SearchPager<Event, EventGridItem>(q => q
 				.Bool(b => b
 					.Must(qc.ToArray())
 					//.IfAny(notqf, x => x.MustNot(notqf.ToArray()))
-					.Filter(qf.ToArray())), pageIndex, pageSize, null, false);
+					.Filter(qf.ToArray())), pageIndex, pageSize.Value, null, false);
 		}
 
 

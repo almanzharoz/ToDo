@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using Core.ElasticSearch.Domain;
 using Core.ElasticSearch.Serialization;
-using Nest;
-using Newtonsoft.Json;
+ using Newtonsoft.Json;
 using SharpFuncExt;
 
 namespace Core.ElasticSearch.Mapping

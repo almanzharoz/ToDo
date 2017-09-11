@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+using BeeFee.Model.Embed;
 
 namespace BeeFee.WebApplication.Models.Event
 {
@@ -16,12 +14,10 @@ namespace BeeFee.WebApplication.Models.Event
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public DateTime? EndDate { get; set; }
         public string City{ get; set; }
-        public bool LoadConcert{ get; set; }
-        public bool LoadExhibition { get; set; }
-        public bool LoadExcursion { get; set; }
+		public EEventType[] Types { get; set; }
         public int PageIndex { get; set; }
-        public int PageSize { get; set; }
+        public int? PageSize { get; set; }
         public decimal? MaxPrice { get; set; }
-        public List<string> Categories { get; set; }
+        public string[] Categories { get; set; }
     }
 }

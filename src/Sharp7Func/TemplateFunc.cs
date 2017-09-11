@@ -237,6 +237,13 @@ namespace SharpFuncExt
 				func(arg, u);
 			return arg;
 		}
+		public static T Using<T, TUsing>(this T arg, Func<TUsing> init, Action<T, TUsing> func) where TUsing : IDisposable
+		{
+			using (var u = init())
+				func(arg, u);
+			return arg;
+		}
+
 
 		public static TResult Using<T, TResult>(this T arg, Func<T, TResult> func) where T : IDisposable
 		{
